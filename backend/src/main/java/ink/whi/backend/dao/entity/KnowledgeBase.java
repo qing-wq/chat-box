@@ -1,0 +1,7 @@
+package ink.whi.backend.dao.entity;
+
+/**
+ * @author: qing
+ * @Date: 2025/6/18
+ */public class KnowledgeBase {
+}

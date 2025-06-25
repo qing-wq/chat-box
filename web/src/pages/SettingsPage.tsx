@@ -116,6 +116,7 @@ const SettingsPage: React.FC = () => {
               rules={[{ required: true, message: 'Please select a model!' }]}
             >
               <Select>
+                <Option value="grok-3-beta">Grok-3-beta</Option>
                 <Option value="gpt-4o">GPT-4o</Option>
                 <Option value="gpt-4-turbo">GPT-4 Turbo</Option>
                 <Option value="gpt-3.5-turbo">GPT-3.5 Turbo</Option>

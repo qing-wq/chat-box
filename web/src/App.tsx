@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { ConfigProvider, theme } from 'antd';
 import { store } from './store';
 import { useAppSelector } from './hooks';
 
@@ -11,6 +10,8 @@ import HomePage from './pages/HomePage';
 import ChatPage from './pages/ChatPage';
 import LoginPage from './pages/LoginPage';
 import SettingsPage from './pages/SettingsPage';
+import MarkdownDemo from './components/demo/MarkdownDemo';
+import SSETest from './components/demo/SSETest';
 
 // Import styles
 import './index.css';
@@ -29,19 +30,17 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 // Theme provider component
 const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { theme: themeMode } = useAppSelector(state => state.config);
-  
-  return (
-    <ConfigProvider
-      theme={{
-        algorithm: themeMode === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
-        token: {
-          colorPrimary: 'rgb(96, 92, 229)',
-        },
-      }}
-    >
-      {children}
-    </ConfigProvider>
-  );
+
+  // Apply theme class to document
+  React.useEffect(() => {
+    if (themeMode === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [themeMode]);
+
+  return <>{children}</>;
 };
 
 // App component with Redux Provider
@@ -61,6 +60,9 @@ const AppContent: React.FC = () => {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           
+          <Route path="/demo" element={<MarkdownDemo />} />
+          <Route path="/sse-test" element={<SSETest />} />
+
           <Route path="/" element={
             <ProtectedRoute>
               <MainLayout />

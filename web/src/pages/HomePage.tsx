@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Typography, Space } from 'antd';
-import { MessageOutlined, PlusOutlined } from '@ant-design/icons';
+import { Plus, MessageSquare, Sparkles } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../hooks';
 import { createNewChat } from '../store/chatSlice';
-
-const { Title, Paragraph } = Typography;
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -43,39 +42,65 @@ const HomePage: React.FC = () => {
   
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-      <div className="max-w-xl">
-        <Title level={1} className="text-primary mb-6">Welcome to Chat Box</Title>
-        
-        <Paragraph className="text-lg mb-8 text-light-text dark:text-dark-text">
-          Your personal AI assistant powered by advanced language models.
-          Start a new conversation or continue where you left off.
-        </Paragraph>
-        
-        <Space direction="vertical" size="large" className="w-full">
-          <Button
-            type="primary"
-            size="large"
-            icon={<PlusOutlined />}
-            onClick={handleNewChat}
-            loading={loading}
-            className="h-12 text-lg bg-primary hover:bg-primary-dark"
-            block
-          >
-            Start New Chat
-          </Button>
-          
+      <div className="max-w-2xl w-full">
+        {/* Welcome Header */}
+        <div className="mb-12">
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            Welcome to Chat Box
+          </h1>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            Your personal AI assistant powered by advanced language models.
+            Start a new conversation or continue where you left off.
+          </p>
+        </div>
+
+        {/* Action Cards */}
+        <div className="grid gap-4 mb-8">
+          <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <CardContent className="p-6">
+              <Button
+                onClick={handleNewChat}
+                disabled={loading}
+                className="w-full h-14 text-lg bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-sm hover:shadow-md transition-all duration-200"
+              >
+                <Plus className="w-5 h-5 mr-3" />
+                {loading ? 'Creating...' : 'Start New Chat'}
+              </Button>
+            </CardContent>
+          </Card>
+
           {chatList.length > 0 && (
-            <Button
-              size="large"
-              icon={<MessageOutlined />}
-              onClick={handleContinueChat}
-              className="h-12 text-lg"
-              block
-            >
-              Continue Last Chat
-            </Button>
+            <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <CardContent className="p-6">
+                <Button
+                  variant="outline"
+                  onClick={handleContinueChat}
+                  className="w-full h-14 text-lg hover:bg-accent transition-all duration-200"
+                >
+                  <MessageSquare className="w-5 h-5 mr-3" />
+                  Continue Last Chat
+                </Button>
+              </CardContent>
+            </Card>
           )}
-        </Space>
+        </div>
+
+        {/* Stats */}
+        <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4" />
+            <span>{chatList.length} conversation{chatList.length !== 1 ? 's' : ''}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span>AI Ready</span>
+          </div>
+        </div>
       </div>
     </div>
   );

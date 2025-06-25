@@ -39,7 +39,8 @@ export const streamChat = async (
   onComplete: () => void
 ) => {
   let fullContent = '';
-  
+  let buffer = ''; // 用于处理跨块的不完整数据
+
   console.log('Starting chat request with:', JSON.stringify(request, null, 2));
   
   // 检查是否设置API URL和API Key
@@ -110,53 +111,113 @@ export const streamChat = async (
     const processStream = async (): Promise<void> => {
       try {
         const { done, value } = await reader.read();
-        
+
         if (done) {
+          // 处理缓冲区中剩余的数据
+          if (buffer.trim()) {
+            console.log('Processing remaining buffer:', JSON.stringify(buffer));
+            processBufferLines(buffer);
+          }
+
           console.log('Stream complete');
           onComplete();
           return;
         }
-        
+
         // 解码数据
         const chunk = decoder.decode(value, { stream: true });
-        // 处理数据块
-        const lines = chunk.split('\n').filter(line => line.trim() !== '');
-        
+        console.log('Received chunk:', JSON.stringify(chunk));
+
+        // 将新数据添加到缓冲区
+        buffer += chunk;
+
+        // 按行分割，但保留最后一行（可能不完整）
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ''; // 保留最后一行作为缓冲
+
+        // 处理完整的行
         for (const line of lines) {
-          let data = line;
-          
-          // 处理data:开头的SSE格式
-          if (data.startsWith('data:')) {
-            data = data.substring(5).trim();
-          }
-          
-          // 尝试解析JSON
-          try {
-            const jsonData = JSON.parse(data);
-            if (jsonData.content) {
-              fullContent += jsonData.content;
-              onMessage(fullContent);
-            }
-            
-            // 检查是否完成
-            if (jsonData.event === 'complete') {
-              console.log('Stream complete event received');
-              onComplete();
-              return;
-            }
-          } catch (jsonError) {
-            // 不是JSON格式，直接添加内容
-            fullContent += data;
-            onMessage(fullContent);
-          }
+          processBufferLines(line);
         }
-        
+
         // 继续读取流
         await processStream();
       } catch (error) {
         const err = error as Error;
         console.error('Error reading stream:', err);
         onError(`读取响应流时出错: ${err.message}`);
+      }
+    };
+
+    // 处理单行数据的函数
+    const processBufferLines = (line: string): void => {
+      // 跳过空行和注释行
+      if (!line.trim() || line.startsWith(':')) {
+        return;
+      }
+
+      // 处理SSE格式的数据行: data:{"v":"token"}
+      if (line.startsWith('data:')) {
+        const jsonStr = line.substring(5).trim(); // 移除 'data:' 前缀并去除首尾空格
+
+        if (!jsonStr) {
+          return; // 跳过空的data行
+        }
+
+        try {
+          const jsonData = JSON.parse(jsonStr);
+          console.log('Parsed SSE JSON:', jsonData);
+
+          // 处理token数据 - 根据后端格式 {"v":"token"}
+          if (jsonData.v !== undefined) {
+            console.log('Token received:', JSON.stringify(jsonData.v));
+            fullContent += jsonData.v;
+            onMessage(fullContent);
+          }
+          // 处理完成事件
+          else if (jsonData.type === 'complete') {
+            console.log('Stream complete event received');
+            onComplete();
+            return;
+          }
+          // 处理错误事件
+          else if (jsonData.type === 'error') {
+            console.error('Stream error received:', jsonData.message);
+            onError(jsonData.message || 'Unknown error occurred');
+            return;
+          }
+        } catch {
+          // JSON解析失败时的处理，去掉未使用的parseError变量
+          console.warn('Failed to parse SSE JSON, treating as plain text:', jsonStr);
+          // 如果JSON解析失败，可能是纯文本，直接添加
+          fullContent += jsonStr;
+          onMessage(fullContent);
+        }
+      }
+      // 处理非SSE格式的JSON数据（兼容性处理）
+      else {
+        try {
+          const jsonData = JSON.parse(line);
+          console.log('Parsed non-SSE JSON:', jsonData);
+
+          if (jsonData.v !== undefined) {
+            fullContent += jsonData.v;
+            onMessage(fullContent);
+          } else if (jsonData.type === 'complete') {
+            onComplete();
+            return;
+          } else if (jsonData.type === 'error') {
+            onError(jsonData.message || 'Unknown error occurred');
+            return;
+          }
+        } catch {
+          // 不是JSON格式，可能是纯文本，去掉未使用的parseError变量
+          if (line.trim()) {
+            console.log('Plain text line:', JSON.stringify(line));
+            fullContent += line;
+            onMessage(fullContent);
+          }
+        }
       }
     };
     
@@ -223,30 +284,33 @@ export const streamChatWithMemory = (
         try {
           // 处理SSE消息
           const data = event.data;
-          console.log('Received memory chat SSE message:', data);
-          
+          console.log('Received memory chat SSE message:', JSON.stringify(data));
+
           // 处理data:开头的SSE格式
           if (data.startsWith('data:')) {
-            const content = data.substring(5).trim(); // 移除'data:'前缀
+            const content = data.substring(5); // 不trim，保持空格和换行
+            console.log('Memory chat data content:', JSON.stringify(content));
             fullContent += content;
             onMessage(fullContent);
           } else {
             // 尝试解析JSON格式
             try {
               const jsonData = JSON.parse(data);
-              if (jsonData.content) {
+              if (jsonData.content !== undefined) {
+                console.log('Memory chat JSON content:', JSON.stringify(jsonData.content));
                 fullContent += jsonData.content;
                 onMessage(fullContent);
               }
-              
+
               // 检查是否完成
               if (jsonData.event === 'complete') {
                 console.log('Memory chat stream complete event received');
                 eventSource.close();
                 onComplete();
               }
-            } catch (jsonError) {
-              // 不是JSON格式，直接添加内容
+            } catch {
+              // 不是JSON格式，直接添加内容，保持原始格式
+              console.log('Memory chat plain text:', JSON.stringify(data));
               fullContent += data;
               onMessage(fullContent);
             }
@@ -322,3 +386,20 @@ export const streamChatWithMemory = (
     console.log('Memory chat cleanup called');
   };
 };
+
+/**
+ * 流式响应处理说明：
+ * 
+ * 后端SSE响应格式：
+ * data:{"v":"有"}
+ * data:{"v":"关于"}
+ * data:{"v":" Markdown"}
+ * 
+ * 处理逻辑：
+ * 1. 使用fetch API接收SSE流
+ * 2. 使用缓冲区处理跨块的不完整数据
+ * 3. 按行分割并处理每行数据
+ * 4. 提取data:后的JSON，获取v字段的token值
+ * 5. 累加token到fullContent并回调onMessage
+ * 6. 错误处理：JSON解析失败时作为纯文本处理
+ */

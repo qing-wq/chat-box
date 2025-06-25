@@ -10,17 +10,19 @@ export const useChat = () => {
   const { modelConfig } = useAppSelector((state: any) => state.config);
   const [error, setError] = useState<string | null>(null);
   const currentChat = useAppSelector((state) => state.chat.currentChat);
-  let messageList = [...currentChat?.messageList || []];
-  const chatId = currentChat?.id;
 
 
   const sendMessage = useCallback((content: string, useTools: string[] = []) => {
     console.log('sendMessage called with content:', content, 'and tools:', useTools);
 
+    const chatId = currentChat?.id;
     if (!chatId) {
       console.error('No current chat available');
       return;
     }
+
+    // Get current message list
+    const messageList = [...currentChat?.messageList || []];
 
     // Add user message to the chat
     const userMessage: Message = {
@@ -61,6 +63,8 @@ export const useChat = () => {
     const cleanup = streamChat(
       chatRequest,
       (content) => {
+        // 确保内容保持换行符
+        console.log('Received streaming content:', content);
         // 更新最后一条消息的内容
         dispatch(updateLastMessage({ content }));
         // 将内容设置为助手回复的内容

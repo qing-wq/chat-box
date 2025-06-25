@@ -1,21 +1,35 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, List, Tooltip, Dropdown, Menu } from 'antd';
-import { 
-  PlusOutlined, 
-  DeleteOutlined, 
-  EditOutlined, 
-  SettingOutlined,
-  LogoutOutlined,
-  BulbOutlined,
-  BulbFilled
-} from '@ant-design/icons';
+import {
+  Plus,
+  Trash2,
+  Edit3,
+  Settings,
+  LogOut,
+  Sun,
+  Moon,
+  MessageSquare,
+  MoreHorizontal,
+  Bot,
+  Clock,
+  Sparkles
+} from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import { fetchChatList, createNewChat, deleteChat, updateChatInfo } from '../../store/chatSlice';
 import { logout } from '../../store/userSlice';
 import { setTheme } from '../../store/configSlice';
 import { ThemeMode } from '../../types';
-import { Modal, Input } from 'antd';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 const Sidebar: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -23,9 +37,8 @@ const Sidebar: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
   const { chatList, loading } = useAppSelector(state => state.chat);
   const { theme } = useAppSelector(state => state.config);
-  const [editModalVisible, setEditModalVisible] = React.useState(false);
-  const [editChatId, setEditChatId] = React.useState<number | null>(null);
-  const [editChatTitle, setEditChatTitle] = React.useState('');
+  const [editingChatId, setEditingChatId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState('');
 
   // Fetch chat list on component mount
   useEffect(() => {
@@ -66,21 +79,25 @@ const Sidebar: React.FC = () => {
   };
 
   // Handle editing a chat title
-  const handleEditClick = (id: number, title: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditChatId(id);
-    setEditChatTitle(title);
-    setEditModalVisible(true);
+  const handleEditClick = (id: number, title: string) => {
+    setEditingChatId(id);
+    setEditTitle(title);
   };
 
-  const handleEditSubmit = async () => {
-    if (editChatId && editChatTitle.trim()) {
+  const handleEditSubmit = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && editingChatId && editTitle.trim()) {
       await dispatch(updateChatInfo({
-        id: editChatId,
-        title: editChatTitle.trim()
+        id: editingChatId,
+        title: editTitle.trim()
       }));
-      setEditModalVisible(false);
+      setEditingChatId(null);
+      setEditTitle('');
     }
+  };
+
+  const handleEditCancel = () => {
+    setEditingChatId(null);
+    setEditTitle('');
   };
 
   // Handle logout
@@ -102,112 +119,215 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="p-4 border-b border-light-border dark:border-dark-border">
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />} 
+    <div className="flex flex-col h-full bg-card border-r">
+      {/* Header with Brand */}
+      <div className="p-4 space-y-4">
+        <div className="flex items-center gap-2 px-2">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10">
+            <Bot className="w-5 h-5 text-primary" />
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-sm font-semibold">Chat Box</h1>
+            <p className="text-xs text-muted-foreground">AI Assistant</p>
+          </div>
+        </div>
+
+        <Button
           onClick={handleNewChat}
-          className="w-full bg-primary hover:bg-primary-dark"
-          loading={loading}
+          className={cn(
+            "w-full h-10 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-sm",
+            "hover:shadow-md hover:scale-[1.02] transition-all duration-200",
+            "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          )}
+          disabled={loading}
         >
-          New Chat
+          <Plus className={cn("w-4 h-4 mr-2 transition-transform duration-200", loading && "animate-spin")} />
+          {loading ? 'Creating...' : 'New Chat'}
         </Button>
       </div>
 
+      <Separator className="mx-4" />
+
       {/* Chat list */}
-      <div className="flex-1 overflow-y-auto">
-        <List
-          loading={loading}
-          dataSource={chatList}
-          renderItem={chat => (
-            <List.Item
-              className={`cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 px-4 py-2 ${
-                Number(chatId) === chat.id ? 'bg-primary-light dark:bg-primary-light' : ''
-              }`}
-              onClick={() => handleSelectChat(chat.id)}
-            >
-              <div className="flex flex-col w-full">
-                <div className="flex justify-between items-center">
-                  <div className="font-medium text-light-text dark:text-dark-text truncate max-w-[160px]">
-                    {chat.title || 'New Chat'}
-                  </div>
-                  <div className="flex space-x-1">
-                    <Tooltip title="Edit">
-                      <Button
-                        type="text"
-                        size="small"
-                        icon={<EditOutlined />}
-                        onClick={(e) => handleEditClick(chat.id, chat.title, e)}
-                        className="text-gray-500 hover:text-primary"
-                      />
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                      <Button
-                        type="text"
-                        size="small"
-                        icon={<DeleteOutlined />}
-                        onClick={(e) => handleDeleteChat(chat.id, e)}
-                        className="text-gray-500 hover:text-red-500"
-                      />
-                    </Tooltip>
-                  </div>
-                </div>
-                <div className="text-xs text-gray-500">
-                  {formatDate(chat.createTime)}
-                </div>
+      <ScrollArea className="flex-1 px-3">
+        <div className="space-y-2 py-3">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-12 space-y-3">
+              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <div className="text-sm text-muted-foreground">Loading chats...</div>
+            </div>
+          ) : chatList.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
+              <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center">
+                <MessageSquare className="w-6 h-6 text-muted-foreground" />
               </div>
-            </List.Item>
+              <div className="space-y-1">
+                <div className="text-sm font-medium">No chats yet</div>
+                <div className="text-xs text-muted-foreground">Start a conversation to see it here</div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="text-xs font-medium text-muted-foreground px-2 py-1">
+                Recent Chats
+              </div>
+              {chatList.map((chat, index) => (
+                <div
+                  key={chat.id}
+                  className={cn(
+                    "group relative flex items-start gap-3 rounded-xl px-3 py-3 cursor-pointer transition-all duration-200 animate-slideIn",
+                    "hover:bg-accent/50 hover:shadow-sm hover:scale-[1.02]",
+                    Number(chatId) === chat.id && "bg-primary/10 border border-primary/20 shadow-sm scale-[1.02]"
+                  )}
+                  style={{ animationDelay: `${index * 50}ms` }}
+                  onClick={() => handleSelectChat(chat.id)}
+                >
+                  {/* Chat Icon */}
+                  <div className={cn(
+                    "flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5",
+                    Number(chatId) === chat.id
+                      ? "bg-primary/20 text-primary"
+                      : "bg-muted text-muted-foreground"
+                  )}>
+                    <MessageSquare className="w-4 h-4" />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    {editingChatId === chat.id ? (
+                      <Input
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        onKeyDown={handleEditSubmit}
+                        onBlur={handleEditCancel}
+                        className="h-7 text-sm border-primary/50"
+                        autoFocus
+                      />
+                    ) : (
+                      <div className="space-y-1">
+                        <div className="font-medium text-sm leading-tight truncate">
+                          {chat.title || 'New Chat'}
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="w-3 h-3" />
+                          {formatDate(chat.createTime)}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {editingChatId !== chat.id && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-accent"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreHorizontal className="w-3.5 h-3.5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditClick(chat.id, chat.title);
+                          }}
+                          className="text-sm"
+                        >
+                          <Edit3 className="w-4 h-4 mr-2" />
+                          Rename
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteChat(chat.id, e);
+                          }}
+                          className="text-destructive text-sm"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </div>
+              ))}
+            </>
           )}
-        />
-      </div>
+        </div>
+      </ScrollArea>
+
+      <Separator className="mx-4" />
 
       {/* Footer */}
-      <div className="p-4 border-t border-light-border dark:border-dark-border">
-        <div className="flex justify-between">
-          <Tooltip title="Settings">
+      <div className="p-4 space-y-3">
+        {/* User Info */}
+        <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-r from-muted/30 to-muted/20 hover:from-muted/40 hover:to-muted/30 transition-all duration-200 cursor-pointer group">
+          <div className="relative">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary via-primary/80 to-primary/60 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-200">
+              <span className="text-sm font-semibold text-white">U</span>
+            </div>
+            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-background animate-pulse"></div>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium truncate group-hover:text-primary transition-colors duration-200">User</div>
+            <div className="text-xs text-muted-foreground">Free Plan • Online</div>
+          </div>
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/settings')}
+            className="h-9 px-3 text-xs hover:bg-accent"
+            title="Settings"
+          >
+            <Settings className="w-4 h-4 mr-2" />
+            Settings
+          </Button>
+
+          <div className="flex items-center gap-1">
             <Button
-              type="text"
-              icon={<SettingOutlined />}
-              onClick={() => navigate('/settings')}
-              className="text-light-text dark:text-dark-text"
-            />
-          </Tooltip>
-          <Tooltip title={theme === 'light' ? 'Dark Mode' : 'Light Mode'}>
-            <Button
-              type="text"
-              icon={theme === 'light' ? <BulbOutlined /> : <BulbFilled />}
+              variant="ghost"
+              size="icon"
               onClick={handleThemeToggle}
-              className="text-light-text dark:text-dark-text"
-            />
-          </Tooltip>
-          <Tooltip title="Logout">
+              className="h-8 w-8 hover:bg-accent"
+              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </Button>
+
             <Button
-              type="text"
-              icon={<LogoutOutlined />}
+              variant="ghost"
+              size="icon"
               onClick={handleLogout}
-              className="text-light-text dark:text-dark-text"
-            />
-          </Tooltip>
+              className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+              title="Logout"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="flex items-center justify-between text-xs px-3 py-2 rounded-lg bg-muted/20">
+          <div className="flex items-center gap-1.5 text-muted-foreground">
+            <MessageSquare className="w-3 h-3" />
+            <span className="font-medium">{chatList.length}</span>
+            <span>chat{chatList.length !== 1 ? 's' : ''}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-primary">
+            <Sparkles className="w-3 h-3 animate-pulse" />
+            <span className="font-medium">AI Ready</span>
+          </div>
         </div>
       </div>
-
-      {/* Edit Chat Title Modal */}
-      <Modal
-        title="Edit Chat Title"
-        open={editModalVisible}
-        onOk={handleEditSubmit}
-        onCancel={() => setEditModalVisible(false)}
-        okButtonProps={{ className: 'bg-primary hover:bg-primary-dark' }}
-      >
-        <Input
-          value={editChatTitle}
-          onChange={(e) => setEditChatTitle(e.target.value)}
-          placeholder="Enter chat title"
-          autoFocus
-        />
-      </Modal>
     </div>
   );
 };

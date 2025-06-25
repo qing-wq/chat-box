@@ -1,54 +1,94 @@
-# React + TypeScript + Vite
+# Chat Box - AI聊天应用
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+这是一个基于React + Spring Boot的AI聊天应用，支持流式响应和丰富的Markdown渲染。
 
-Currently, two official plugins are available:
+## ✨ 主要功能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🤖 **智能对话**：支持多轮对话，流式响应
+- 📝 **Markdown渲染**：支持代码高亮、数学公式、表格等
+- 🌓 **主题切换**：支持明暗主题
+- 💾 **会话管理**：保存和管理聊天历史
+- 🔧 **配置管理**：灵活的API配置
 
-## Expanding the ESLint configuration
+## 🛠️ Markdown支持功能
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### ✅ 已支持的功能
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- **标题** (H1-H6)
+- **文本格式** (粗体、斜体、删除线)
+- **代码块** (支持语法高亮)
+- **内联代码**
+- **引用块**
+- **列表** (有序、无序)
+- **链接**
+- **数学公式** (KaTeX)
+- **表格** ✨ (新修复)
+
+### 📊 表格示例
+
+您现在可以在聊天中使用Markdown表格：
+
+```markdown
+| 功能 | 状态 | 描述 |
+|------|------|------|
+| 表格渲染 | ✅ 已修复 | 支持完整的Markdown表格语法 |
+| 代码高亮 | ✅ 正常 | 支持多种编程语言 |
+| 数学公式 | ✅ 正常 | 支持LaTeX语法 |
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 🔧 技术实现
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+表格渲染使用以下技术栈：
+- `react-markdown`: Markdown解析和渲染
+- `remark-gfm`: GitHub风格Markdown支持
+- `remark-math`: 数学公式支持
+- `rehype-katex`: 数学公式渲染
+- Tailwind CSS: 样式系统
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+## 🚀 快速开始
+
+### 前端开发
+
+```bash
+cd web
+npm install
+npm run dev
 ```
+
+### 后端开发
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+## 📁 项目结构
+
+```
+chat-box/
+├── backend/          # Spring Boot后端
+├── web/             # React前端
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── chat/     # 聊天组件
+│   │   │   └── demo/     # 演示组件
+│   │   ├── pages/
+│   │   └── utils/
+│   └── package.json
+└── README.md
+```
+
+## 🎯 演示页面
+
+访问以下页面查看功能演示：
+- `/demo` - Markdown渲染演示 (包含表格示例)
+- `/sse-test` - 流式响应测试
+
+## 📝 更新日志
+
+### 最新更新 (v1.1.0)
+- ✅ 修复Markdown表格渲染问题
+- ✅ 添加`remark-gfm`插件支持
+- ✅ 优化表格样式和响应式设计
+- ✅ 同时支持流式渲染和常规渲染中的表格
+- ✅ 添加表格hover效果和更好的视觉样式
