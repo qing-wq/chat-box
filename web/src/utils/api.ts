@@ -2,7 +2,8 @@ import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'ax
 import { ChatRequest, MemoryChatRequest } from '../types';
 
 // Configure axios defaults
-axios.defaults.baseURL = '/'; // Assuming API is served from the same domain
+axios.defaults.baseURL = import.meta.env.VITE_HTTP_URL; // Assuming API is served from the same domain
+
 axios.defaults.timeout = 30000;
 // 不设置全局 Content-Type，让 axios 根据数据类型自动设置
 

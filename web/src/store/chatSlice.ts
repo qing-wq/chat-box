@@ -23,7 +23,7 @@ export const fetchChatList = createAsyncThunk(
   'chat/fetchChatList',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get<ResVo<ChatInfo[]>>('/api/chat/list');
+      const response = await axios.get<ResVo<ChatInfo[]>>('/api/conversation/list');
       
       if (response.data.status.code === 0) {
         return response.data.data;

@@ -12,12 +12,11 @@ interface UserState {
 }
 
 const initialState: UserState = {
-  userInfo: null,
-  isLoggedIn: false,
+  userInfo: localStorage.getItem('chat-box-userInfo') ? JSON.parse(localStorage.getItem('chat-box-userInfo')!) : null,
+  isLoggedIn: localStorage.getItem('chat-box-isLoggedIn') === 'true',
   loading: false,
   error: null
 };
-
 // Async thunks for authentication
 export const login = createAsyncThunk(
   'user/login',
@@ -40,6 +39,9 @@ export const login = createAsyncThunk(
       
       if (response.data.status.code === 0) {
         console.log('Login successful, user info:', response.data.data);
+        // 保存登录信息到localStorage
+        localStorage.setItem('chat-box-userInfo', JSON.stringify(response.data.data));
+        localStorage.setItem('chat-box-isLoggedIn', 'true');
         return response.data.data;
       } else {
         console.log('Login failed:', response.data.status.msg);
@@ -109,6 +111,9 @@ export const logout = createAsyncThunk(
       const response = await axios.get<ResVo<string>>('/api/logout');
       
       if (response.data.status.code === 0) {
+        // 清除localStorage中的登录信息
+        localStorage.removeItem('chat-box-userInfo');
+        localStorage.removeItem('chat-box-isLoggedIn');
         return true;
       } else {
         return rejectWithValue(response.data.status.msg);
