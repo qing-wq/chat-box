@@ -11,6 +11,7 @@ interface FileItem {
   status?: string;
 }
 
+
 const ChatInput: React.FC = () => {
   const [messageText, setMessageText] = useState('');
   const [fileList, setFileList] = useState<FileItem[]>([]);
