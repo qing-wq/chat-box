@@ -8,6 +8,7 @@ import { streamChat } from '../utils/api';
 export const useChat = () => {
   const dispatch = useAppDispatch();
   const { modelConfig } = useAppSelector((state: any) => state.config);
+  
   const [error, setError] = useState<string | null>(null);
   const currentChat = useAppSelector((state) => state.chat.currentChat);
 
@@ -15,8 +16,8 @@ export const useChat = () => {
   const sendMessage = useCallback((content: string, useTools: string[] = []) => {
     console.log('sendMessage called with content:', content, 'and tools:', useTools);
 
-    const chatId = currentChat?.id;
-    if (!chatId) {
+    const conversationUuId = currentChat?.conversation?.uuid;
+    if (!conversationUuId) {
       console.error('No current chat available');
       return;
     }
@@ -48,7 +49,7 @@ export const useChat = () => {
 
     // Create chat request
     const chatRequest: ChatRequest = {
-      chatId,
+      conversationUuId,
       messageList,
       modelConfig,
       toolList: useTools.length > 0 ? useTools : undefined
@@ -94,21 +95,21 @@ export const useChat = () => {
         messagesToSave.push({
           role: 'user',
           content: userMessage.content,
-          chatId
+          conversationUuId
         });
 
         // 添加助手消息
         messagesToSave.push({
           role: 'assistant',
           content: assistantResponse,
-          chatId
+          conversationUuId
         });
         
         console.log('Saving updated messages to backend:', JSON.stringify(messagesToSave));
-        dispatch(updateChatMessages({
-          chatId,
-          newMessageList: messagesToSave
-        }));
+        // dispatch(updateChatMessages({
+        //   conversationUuId,
+        //   curcurrentChat.conversation.title
+        // }));
       }
     );
 

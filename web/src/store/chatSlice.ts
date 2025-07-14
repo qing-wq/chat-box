@@ -41,9 +41,9 @@ export const fetchChatList = createAsyncThunk(
 
 export const fetchChatDetail = createAsyncThunk(
   'chat/fetchChatDetail',
-  async (chatId: number, { rejectWithValue }) => {
+  async (uuid: string, { rejectWithValue }) => {
     try {
-      const response = await axios.get<ResVo<ChatDetail>>(`/api/chat/detail/${chatId}`);
+      const response = await axios.get<ResVo<ChatDetail>>(`/api/conversation/detail/${uuid}`);
       
       if (response.data.status.code === 0) {
         return response.data.data;
@@ -63,7 +63,8 @@ export const createNewChat = createAsyncThunk(
   'chat/createNewChat',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post<ResVo<ChatInfo>>('/api/chat/new');
+      const uuid = crypto.randomUUID();
+      const response = await axios.post<ResVo<ChatInfo>>(`/api/conversation/${uuid}`);
       
       if (response.data.status.code === 0) {
         return response.data.data;
@@ -83,7 +84,10 @@ export const updateChatInfo = createAsyncThunk(
   'chat/updateChatInfo',
   async (chatUpdateRequest: ChatUpdateRequest, { rejectWithValue }) => {
     try {
-      const response = await axios.post<ResVo<string>>('/api/chat/update/info', chatUpdateRequest);
+      const response = await axios.post<ResVo<string>>(`/api/conversation/update`, {
+        conversationUUid: chatUpdateRequest.uuid,
+        title: chatUpdateRequest.title
+      });
       
       if (response.data.status.code === 0) {
         return chatUpdateRequest;
@@ -101,12 +105,12 @@ export const updateChatInfo = createAsyncThunk(
 
 export const deleteChat = createAsyncThunk(
   'chat/deleteChat',
-  async (chatId: number, { rejectWithValue }) => {
+  async (uuid: string, { rejectWithValue }) => {
     try {
-      const response = await axios.get<ResVo<string>>(`/api/chat/delete/${chatId}`);
+      const response = await axios.get<ResVo<string>>(`/api/conversation/${uuid}`);
       
       if (response.data.status.code === 0) {
-        return chatId;
+        return uuid;
       } else {
         return rejectWithValue(response.data.status.msg);
       }
@@ -118,20 +122,20 @@ export const deleteChat = createAsyncThunk(
     }
   }
 );
-
+// TODO 待修改
 export const updateChatMessages = createAsyncThunk(
   'chat/updateChatMessages',
-  async ({ chatId, newMessageList }: { chatId: number, newMessageList: Message[] }, { rejectWithValue, dispatch }) => {
+  async ({ conversationUuId, newMessageList }: { conversationUuId: string, newMessageList: Message[] }, { rejectWithValue, dispatch }) => {
     try {
-      const response = await axios.post<ResVo<string>>('/api/chat/update', {
-        chatId,
+      const response = await axios.post<ResVo<string>>('/api/conversation/update', {
+        conversationUuId,
         newMessageList
       });
       
       if (response.data.status.code === 0) {
         // 更新后重新获取聊天详情
-        dispatch(fetchChatDetail(chatId));
-        return { chatId, newMessageList };
+        dispatch(fetchChatDetail(conversationUuId));
+        return { conversationUuId, newMessageList };
       } else {
         return rejectWithValue(response.data.status.msg);
       }
@@ -226,16 +230,16 @@ const chatSlice = createSlice({
       })
       .addCase(updateChatInfo.fulfilled, (state, action: PayloadAction<ChatUpdateRequest>) => {
         state.loading = false;
-        const { id, title } = action.payload;
+        const { uuid, title } = action.payload;
         
         // Update in chat list
-        const chatIndex = state.chatList.findIndex(chat => chat.id === id);
+        const chatIndex = state.chatList.findIndex(chat => chat.uuid === uuid);
         if (chatIndex !== -1 && title) {
           state.chatList[chatIndex].title = title;
         }
         
         // Update current chat if it's the same
-        if (state.currentChat && state.currentChat.id === id && title) {
+        if (state.currentChat && state.currentChat.uuid === uuid && title) {
           state.currentChat.title = title;
         }
       })
@@ -249,12 +253,12 @@ const chatSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(deleteChat.fulfilled, (state, action: PayloadAction<number>) => {
+      .addCase(deleteChat.fulfilled, (state, action: PayloadAction<string>) => {
         state.loading = false;
-        state.chatList = state.chatList.filter(chat => chat.id !== action.payload);
+        state.chatList = state.chatList.filter(chat => chat.uuid !== action.payload);
         
         // Clear current chat if it's the deleted one
-        if (state.currentChat && state.currentChat.id === action.payload) {
+        if (state.currentChat && state.currentChat.uuid === action.payload) {
           state.currentChat = null;
         }
       })

@@ -86,67 +86,78 @@ export const streamChat = async (
     }
     
     console.log('Processed request:', JSON.stringify(processedRequest, null, 2));
-    
-    const response = await fetch('/api/agent/chat', {
+    let chatMessage = {
+      "conversationUuId": processedRequest.conversationUuId,
+      "userMessage": processedRequest.messageList[processedRequest.messageList.length - 1].content,
+      "modelId": 1
+    } 
+    const response = await fetch('/api/chat/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(processedRequest),
+      body: JSON.stringify(chatMessage),
       signal: signal
     });
-    
+
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`HTTP error! Status: ${response.status}, Data: ${errorText}`);
     }
-    
+
     if (!response.body) {
       throw new Error('Response body is null');
     }
-    
-    // 获取响应的读取流
+
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
-    
-    // 递归读取流数据
+
     const processStream = async (): Promise<void> => {
       try {
         const { done, value } = await reader.read();
 
         if (done) {
-          // 处理缓冲区中剩余的数据
           if (buffer.trim()) {
-            console.log('Processing remaining buffer:', JSON.stringify(buffer));
             processBufferLines(buffer);
           }
-
-          console.log('Stream complete');
           onComplete();
           return;
         }
 
-        // 解码数据
         const chunk = decoder.decode(value, { stream: true });
-        console.log('Received chunk:', JSON.stringify(chunk));
-
-        // 将新数据添加到缓冲区
         buffer += chunk;
 
-        // 按行分割，但保留最后一行（可能不完整）
         const lines = buffer.split('\n');
-        buffer = lines.pop() || ''; // 保留最后一行作为缓冲
+        buffer = lines.pop() || '';
 
-        // 处理完整的行
         for (const line of lines) {
           processBufferLines(line);
         }
 
-        // 继续读取流
         await processStream();
       } catch (error) {
-        const err = error as Error;
-        console.error('Error reading stream:', err);
-        onError(`读取响应流时出错: ${err.message}`);
+        if (axios.isAxiosError(error)) {
+          const axiosError = error as AxiosError;
+          if (axiosError.response) {
+            // 服务器返回了非 2xx 状态码
+            const errorData = axiosError.response.data;
+            console.error('Axios error response:', errorData);
+            onError(`请求错误: HTTP error! Status: ${axiosError.response.status}, Data: ${JSON.stringify(errorData)}`);
+          } else if (axiosError.request) {
+            // 请求已发出但没有收到响应
+            console.error('Axios error request:', axiosError.request);
+            onError('请求错误: 未收到服务器响应');
+          } else {
+            // 在设置请求时发生了一些事情，触发了错误
+            console.error('Axios error message:', axiosError.message);
+            onError(`请求错误: ${axiosError.message}`);
+          }
+        } else {
+          // 其他未知错误
+          const err = error as Error;
+          console.error('Error reading stream:', err);
+          onError(`读取响应流时出错: ${err.message}`);
+        }
       }
     };
 
@@ -227,12 +238,16 @@ export const streamChat = async (
   } catch (error) {
     const err = error as Error;
     console.error('Fetch error:', err);
-    onError(`请求错误: ${err.message}`);
-  }
+    if (err.name === 'AbortError') {
+      console.log('Fetch aborted');
+    } else {
+      onError(`请求错误: ${err.message}`);
+    }
+    onComplete();}
   
   // 返回清理函数
   return () => {
-    console.log('Aborting fetch request');
+    console.log('Aborting axios request');
     controller.abort();
   };
 };

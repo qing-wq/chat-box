@@ -26,7 +26,7 @@ const ChatPage: React.FC = () => {
   // Fetch chat details when chat ID changes
   useEffect(() => {
     if (chatId && isLoggedIn) {
-      dispatch(fetchChatDetail(Number(chatId)));
+      dispatch(fetchChatDetail(chatId));
     }
   }, [chatId, dispatch, isLoggedIn]);
 
@@ -81,7 +81,7 @@ const ChatPage: React.FC = () => {
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Chat header */}
-      <div className="flex-shrink-0 px-4 py-3 sm:px-6 border-b bg-card">
+      <div className="flex-shrink-0 px-4 py-3 sm:px-6 border-b bg-card shadow-sm z-10">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <h1 className="text-lg sm:text-xl font-medium truncate">
             {currentChat.title || '新对话'}

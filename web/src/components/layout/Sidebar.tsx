@@ -37,7 +37,7 @@ const Sidebar: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
   const { chatList, loading } = useAppSelector(state => state.chat);
   const { theme } = useAppSelector(state => state.config);
-  const [editingChatId, setEditingChatId] = useState<number | null>(null);
+  const [editingChatUuid, setEditingChatUuid] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
 
   // Fetch chat list on component mount
@@ -54,21 +54,21 @@ const Sidebar: React.FC = () => {
   };
 
   // Handle selecting a chat
-  const handleSelectChat = (id: number) => {
-    navigate(`/chat/${id}`);
+  const handleSelectChat = (uuid: string) => {
+    navigate(`/chat/${uuid}`);
   };
 
   // Handle deleting a chat
-  const handleDeleteChat = async (id: number, e: React.MouseEvent) => {
+  const handleDeleteChat = async (uuid: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    await dispatch(deleteChat(id));
+    await dispatch(deleteChat(uuid));
     
     // If the deleted chat is the current one, navigate to the first available chat or home
-    if (Number(chatId) === id) {
+    if (chatId === uuid) {
       if (chatList.length > 1) {
-        const nextChat = chatList.find(chat => chat.id !== id);
+        const nextChat = chatList.find(chat => chat.uuid !== uuid);
         if (nextChat) {
-          navigate(`/chat/${nextChat.id}`);
+          navigate(`/chat/${nextChat.uuid}`);
         } else {
           navigate('/');
         }
@@ -79,24 +79,24 @@ const Sidebar: React.FC = () => {
   };
 
   // Handle editing a chat title
-  const handleEditClick = (id: number, title: string) => {
-    setEditingChatId(id);
+  const handleEditClick = (uuid: string, title: string) => {
+    setEditingChatUuid(uuid);
     setEditTitle(title);
   };
 
   const handleEditSubmit = async (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && editingChatId && editTitle.trim()) {
+    if (e.key === 'Enter' && editingChatUuid && editTitle.trim()) {
       await dispatch(updateChatInfo({
-        id: editingChatId,
+        uuid: editingChatUuid,
         title: editTitle.trim()
       }));
-      setEditingChatId(null);
+      setEditingChatUuid(null);
       setEditTitle('');
     }
   };
 
   const handleEditCancel = () => {
-    setEditingChatId(null);
+    setEditingChatUuid(null);
     setEditTitle('');
   };
 
@@ -177,15 +177,15 @@ const Sidebar: React.FC = () => {
                   className={cn(
                     "group relative flex items-start gap-3 rounded-xl px-3 py-3 cursor-pointer transition-all duration-200 animate-slideIn",
                     "hover:bg-accent/50 hover:shadow-sm hover:scale-[1.02]",
-                    Number(chatId) === chat.id && "bg-primary/10 border border-primary/20 shadow-sm scale-[1.02]"
+                    chatId === chat.uuid && "bg-primary/10 border border-primary/20 shadow-sm scale-[1.02]"
                   )}
                   style={{ animationDelay: `${index * 50}ms` }}
-                  onClick={() => handleSelectChat(chat.id)}
+                  onClick={() => handleSelectChat(chat.uuid)}
                 >
                   {/* Chat Icon */}
                   <div className={cn(
                     "flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5",
-                    Number(chatId) === chat.id
+                    chatId === chat.uuid
                       ? "bg-primary/20 text-primary"
                       : "bg-muted text-muted-foreground"
                   )}>
@@ -193,7 +193,7 @@ const Sidebar: React.FC = () => {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    {editingChatId === chat.id ? (
+                    {editingChatUuid === chat.uuid ? (
                       <Input
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
@@ -215,7 +215,7 @@ const Sidebar: React.FC = () => {
                     )}
                   </div>
 
-                  {editingChatId !== chat.id && (
+                  {editingChatUuid !== chat.uuid && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
@@ -231,7 +231,7 @@ const Sidebar: React.FC = () => {
                         <DropdownMenuItem
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleEditClick(chat.id, chat.title);
+                            handleEditClick(chat.uuid, chat.title);
                           }}
                           className="text-sm"
                         >
@@ -241,7 +241,7 @@ const Sidebar: React.FC = () => {
                         <DropdownMenuItem
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDeleteChat(chat.id, e);
+                            handleDeleteChat(chat.uuid, e);
                           }}
                           className="text-destructive text-sm"
                         >

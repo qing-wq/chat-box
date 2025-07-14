@@ -21,19 +21,21 @@ export interface UserInfo {
 // Chat types
 export interface ChatInfo {
   id: number;
+  uuid: string;
   createTime: string;
   updateTime: string;
   title: string;
 }
 
 export interface ChatDetail extends ChatInfo {
+  conversation: any;
   messageList: Message[];
 }
 
 // Message types
 export interface Message {
   id?: number;
-  chatId?: number;
+  conversationUuId?: string;
   createTime?: string;
   updateTime?: string;
   role: 'user' | 'assistant' | 'system';
@@ -42,7 +44,7 @@ export interface Message {
 
 // Chat update request
 export interface ChatUpdateRequest {
-  id: number;
+  uuid: string;
   title?: string;
 }
 
@@ -63,7 +65,7 @@ export interface ModelConfig {
 
 // Chat request
 export interface ChatRequest {
-  chatId: number;
+  conversationUuId: string;
   messageList: Message[];
   modelConfig: ModelConfig;
   toolList?: string[];
