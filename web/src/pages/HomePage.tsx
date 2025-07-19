@@ -9,16 +9,16 @@ import { Card, CardContent } from '@/components/ui/card';
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { isLoggedIn } = useAppSelector(state => state.user);
-  const { chatList, loading } = useAppSelector(state => state.chat);
-  
+  const { isLoggedIn } = useAppSelector((state) => state.user);
+  const { chatList, loading } = useAppSelector((state) => state.chat);
+
   // Redirect to login if not logged in
   useEffect(() => {
     if (!isLoggedIn) {
       navigate('/login');
     }
   }, [isLoggedIn, navigate]);
-  
+
   // Handle creating a new chat
   const handleNewChat = async () => {
     const resultAction = await dispatch(createNewChat());
@@ -26,7 +26,7 @@ const HomePage: React.FC = () => {
       navigate(`/chat/${resultAction.payload.id}`);
     }
   };
-  
+
   // Handle continuing the last chat
   const handleContinueChat = () => {
     if (chatList.length > 0) {
@@ -35,11 +35,11 @@ const HomePage: React.FC = () => {
       handleNewChat();
     }
   };
-  
+
   if (!isLoggedIn) {
     return null; // Will redirect to login
   }
-  
+
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
       <div className="max-w-2xl w-full">
@@ -94,7 +94,9 @@ const HomePage: React.FC = () => {
         <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <MessageSquare className="w-4 h-4" />
-            <span>{chatList.length} conversation{chatList.length !== 1 ? 's' : ''}</span>
+            <span>
+              {chatList.length} conversation{chatList.length !== 1 ? 's' : ''}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-primary" />

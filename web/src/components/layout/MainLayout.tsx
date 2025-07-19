@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils';
 
 const MainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const { theme, modelConfig } = useAppSelector(state => state.config);
-  
+  const { theme, modelConfig } = useAppSelector((state) => state.config);
+
   // Apply theme class to document
   useEffect(() => {
     if (theme === 'dark') {
@@ -38,11 +38,11 @@ const MainLayout: React.FC = () => {
       {/* Sidebar */}
       <div
         className={cn(
-          "relative transition-all duration-300 ease-in-out h-full bg-card shadow-sm",
-          collapsed ? "w-0" : "w-64 md:w-80"
+          'relative transition-all duration-300 ease-in-out h-full bg-card shadow-sm',
+          collapsed ? 'w-0' : 'w-64 md:w-80',
         )}
       >
-        <div className={cn("h-full", collapsed ? "invisible" : "visible")}>
+        <div className={cn('h-full', collapsed ? 'invisible' : 'visible')}>
           <Sidebar />
         </div>
       </div>
@@ -66,7 +66,11 @@ const MainLayout: React.FC = () => {
               onClick={() => setCollapsed(!collapsed)}
               className="h-8 w-8"
             >
-              {collapsed ? <Menu className="w-4 h-4" /> : <X className="w-4 h-4" />}
+              {collapsed ? (
+                <Menu className="w-4 h-4" />
+              ) : (
+                <X className="w-4 h-4" />
+              )}
             </Button>
 
             <Separator orientation="vertical" className="h-6" />
@@ -89,7 +93,7 @@ const MainLayout: React.FC = () => {
         </header>
 
         {/* Content area */}
-        <main className="flex-1 overflow-hidden bg-background px-4">
+        <main className="flex-1 overflow-y-auto bg-background px-4">
           <Outlet />
         </main>
       </div>

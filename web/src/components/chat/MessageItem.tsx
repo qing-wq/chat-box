@@ -18,10 +18,13 @@ interface MessageItemProps {
   isStreaming?: boolean;
 }
 
-const MessageItem: React.FC<MessageItemProps> = ({ message, isStreaming = false }) => {
+const MessageItem: React.FC<MessageItemProps> = ({
+  message,
+  isStreaming = false,
+}) => {
   const isUser = message.role === 'user';
   const [copied, setCopied] = React.useState(false);
-  
+
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(message.content);
@@ -33,36 +36,44 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isStreaming = false 
   };
 
   return (
-    <div className={cn(
-      "py-6 px-4 sm:px-6 transition-all duration-200 border-b border-border/50 last:border-b-0",
-      !isUser && "bg-muted/20"
-    )}>
+    <div
+      className={cn(
+        'py-6 px-4 sm:px-6 transition-all duration-200 border-b border-border/50 last:border-b-0',
+        !isUser && 'bg-muted/20',
+      )}
+    >
       <div className="max-w-4xl mx-auto">
         <div className="flex items-start gap-4">
           {/* Avatar */}
           <div className="flex-shrink-0">
-            <Avatar className={cn(
-              "h-8 w-8 transition-all duration-200",
-              isUser
-                ? "bg-blue-500 hover:bg-blue-600"
-                : "bg-primary hover:bg-primary/90"
-            )}>
+            <Avatar
+              className={cn(
+                'h-8 w-8 transition-all duration-200',
+                isUser
+                  ? 'bg-blue-500 hover:bg-blue-600'
+                  : 'bg-primary hover:bg-primary/90',
+              )}
+            >
               <AvatarFallback className="text-white">
-                {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                {isUser ? (
+                  <User className="w-4 h-4" />
+                ) : (
+                  <Bot className="w-4 h-4" />
+                )}
               </AvatarFallback>
             </Avatar>
           </div>
-          
+
           {/* Message content */}
           <div className="flex-1 min-w-0">
             {/* Role label */}
             <div className="flex items-center justify-between mb-2">
-              <span className={cn(
-                "text-sm font-semibold",
-                isUser
-                  ? "text-blue-600 dark:text-blue-400"
-                  : "text-primary"
-              )}>
+              <span
+                className={cn(
+                  'text-sm font-semibold',
+                  isUser ? 'text-blue-600 dark:text-blue-400' : 'text-primary',
+                )}
+              >
                 {isUser ? '你' : 'AI助手'}
               </span>
 
@@ -73,30 +84,45 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isStreaming = false 
                   size="sm"
                   onClick={copyToClipboard}
                   className={cn(
-                    "h-6 w-6 p-0 transition-all duration-200",
+                    'h-6 w-6 p-0 transition-all duration-200',
                     copied
-                      ? "text-green-500"
-                      : "text-muted-foreground hover:text-primary"
+                      ? 'text-green-500'
+                      : 'text-muted-foreground hover:text-primary',
                   )}
                 >
-                  {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  {copied ? (
+                    <Check className="w-3 h-3" />
+                  ) : (
+                    <Copy className="w-3 h-3" />
+                  )}
                 </Button>
               )}
             </div>
-            
+
             {/* Message content */}
-            <div className={cn(
-              "max-w-none",
-              isUser && "bg-blue-50 dark:bg-blue-900/20 rounded-xl px-4 py-3 border border-blue-200 dark:border-blue-800 prose prose-sm sm:prose dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground"
-            )}>
+            <div
+              className={cn(
+                'max-w-none',
+                isUser &&
+                  'bg-blue-50 dark:bg-blue-900/20 rounded-xl px-4 py-3 border border-blue-200 dark:border-blue-800 prose prose-sm sm:prose dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground',
+              )}
+            >
               {isStreaming && !isUser && !message.content && (
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1">
                     <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div
+                      className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                      style={{ animationDelay: '0.1s' }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                      style={{ animationDelay: '0.2s' }}
+                    ></div>
                   </div>
-                  <span className="text-muted-foreground text-sm">正在思考...</span>
+                  <span className="text-muted-foreground text-sm">
+                    正在思考...
+                  </span>
                 </div>
               )}
 
@@ -136,13 +162,23 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isStreaming = false 
                             </div>
                           </div>
                         ) : (
-                          <code className={cn(className, "bg-muted px-1.5 py-0.5 rounded text-sm font-mono")} {...props}>
+                          <code
+                            className={cn(
+                              className,
+                              'bg-muted px-1.5 py-0.5 rounded text-sm font-mono',
+                            )}
+                            {...props}
+                          >
                             {children}
                           </code>
                         );
                       },
                       p({ children }) {
-                        return <p className="mb-4 last:mb-0 leading-relaxed text-foreground">{children}</p>;
+                        return (
+                          <p className="mb-4 last:mb-0 leading-relaxed text-foreground">
+                            {children}
+                          </p>
+                        );
                       },
                       table({ children }) {
                         return (
@@ -154,13 +190,23 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isStreaming = false 
                         );
                       },
                       thead({ children }) {
-                        return <thead className="bg-muted/50">{children}</thead>;
+                        return (
+                          <thead className="bg-muted/50">{children}</thead>
+                        );
                       },
                       tbody({ children }) {
-                        return <tbody className="divide-y divide-border bg-background">{children}</tbody>;
+                        return (
+                          <tbody className="divide-y divide-border bg-background">
+                            {children}
+                          </tbody>
+                        );
                       },
                       tr({ children }) {
-                        return <tr className="hover:bg-muted/30 transition-colors">{children}</tr>;
+                        return (
+                          <tr className="hover:bg-muted/30 transition-colors">
+                            {children}
+                          </tr>
+                        );
                       },
                       th({ children }) {
                         return (
@@ -206,7 +252,9 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isStreaming = false 
                               variant="ghost"
                               size="sm"
                               className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => navigator.clipboard.writeText(codeContent)}
+                              onClick={() =>
+                                navigator.clipboard.writeText(codeContent)
+                              }
                             >
                               <Copy className="w-3 h-3" />
                             </Button>
@@ -228,38 +276,74 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isStreaming = false 
                           </div>
                         </div>
                       ) : (
-                        <code className={cn(className, "bg-muted px-1.5 py-0.5 rounded text-sm font-mono")} {...props}>
+                        <code
+                          className={cn(
+                            className,
+                            'bg-muted px-1.5 py-0.5 rounded text-sm font-mono',
+                          )}
+                          {...props}
+                        >
                           {children}
                         </code>
                       );
                     },
                     p({ children }) {
-                      return <p className="mb-4 last:mb-0 leading-relaxed text-foreground">{children}</p>;
+                      return (
+                        <p className="mb-4 last:mb-0 leading-relaxed text-foreground">
+                          {children}
+                        </p>
+                      );
                     },
                     h1({ children }) {
-                      return <h1 className="text-2xl font-bold mb-4 mt-6 first:mt-0 text-foreground border-b pb-2">{children}</h1>;
+                      return (
+                        <h1 className="text-2xl font-bold mb-4 mt-6 first:mt-0 text-foreground border-b pb-2">
+                          {children}
+                        </h1>
+                      );
                     },
                     h2({ children }) {
-                      return <h2 className="text-xl font-semibold mb-3 mt-5 first:mt-0 text-foreground">{children}</h2>;
+                      return (
+                        <h2 className="text-xl font-semibold mb-3 mt-5 first:mt-0 text-foreground">
+                          {children}
+                        </h2>
+                      );
                     },
                     h3({ children }) {
-                      return <h3 className="text-lg font-medium mb-2 mt-4 first:mt-0 text-foreground">{children}</h3>;
+                      return (
+                        <h3 className="text-lg font-medium mb-2 mt-4 first:mt-0 text-foreground">
+                          {children}
+                        </h3>
+                      );
                     },
                     h4({ children }) {
-                      return <h4 className="text-base font-medium mb-2 mt-3 first:mt-0 text-foreground">{children}</h4>;
+                      return (
+                        <h4 className="text-base font-medium mb-2 mt-3 first:mt-0 text-foreground">
+                          {children}
+                        </h4>
+                      );
                     },
                     blockquote({ children }) {
                       return (
                         <blockquote className="border-l-4 border-primary pl-4 my-4 italic bg-muted/50 py-3 rounded-r-lg">
-                          <div className="text-muted-foreground">{children}</div>
+                          <div className="text-muted-foreground">
+                            {children}
+                          </div>
                         </blockquote>
                       );
                     },
                     ul({ children }) {
-                      return <ul className="list-disc list-inside mb-4 space-y-1 text-foreground">{children}</ul>;
+                      return (
+                        <ul className="list-disc list-inside mb-4 space-y-1 text-foreground">
+                          {children}
+                        </ul>
+                      );
                     },
                     ol({ children }) {
-                      return <ol className="list-decimal list-inside mb-4 space-y-1 text-foreground">{children}</ol>;
+                      return (
+                        <ol className="list-decimal list-inside mb-4 space-y-1 text-foreground">
+                          {children}
+                        </ol>
+                      );
                     },
                     li({ children }) {
                       return <li className="leading-relaxed">{children}</li>;
@@ -277,10 +361,18 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isStreaming = false 
                       return <thead className="bg-muted/50">{children}</thead>;
                     },
                     tbody({ children }) {
-                      return <tbody className="divide-y divide-border bg-background">{children}</tbody>;
+                      return (
+                        <tbody className="divide-y divide-border bg-background">
+                          {children}
+                        </tbody>
+                      );
                     },
                     tr({ children }) {
-                      return <tr className="hover:bg-muted/30 transition-colors">{children}</tr>;
+                      return (
+                        <tr className="hover:bg-muted/30 transition-colors">
+                          {children}
+                        </tr>
+                      );
                     },
                     th({ children }) {
                       return (
@@ -309,11 +401,17 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isStreaming = false 
                       );
                     },
                     strong({ children }) {
-                      return <strong className="font-semibold text-foreground">{children}</strong>;
+                      return (
+                        <strong className="font-semibold text-foreground">
+                          {children}
+                        </strong>
+                      );
                     },
                     em({ children }) {
-                      return <em className="italic text-foreground">{children}</em>;
-                    }
+                      return (
+                        <em className="italic text-foreground">{children}</em>
+                      );
+                    },
                   }}
                 >
                   {message.content}

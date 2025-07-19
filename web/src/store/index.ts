@@ -7,8 +7,8 @@ export const store = configureStore({
   reducer: {
     user: userReducer,
     chat: chatReducer,
-    config: configReducer
-  }
+    config: configReducer,
+  },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

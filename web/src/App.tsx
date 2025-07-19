@@ -1,5 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { useAppSelector } from './hooks';
@@ -17,19 +22,23 @@ import SSETest from './components/demo/SSETest';
 import './index.css';
 
 // Auth guard component
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isLoggedIn } = useAppSelector(state => state.user);
-  
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const { isLoggedIn } = useAppSelector((state) => state.user);
+
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
-  
+
   return <>{children}</>;
 };
 
 // Theme provider component
-const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { theme: themeMode } = useAppSelector(state => state.config);
+const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const { theme: themeMode } = useAppSelector((state) => state.config);
 
   // Apply theme class to document
   React.useEffect(() => {
@@ -59,20 +68,23 @@ const AppContent: React.FC = () => {
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          
+
           <Route path="/demo" element={<MarkdownDemo />} />
           <Route path="/sse-test" element={<SSETest />} />
 
-          <Route path="/" element={
-            <ProtectedRoute>
-              <MainLayout />
-            </ProtectedRoute>
-          }>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route index element={<HomePage />} />
             <Route path="chat/:chatId" element={<ChatPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
-          
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
