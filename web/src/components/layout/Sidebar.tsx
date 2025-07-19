@@ -15,7 +15,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks';
-import { fetchChatList, createNewChat, deleteChat, updateChatInfo, updateChatMessages } from '../../store/chatSlice';
+import { fetchChatList, createNewChat, deleteChat, updateChatMessages } from '../../store/chatSlice';
 import { logout } from '../../store/userSlice';
 import { setTheme } from '../../store/configSlice';
 import { ThemeMode } from '../../types';

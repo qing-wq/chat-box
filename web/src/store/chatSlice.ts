@@ -81,28 +81,6 @@ export const createNewChat = createAsyncThunk(
   }
 );
 
-export const updateChatInfo = createAsyncThunk(
-  'chat/updateChatInfo',
-  async (chatUpdateRequest: ChatUpdateRequest, { rejectWithValue }) => {
-    try {
-      const response = await axios.post<ResVo<string>>(`/api/conversation/update`, {
-        conversationUUid: chatUpdateRequest.uuid,
-        title: chatUpdateRequest.title
-      });
-      
-      if (response.data.status.code === 0) {
-        return chatUpdateRequest;
-      } else {
-        return rejectWithValue(response.data.status.msg);
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        return rejectWithValue(error.response.data.status?.msg || 'Failed to update chat');
-      }
-      return rejectWithValue('Failed to update chat. Please try again.');
-    }
-  }
-);
 
 export const deleteChat = createAsyncThunk(
   'chat/deleteChat',
@@ -227,31 +205,6 @@ const chatSlice = createSlice({
         }}
     )
       .addCase(createNewChat.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-      
-      // Update chat info
-      .addCase(updateChatInfo.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateChatInfo.fulfilled, (state, action: PayloadAction<ChatUpdateRequest>) => {
-        state.loading = false;
-        const { uuid, title } = action.payload;
-        
-        // Update in chat list
-        const chatIndex = state.chatList.findIndex(chat => chat.uuid === uuid);
-        if (chatIndex !== -1 && title) {
-          state.chatList[chatIndex].title = title;
-        }
-        
-        // Update current chat if it's the same
-        if (state.currentChat && state.currentChat.conversation.uuid === uuid && title) {
-          state.currentChat.conversation.title = title;
-        }
-      })
-      .addCase(updateChatInfo.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
