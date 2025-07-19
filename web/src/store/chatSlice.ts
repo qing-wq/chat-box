@@ -1,11 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import {
-  ChatInfo,
-  ChatDetail,
-  Message,
-  ResVo,
-  ChatUpdateRequest,
-} from '../types';
+
+import { ChatInfo, ChatDetail, Message, ResVo, ChatUpdateRequest, Conversation } from '../types';
+
+
 import axios from 'axios';
 
 interface ChatState {
@@ -78,9 +75,9 @@ export const createNewChat = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const uuid = crypto.randomUUID();
-      const response = await axios.post<ResVo<ChatInfo>>(
-        `/api/conversation/${uuid}`,
-      );
+
+      const response = await axios.post<ResVo<Conversation>>(`/api/conversation/${uuid}`);
+      
 
       if (response.data.status.code === 0) {
         return response.data.data;
@@ -126,13 +123,14 @@ export const updateChatInfo = createAsyncThunk(
   },
 );
 
+
 export const deleteChat = createAsyncThunk(
   'chat/deleteChat',
   async (uuid: string, { rejectWithValue }) => {
     try {
-      const response = await axios.get<ResVo<string>>(
-        `/api/conversation/${uuid}`,
-      );
+
+      const response = await axios.get<ResVo<string>>(`/api/conversation/del/${uuid}`);
+      
 
       if (response.data.status.code === 0) {
         return uuid;
@@ -152,26 +150,26 @@ export const deleteChat = createAsyncThunk(
 // TODO 待修改
 export const updateChatMessages = createAsyncThunk(
   'chat/updateChatMessages',
-  async (
-    {
-      conversationUuId,
-      newMessageList,
-    }: { conversationUuId: string; newMessageList: Message[] },
-    { rejectWithValue, dispatch },
-  ) => {
+
+  async ({ uuid, title, description, systemMessage }: { uuid: string, title?: string, description?: string, systemMessage?: string }, { rejectWithValue, dispatch }) => {
+
     try {
-      const response = await axios.post<ResVo<string>>(
-        '/api/conversation/update',
-        {
-          conversationUuId,
-          newMessageList,
-        },
-      );
+      const response = await axios.post<ResVo<string>>('/api/conversation/update', {
+        uuid,
+        title,
+        ...(description ? { description } : {}),
+        ...(systemMessage ? { systemMessage } : {})
+      });
+      
 
       if (response.data.status.code === 0) {
-        // 更新后重新获取聊天详情
-        dispatch(fetchChatDetail(conversationUuId));
-        return { conversationUuId, newMessageList };
+        // 更新后重新获取聊天详情并返回
+        const detailResponse = await dispatch(fetchChatDetail(uuid));
+        if (fetchChatDetail.fulfilled.match(detailResponse)) {
+          return detailResponse.payload;
+        } else {
+          return rejectWithValue(detailResponse.payload || 'Failed to fetch updated chat detail');
+        }
       } else {
         return rejectWithValue(response.data.status.msg);
       }
@@ -259,21 +257,21 @@ const chatSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        createNewChat.fulfilled,
-        (state, action: PayloadAction<ChatInfo>) => {
-          state.loading = false;
-          state.chatList.unshift(action.payload);
-          state.currentChat = {
-            ...action.payload,
-            messageList: [],
-          };
-        },
-      )
+
+      .addCase(createNewChat.fulfilled, (state, action: PayloadAction<ChatInfo>) => {
+        state.loading = false;
+        state.chatList.unshift(action.payload);
+        state.currentChat = {
+          conversation: action.payload,
+          messageList: []
+        }}
+    )
+
       .addCase(createNewChat.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
+
 
       // Update chat info
       .addCase(updateChatInfo.pending, (state) => {
@@ -305,6 +303,7 @@ const chatSlice = createSlice({
         state.error = action.payload as string;
       })
 
+
       // Delete chat
       .addCase(deleteChat.pending, (state) => {
         state.loading = true;
@@ -317,7 +316,8 @@ const chatSlice = createSlice({
         );
 
         // Clear current chat if it's the deleted one
-        if (state.currentChat && state.currentChat.uuid === action.payload) {
+        if (state.currentChat && state.currentChat.conversation.uuid === action.payload) {
+
           state.currentChat = null;
         }
       })
@@ -331,23 +331,24 @@ const chatSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        updateChatMessages.fulfilled,
-        (
-          state,
-          action: PayloadAction<{ chatId: number; newMessageList: Message[] }>,
-        ) => {
-          state.loading = false;
 
-          // Update current chat if it's the same
-          if (
-            state.currentChat &&
-            state.currentChat.id === action.payload.chatId
-          ) {
-            state.currentChat.messageList = action.payload.newMessageList;
-          }
-        },
-      )
+      .addCase(updateChatMessages.fulfilled, (state, action: PayloadAction<ChatDetail>) => {
+        state.loading = false;
+        const { uuid, title, description } = action.payload.conversation;
+        
+        // Update in chat list
+        const chatIndex = state.chatList.findIndex(chat => chat.uuid === uuid);
+        if (chatIndex !== -1) {
+          if (title) state.chatList[chatIndex].title = title;
+          if (description) state.chatList[chatIndex].description = description;
+        }
+        
+        // Update current chat if it's the same
+        if (state.currentChat && state.currentChat.conversation.uuid === uuid) {
+          state.currentChat = action.payload;
+        }
+      })
+
       .addCase(updateChatMessages.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;

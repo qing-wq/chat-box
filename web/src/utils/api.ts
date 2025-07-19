@@ -95,12 +95,13 @@ export const streamChat = async (
       JSON.stringify(processedRequest, null, 2),
     );
     let chatMessage = {
-      conversationUuId: processedRequest.conversationUuId,
-      userMessage:
-        processedRequest.messageList[processedRequest.messageList.length - 1]
-          .content,
-      modelId: 1,
-    };
+
+      "conversationUuId": processedRequest.conversationUuId,
+      "userMessage": processedRequest.messageList[processedRequest.messageList.length - 1].content,
+      "modelId": 1,
+      "toolList": processedRequest.toolList
+    } 
+
     const response = await fetch('/api/chat/', {
       method: 'POST',
       headers: {
