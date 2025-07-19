@@ -25,11 +25,25 @@ export interface ChatInfo {
   createTime: string;
   updateTime: string;
   title: string;
+  description?: string;
+  systemMessage?: string;
 }
 
-export interface ChatDetail extends ChatInfo {
-  conversation: any;
+export interface ChatDetail{
+  conversation: Conversation;
   messageList: Message[];
+}
+
+// Conversation types
+export interface Conversation {
+  id: number;
+  uuid: string;
+  createTime: string;
+  updateTime: string;
+  title: string;
+  remark?: string;
+  description?: string;
+  systemMessage?: string;
 }
 
 // Message types

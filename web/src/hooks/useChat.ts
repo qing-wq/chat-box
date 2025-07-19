@@ -106,12 +106,14 @@ export const useChat = () => {
         });
         
         console.log('Saving updated messages to backend:', JSON.stringify(messagesToSave));
-        // dispatch(updateChatMessages({
-        //   conversationUuId,
-        //   curcurrentChat.conversation.title
-        // }));
+        dispatch(updateChatMessages({
+          uuid:currentChat.conversation.uuid,
+          title:currentChat.conversation.title,
+          description:currentChat.conversation.description,
+          systemMessage:currentChat.conversation.systemMessage
+        }));
       }
-    );
+    );  
 
     return cleanup;
   }, [modelConfig, dispatch, currentChat]);

@@ -15,7 +15,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks';
-import { fetchChatList, createNewChat, deleteChat, updateChatInfo } from '../../store/chatSlice';
+import { fetchChatList, createNewChat, deleteChat, updateChatInfo, updateChatMessages } from '../../store/chatSlice';
 import { logout } from '../../store/userSlice';
 import { setTheme } from '../../store/configSlice';
 import { ThemeMode } from '../../types';
@@ -34,7 +34,7 @@ import { cn } from '@/lib/utils';
 const Sidebar: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { chatId } = useParams<{ chatId: string }>();
+  const { chatId } = useParams<{ chatId: string }>();//当前的路由上的uuid
   const { chatList, loading } = useAppSelector(state => state.chat);
   const { theme } = useAppSelector(state => state.config);
   const [editingChatUuid, setEditingChatUuid] = useState<string | null>(null);
@@ -86,7 +86,7 @@ const Sidebar: React.FC = () => {
 
   const handleEditSubmit = async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && editingChatUuid && editTitle.trim()) {
-      await dispatch(updateChatInfo({
+      await dispatch(updateChatMessages({
         uuid: editingChatUuid,
         title: editTitle.trim()
       }));

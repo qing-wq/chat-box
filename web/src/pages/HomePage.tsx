@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
   // Handle continuing the last chat
   const handleContinueChat = () => {
     if (chatList.length > 0) {
-      navigate(`/chat/${chatList[0].id}`);
+      navigate(`/chat/${chatList[0].uuid}`);
     } else {
       handleNewChat();
     }
