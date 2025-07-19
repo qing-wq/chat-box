@@ -13,8 +13,8 @@ const ChatPage: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { currentChat, loading, error } = useAppSelector(state => state.chat);
-  const { isLoggedIn } = useAppSelector(state => state.user);
+  const { currentChat, loading, error } = useAppSelector((state) => state.chat);
+  const { isLoggedIn } = useAppSelector((state) => state.user);
 
   // Redirect to login if not logged in
   useEffect(() => {
@@ -71,7 +71,9 @@ const ChatPage: React.FC = () => {
         <div className="max-w-lg">
           <MessageSquare className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
           <h2 className="text-2xl font-semibold mb-3">选择一个对话</h2>
-          <p className="text-muted-foreground mb-6">从侧边栏选择一个对话或创建新对话开始聊天。</p>
+          <p className="text-muted-foreground mb-6">
+            从侧边栏选择一个对话或创建新对话开始聊天。
+          </p>
           <ApiConfigAlert />
         </div>
       </div>

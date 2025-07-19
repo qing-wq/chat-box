@@ -6,30 +6,40 @@ import { login, register, clearError } from '../store/userSlice';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
 const LoginPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('login');
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
-  const [registerForm, setRegisterForm] = useState({ username: '', password: '', confirm: '' });
+  const [registerForm, setRegisterForm] = useState({
+    username: '',
+    password: '',
+    confirm: '',
+  });
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { loading, error, isLoggedIn } = useAppSelector(state => state.user);
-  
+  const { loading, error, isLoggedIn } = useAppSelector((state) => state.user);
+
   // Redirect to home if already logged in
   useEffect(() => {
     if (isLoggedIn) {
       navigate('/');
     }
   }, [isLoggedIn, navigate]);
-  
+
   // Clear error when switching tabs
   useEffect(() => {
     dispatch(clearError());
   }, [activeTab, dispatch]);
-  
+
   // Handle login form submission
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,14 +57,21 @@ const LoginPage: React.FC = () => {
   // Handle register form submission
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!registerForm.username || !registerForm.password || !registerForm.confirm) return;
+    if (
+      !registerForm.username ||
+      !registerForm.password ||
+      !registerForm.confirm
+    )
+      return;
     if (registerForm.password !== registerForm.confirm) return;
 
     try {
-      const result = await dispatch(register({
-        username: registerForm.username,
-        password: registerForm.password
-      }));
+      const result = await dispatch(
+        register({
+          username: registerForm.username,
+          password: registerForm.password,
+        }),
+      );
 
       console.log('Register result:', result);
       navigate('/');
@@ -62,14 +79,16 @@ const LoginPage: React.FC = () => {
       console.log('Registration failed:', error);
     }
   };
-  
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Bot className="w-8 h-8 text-primary" />
-            <CardTitle className="text-2xl font-bold text-primary">Chat Box</CardTitle>
+            <CardTitle className="text-2xl font-bold text-primary">
+              Chat Box
+            </CardTitle>
           </div>
           <CardDescription>Your AI Chat Assistant</CardDescription>
         </CardHeader>
@@ -89,8 +108,12 @@ const LoginPage: React.FC = () => {
               </Button>
             </div>
           )}
-        
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
@@ -106,7 +129,12 @@ const LoginPage: React.FC = () => {
                       id="login-username"
                       placeholder="Username"
                       value={loginForm.username}
-                      onChange={(e) => setLoginForm(prev => ({ ...prev, username: e.target.value }))}
+                      onChange={(e) =>
+                        setLoginForm((prev) => ({
+                          ...prev,
+                          username: e.target.value,
+                        }))
+                      }
                       className="pl-10"
                       required
                     />
@@ -122,7 +150,12 @@ const LoginPage: React.FC = () => {
                       type="password"
                       placeholder="Password"
                       value={loginForm.password}
-                      onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                      onChange={(e) =>
+                        setLoginForm((prev) => ({
+                          ...prev,
+                          password: e.target.value,
+                        }))
+                      }
                       className="pl-10"
                       required
                     />
@@ -132,13 +165,15 @@ const LoginPage: React.FC = () => {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={loading || !loginForm.username || !loginForm.password}
+                  disabled={
+                    loading || !loginForm.username || !loginForm.password
+                  }
                 >
                   {loading ? 'Logging in...' : 'Log in'}
                 </Button>
               </form>
             </TabsContent>
-          
+
             <TabsContent value="register" className="space-y-4">
               <form onSubmit={handleRegister} className="space-y-4">
                 <div className="space-y-2">
@@ -149,15 +184,23 @@ const LoginPage: React.FC = () => {
                       id="register-username"
                       placeholder="Username"
                       value={registerForm.username}
-                      onChange={(e) => setRegisterForm(prev => ({ ...prev, username: e.target.value }))}
+                      onChange={(e) =>
+                        setRegisterForm((prev) => ({
+                          ...prev,
+                          username: e.target.value,
+                        }))
+                      }
                       className="pl-10"
                       required
                       minLength={3}
                     />
                   </div>
-                  {registerForm.username && registerForm.username.length < 3 && (
-                    <p className="text-xs text-destructive">Username must be at least 3 characters</p>
-                  )}
+                  {registerForm.username &&
+                    registerForm.username.length < 3 && (
+                      <p className="text-xs text-destructive">
+                        Username must be at least 3 characters
+                      </p>
+                    )}
                 </div>
 
                 <div className="space-y-2">
@@ -169,15 +212,23 @@ const LoginPage: React.FC = () => {
                       type="password"
                       placeholder="Password"
                       value={registerForm.password}
-                      onChange={(e) => setRegisterForm(prev => ({ ...prev, password: e.target.value }))}
+                      onChange={(e) =>
+                        setRegisterForm((prev) => ({
+                          ...prev,
+                          password: e.target.value,
+                        }))
+                      }
                       className="pl-10"
                       required
                       minLength={6}
                     />
                   </div>
-                  {registerForm.password && registerForm.password.length < 6 && (
-                    <p className="text-xs text-destructive">Password must be at least 6 characters</p>
-                  )}
+                  {registerForm.password &&
+                    registerForm.password.length < 6 && (
+                      <p className="text-xs text-destructive">
+                        Password must be at least 6 characters
+                      </p>
+                    )}
                 </div>
 
                 <div className="space-y-2">
@@ -189,20 +240,34 @@ const LoginPage: React.FC = () => {
                       type="password"
                       placeholder="Confirm Password"
                       value={registerForm.confirm}
-                      onChange={(e) => setRegisterForm(prev => ({ ...prev, confirm: e.target.value }))}
+                      onChange={(e) =>
+                        setRegisterForm((prev) => ({
+                          ...prev,
+                          confirm: e.target.value,
+                        }))
+                      }
                       className="pl-10"
                       required
                     />
                   </div>
-                  {registerForm.confirm && registerForm.password !== registerForm.confirm && (
-                    <p className="text-xs text-destructive">Passwords do not match</p>
-                  )}
+                  {registerForm.confirm &&
+                    registerForm.password !== registerForm.confirm && (
+                      <p className="text-xs text-destructive">
+                        Passwords do not match
+                      </p>
+                    )}
                 </div>
 
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={loading || !registerForm.username || !registerForm.password || !registerForm.confirm || registerForm.password !== registerForm.confirm}
+                  disabled={
+                    loading ||
+                    !registerForm.username ||
+                    !registerForm.password ||
+                    !registerForm.confirm ||
+                    registerForm.password !== registerForm.confirm
+                  }
                 >
                   {loading ? 'Registering...' : 'Register'}
                 </Button>

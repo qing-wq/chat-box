@@ -12,10 +12,15 @@ import {
   MoreHorizontal,
   Bot,
   Clock,
-  Sparkles
+  Sparkles,
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks';
-import { fetchChatList, createNewChat, deleteChat, updateChatInfo } from '../../store/chatSlice';
+import {
+  fetchChatList,
+  createNewChat,
+  deleteChat,
+  updateChatInfo,
+} from '../../store/chatSlice';
 import { logout } from '../../store/userSlice';
 import { setTheme } from '../../store/configSlice';
 import { ThemeMode } from '../../types';
@@ -35,8 +40,8 @@ const Sidebar: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { chatId } = useParams<{ chatId: string }>();
-  const { chatList, loading } = useAppSelector(state => state.chat);
-  const { theme } = useAppSelector(state => state.config);
+  const { chatList, loading } = useAppSelector((state) => state.chat);
+  const { theme } = useAppSelector((state) => state.config);
   const [editingChatUuid, setEditingChatUuid] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
 
@@ -62,11 +67,11 @@ const Sidebar: React.FC = () => {
   const handleDeleteChat = async (uuid: string, e: React.MouseEvent) => {
     e.stopPropagation();
     await dispatch(deleteChat(uuid));
-    
+
     // If the deleted chat is the current one, navigate to the first available chat or home
     if (chatId === uuid) {
       if (chatList.length > 1) {
-        const nextChat = chatList.find(chat => chat.uuid !== uuid);
+        const nextChat = chatList.find((chat) => chat.uuid !== uuid);
         if (nextChat) {
           navigate(`/chat/${nextChat.uuid}`);
         } else {
@@ -86,10 +91,12 @@ const Sidebar: React.FC = () => {
 
   const handleEditSubmit = async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && editingChatUuid && editTitle.trim()) {
-      await dispatch(updateChatInfo({
-        uuid: editingChatUuid,
-        title: editTitle.trim()
-      }));
+      await dispatch(
+        updateChatInfo({
+          uuid: editingChatUuid,
+          title: editTitle.trim(),
+        }),
+      );
       setEditingChatUuid(null);
       setEditTitle('');
     }
@@ -135,13 +142,18 @@ const Sidebar: React.FC = () => {
         <Button
           onClick={handleNewChat}
           className={cn(
-            "w-full h-10 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-sm",
-            "hover:shadow-md hover:scale-[1.02] transition-all duration-200",
-            "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            'w-full h-10 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-sm',
+            'hover:shadow-md hover:scale-[1.02] transition-all duration-200',
+            'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100',
           )}
           disabled={loading}
         >
-          <Plus className={cn("w-4 h-4 mr-2 transition-transform duration-200", loading && "animate-spin")} />
+          <Plus
+            className={cn(
+              'w-4 h-4 mr-2 transition-transform duration-200',
+              loading && 'animate-spin',
+            )}
+          />
           {loading ? 'Creating...' : 'New Chat'}
         </Button>
       </div>
@@ -154,7 +166,9 @@ const Sidebar: React.FC = () => {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12 space-y-3">
               <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <div className="text-sm text-muted-foreground">Loading chats...</div>
+              <div className="text-sm text-muted-foreground">
+                Loading chats...
+              </div>
             </div>
           ) : chatList.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
@@ -163,7 +177,9 @@ const Sidebar: React.FC = () => {
               </div>
               <div className="space-y-1">
                 <div className="text-sm font-medium">No chats yet</div>
-                <div className="text-xs text-muted-foreground">Start a conversation to see it here</div>
+                <div className="text-xs text-muted-foreground">
+                  Start a conversation to see it here
+                </div>
               </div>
             </div>
           ) : (
@@ -175,20 +191,23 @@ const Sidebar: React.FC = () => {
                 <div
                   key={chat.id}
                   className={cn(
-                    "group relative flex items-start gap-3 rounded-xl px-3 py-3 cursor-pointer transition-all duration-200 animate-slideIn",
-                    "hover:bg-accent/50 hover:shadow-sm hover:scale-[1.02]",
-                    chatId === chat.uuid && "bg-primary/10 border border-primary/20 shadow-sm scale-[1.02]"
+                    'group relative flex items-start gap-3 rounded-xl px-3 py-3 cursor-pointer transition-all duration-200 animate-slideIn',
+                    'hover:bg-accent/50 hover:shadow-sm hover:scale-[1.02]',
+                    chatId === chat.uuid &&
+                      'bg-primary/10 border border-primary/20 shadow-sm scale-[1.02]',
                   )}
                   style={{ animationDelay: `${index * 50}ms` }}
                   onClick={() => handleSelectChat(chat.uuid)}
                 >
                   {/* Chat Icon */}
-                  <div className={cn(
-                    "flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5",
-                    chatId === chat.uuid
-                      ? "bg-primary/20 text-primary"
-                      : "bg-muted text-muted-foreground"
-                  )}>
+                  <div
+                    className={cn(
+                      'flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5',
+                      chatId === chat.uuid
+                        ? 'bg-primary/20 text-primary'
+                        : 'bg-muted text-muted-foreground',
+                    )}
+                  >
                     <MessageSquare className="w-4 h-4" />
                   </div>
 
@@ -271,8 +290,12 @@ const Sidebar: React.FC = () => {
             <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-background animate-pulse"></div>
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium truncate group-hover:text-primary transition-colors duration-200">User</div>
-            <div className="text-xs text-muted-foreground">Free Plan • Online</div>
+            <div className="text-sm font-medium truncate group-hover:text-primary transition-colors duration-200">
+              User
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Free Plan • Online
+            </div>
           </div>
           <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
@@ -298,9 +321,17 @@ const Sidebar: React.FC = () => {
               size="icon"
               onClick={handleThemeToggle}
               className="h-8 w-8 hover:bg-accent"
-              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+              title={
+                theme === 'light'
+                  ? 'Switch to dark mode'
+                  : 'Switch to light mode'
+              }
             >
-              {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+              {theme === 'light' ? (
+                <Moon className="w-4 h-4" />
+              ) : (
+                <Sun className="w-4 h-4" />
+              )}
             </Button>
 
             <Button

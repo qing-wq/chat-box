@@ -11,15 +11,14 @@ interface FileItem {
   status?: string;
 }
 
-
 const ChatInput: React.FC = () => {
   const [messageText, setMessageText] = useState('');
   const [fileList, setFileList] = useState<FileItem[]>([]);
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const { sendMessage } = useChat();
-  const { streaming } = useAppSelector(state => state.chat);
-  
+  const { streaming } = useAppSelector((state) => state.chat);
+
   // Auto focus the textarea when component mounts
   useEffect(() => {
     if (textAreaRef.current) {
@@ -32,19 +31,19 @@ const ChatInput: React.FC = () => {
     console.log('handleSend called, streaming state:', streaming);
     console.log('Message text:', messageText);
     console.log('File list:', fileList);
-    
+
     if ((messageText.trim() || fileList.length > 0) && !streaming) {
       console.log('Conditions met for sending message');
-      
+
       // Create message content with file attachments if present
       let content = messageText.trim();
       console.log('Trimmed content:', content);
-      
+
       // If there are files, add them to the message
       if (fileList.length > 0) {
         // In a real implementation, you would upload the files to a server
         // and include the file URLs in the message
-        const fileNames = fileList.map(file => file.name).join(', ');
+        const fileNames = fileList.map((file) => file.name).join(', ');
         if (content) {
           content += `\n\n附件文件：${fileNames}`;
         } else {
@@ -52,19 +51,19 @@ const ChatInput: React.FC = () => {
         }
         console.log('Content with files:', content);
       }
-      
+
       // Pass web search flag to sendMessage
       const useTools = webSearchEnabled ? ['web_search'] : [];
       console.log('Using tools:', useTools);
       console.log('About to call sendMessage function');
-      
+
       try {
         sendMessage(content, useTools);
         console.log('sendMessage called successfully');
       } catch (error) {
         console.error('Error calling sendMessage:', error);
       }
-      
+
       setMessageText('');
       setFileList([]);
     } else {
@@ -93,7 +92,7 @@ const ChatInput: React.FC = () => {
       textAreaRef.current.focus();
     }
   };
-  
+
   // Handle file upload
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -108,10 +107,10 @@ const ChatInput: React.FC = () => {
     const newFileList: FileItem[] = Array.from(files).map((file, index) => ({
       uid: `${Date.now()}-${index}`,
       name: file.name,
-      status: 'done'
+      status: 'done',
     }));
 
-    setFileList(prev => [...prev, ...newFileList]);
+    setFileList((prev) => [...prev, ...newFileList]);
   };
 
   // Handle removing all files
@@ -125,7 +124,9 @@ const ChatInput: React.FC = () => {
       {fileList.length > 0 && (
         <div className="mb-4 p-3 bg-muted rounded-lg border">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium">附件文件 ({fileList.length})</span>
+            <span className="text-sm font-medium">
+              附件文件 ({fileList.length})
+            </span>
             <Button
               variant="ghost"
               size="sm"
@@ -136,16 +137,21 @@ const ChatInput: React.FC = () => {
             </Button>
           </div>
           <div className="flex flex-wrap gap-2">
-            {fileList.map(file => (
-              <div key={file.uid} className="flex items-center bg-background rounded-md px-3 py-2 border shadow-sm">
+            {fileList.map((file) => (
+              <div
+                key={file.uid}
+                className="flex items-center bg-background rounded-md px-3 py-2 border shadow-sm"
+              >
                 <File className="w-4 h-4 mr-2 text-blue-500" />
-                <span className="text-sm truncate max-w-[120px]">{file.name}</span>
+                <span className="text-sm truncate max-w-[120px]">
+                  {file.name}
+                </span>
               </div>
             ))}
           </div>
         </div>
       )}
-      
+
       <div className="flex items-end gap-3">
         {/* 输入框区域 */}
         <div className="flex-1">
@@ -154,13 +160,13 @@ const ChatInput: React.FC = () => {
             value={messageText}
             onChange={(e) => setMessageText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={streaming ? "正在生成回复..." : "输入消息..."}
+            placeholder={streaming ? '正在生成回复...' : '输入消息...'}
             disabled={streaming}
             className="min-h-[40px] max-h-[200px] resize-none rounded-xl transition-all duration-200"
             rows={1}
           />
         </div>
-        
+
         {/* 按钮组 */}
         <div className="flex items-center gap-2">
           {/* File upload button */}
@@ -191,12 +197,12 @@ const ChatInput: React.FC = () => {
             onClick={() => setWebSearchEnabled(!webSearchEnabled)}
             disabled={streaming}
             className={cn(
-              "h-10 w-10 transition-all duration-200",
+              'h-10 w-10 transition-all duration-200',
               webSearchEnabled
-                ? "text-primary bg-primary/10"
-                : "text-muted-foreground hover:text-primary"
+                ? 'text-primary bg-primary/10'
+                : 'text-muted-foreground hover:text-primary',
             )}
-            title={webSearchEnabled ? "已启用网络搜索" : "启用网络搜索"}
+            title={webSearchEnabled ? '已启用网络搜索' : '启用网络搜索'}
           >
             <Globe className="w-4 h-4" />
           </Button>
@@ -217,12 +223,18 @@ const ChatInput: React.FC = () => {
           {/* Send button */}
           <Button
             onClick={handleSend}
-            disabled={(!messageText.trim() && fileList.length === 0) || streaming}
+            disabled={
+              (!messageText.trim() && fileList.length === 0) || streaming
+            }
             className="h-10 w-10 rounded-xl transition-all duration-200 hover:scale-105"
             size="icon"
             title={streaming ? '正在生成回复...' : '发送消息'}
           >
-            {streaming ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            {streaming ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
           </Button>
         </div>
       </div>
