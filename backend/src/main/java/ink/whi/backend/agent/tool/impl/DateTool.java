@@ -13,11 +13,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
-import java.util.List;
 import java.util.Map;
 
-import static dev.langchain4j.agent.tool.JsonSchemaProperty.description;
-import static dev.langchain4j.agent.tool.JsonSchemaProperty.type;
 
 /**
  * 日期工具

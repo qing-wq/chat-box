@@ -1,10 +1,8 @@
 package ink.whi.backend.common.converter;
 
 import ink.whi.backend.common.dto.message.MessageDTO;
-import ink.whi.backend.common.dto.message.MessageDTO;
-import ink.whi.backend.common.enums.RoleEnum;
-import ink.whi.backend.dao.entity.MessageDO;
-import org.springframework.beans.BeanUtils;
+import ink.whi.backend.common.enums.MsgRoleEnum;
+import ink.whi.backend.dao.entity.Message;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,18 +23,18 @@ public class MessageConverter {
      * @param messageDO 消息DO对象
      * @return 消息DTO对象
      */
-    public static MessageDTO toDTO(MessageDO messageDO) {
+    public static MessageDTO toDTO(Message messageDO) {
         if (messageDO == null) {
             return null;
         }
-        MessageDTO messageDTO = new MessageDTO();
-        messageDTO.setId(messageDO.getId());
-        messageDTO.setRole(RoleEnum.getRoleByType(messageDO.getRole()).getRole());
-        messageDTO.setChatId(messageDO.getChatId());
-        messageDTO.setContent(messageDO.getContent());
-        messageDTO.setCreateTime(messageDO.getCreateTime());
-        messageDTO.setUpdateTime(messageDO.getUpdateTime());
-        return messageDTO;
+        MessageDTO dto = new MessageDTO();
+        dto.setId(messageDO.getId());
+        dto.setRole(MsgRoleEnum.formType(messageDO.getRole()).getRole());
+        dto.setConversationUuid(messageDO.getConversationUuid());
+        dto.setContent(messageDO.getContent());
+        dto.setCreateTime(messageDO.getCreateTime());
+        dto.setUpdateTime(messageDO.getUpdateTime());
+        return dto;
     }
 
     /**
@@ -45,33 +43,34 @@ public class MessageConverter {
      * @param MessageDTO 消息DTO对象
      * @return 消息DO对象
      */
-    public static MessageDO toDO(MessageDTO MessageDTO) {
+    public static Message toDO(MessageDTO MessageDTO) {
         if (MessageDTO == null) {
             return null;
         }
-        MessageDO messageDO = new MessageDO();
-        messageDO.setContent(MessageDTO.getContent());
-        messageDO.setChatId(MessageDTO.getChatId());
-        RoleEnum role = RoleEnum.getRoleByName(MessageDTO.getRole());
+        Message message = new Message();
+        message.setContent(MessageDTO.getContent());
+        message.setConversationUuid(MessageDTO.getConversationUuid());
+        MsgRoleEnum role = MsgRoleEnum.formRole(MessageDTO.getRole());
         if (role == null) {
             throw new IllegalArgumentException("Invalid role: " + MessageDTO.getRole());
         }
-        messageDO.setRole(role.getId());
-        return messageDO;
+        message.setRole(role.getType());
+        return message;
     }
 
     /**
      * 批量转换MessageDO列表为MessageDTO列表
      *
-     * @param messageDOList 消息DO对象列表
+     * @param list 消息DO对象列表
      * @return 消息DTO对象列表
      */
-    public static List<MessageDTO> toDTOList(List<MessageDO> messageDOList) {
-        if (messageDOList == null || messageDOList.isEmpty()) {
+    public static List<MessageDTO> toDTOList(List<Message> list) {
+        if (list == null || list.isEmpty()) {
             return Collections.emptyList();
         }
-        List<MessageDTO> dtoList = new ArrayList<>(messageDOList.size());
-        for (MessageDO messageDO : messageDOList) {
+
+        List<MessageDTO> dtoList = new ArrayList<>(list.size());
+        for (Message messageDO : list) {
             MessageDTO dto = toDTO(messageDO);
             if (Objects.nonNull(dto)) {
                 dtoList.add(dto);

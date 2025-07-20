@@ -11,10 +11,20 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("message")
-public class MessageDO extends BaseDO {
+public class Message extends BaseEntity {
 
-    public Integer chatId;
-//    public Integer parentId;
+    public String conversationUuid;
+
+    public Integer userId;
+
+    private Integer role;
+
+    private Integer modelId;
+
     public String content;
-    public Integer role;
+
+    /**
+     * token数量
+     */
+    private Integer tokens;
 }

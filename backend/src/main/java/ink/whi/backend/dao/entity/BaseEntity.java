@@ -12,7 +12,7 @@ import java.util.Date;
  * @Date: 2025/3/2
  */
 @Data
-public class BaseDO implements Serializable {
+public class BaseEntity implements Serializable {
 
     @TableId(type = IdType.AUTO)
     private Integer id;

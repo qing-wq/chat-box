@@ -9,10 +9,9 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
-    default-property-inclusion: non_null
   datasource:
     url: jdbc:mysql://localhost:3306/chat_box_db?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
-    username:
+    username: root
     password:
 
 jwt:
@@ -25,8 +24,3 @@ jwt:
 #  pattern:
 #    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 #    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-
-# AI配置
-ai:
-  default-model: gpt-3.5-turbo
-  default-api-url: https://api.openai.com/v1

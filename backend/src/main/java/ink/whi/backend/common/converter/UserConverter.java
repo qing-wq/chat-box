@@ -2,7 +2,7 @@ package ink.whi.backend.common.converter;
 
 import ink.whi.backend.common.dto.user.BaseUserInfoDTO;
 import ink.whi.backend.common.dto.user.UserSaveReq;
-import ink.whi.backend.dao.entity.UserDO;
+import ink.whi.backend.dao.entity.User;
 
 /**
  * User converter to transform between different user related objects
@@ -16,7 +16,7 @@ public class UserConverter {
      * @param userDO User database object
      * @return BaseUserInfoDTO
      */
-    public static BaseUserInfoDTO toDTO(UserDO userDO) {
+    public static BaseUserInfoDTO toDTO(User userDO) {
         if (userDO == null) {
             return null;
         }
@@ -33,12 +33,12 @@ public class UserConverter {
      * @param req User save/update request
      * @return UserDO
      */
-    public static UserDO toDO(UserSaveReq req) {
+    public static User toDO(UserSaveReq req) {
         if (req == null) {
             return null;
         }
         
-        UserDO userDO = new UserDO();
+        User userDO = new User();
         userDO.setUsername(req.getUsername());
         userDO.setPassword(req.getPassword());
         
@@ -55,7 +55,7 @@ public class UserConverter {
      * @param userDO Existing user DO to update
      * @param req Request containing update information
      */
-    public static void updateDO(UserDO userDO, UserSaveReq req) {
+    public static void updateDO(User userDO, UserSaveReq req) {
         if (userDO == null || req == null) {
             return;
         }

@@ -1,4 +1,4 @@
-package ink.whi.backend.common.dto.chat;
+package ink.whi.backend.common.dto.conversation;
 
 import ink.whi.backend.common.dto.BaseDTO;
 import ink.whi.backend.common.dto.message.MessageDTO;
@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -14,13 +13,14 @@ import java.util.List;
  * @Date: 2025/3/30
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class ChatDTO extends BaseDTO {
+public class ConversationDTO extends BaseDTO {
 
     @Serial
     private static final long serialVersionUID = -1314162575898615006L;
 
-    public String title;
+    private String uuid;
 
-    public List<MessageDTO> messageList;
+    private String title;
+
+    private String systemMessage;
 }

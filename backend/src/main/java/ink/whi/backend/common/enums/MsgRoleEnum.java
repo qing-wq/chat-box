@@ -6,58 +6,58 @@ import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import lombok.Getter;
 
-/**
- * 消息角色枚举
- */
+import java.util.Objects;
+
 @Getter
-public enum ChatMessageRoleEnum {
-    
-    USER("user") {
+public enum MsgRoleEnum {
+
+    User(1, "user") {
         @Override
         public ChatMessage createMessage(String content) {
             return new UserMessage(content);
         }
     },
-    
-    ASSISTANT("assistant") {
+    Assistant(2, "assistant") {
         @Override
         public ChatMessage createMessage(String content) {
             return new AiMessage(content);
         }
     },
-    
-    SYSTEM("system") {
+    System(3, "system") {
         @Override
         public ChatMessage createMessage(String content) {
             return new SystemMessage(content);
         }
     };
-    
-    private final String role;
-    
-    ChatMessageRoleEnum(String role) {
+
+    private int type;
+    private String role;
+
+    MsgRoleEnum(int type, String role) {
+        this.type = type;
         this.role = role;
     }
-    
-    /**
-     * 创建对应类型的消息对象
-     */
+
     public abstract ChatMessage createMessage(String content);
-    
+
     /**
-     * 通过角色名称获取对应的枚举
+     * 根据类型获取角色名称
      */
-    public static ChatMessageRoleEnum fromRole(String role) {
-        if (role == null) {
-            return null;
-        }
-        
-        for (ChatMessageRoleEnum chatMessageRoleEnum : values()) {
-            if (chatMessageRoleEnum.getRole().equalsIgnoreCase(role)) {
-                return chatMessageRoleEnum;
+    public static MsgRoleEnum formRole(String role) {
+        for (MsgRoleEnum msgRoleEnum : MsgRoleEnum.values()) {
+            if (Objects.equals(role, msgRoleEnum.getRole())) {
+                return msgRoleEnum;
             }
         }
-        
+        return null;
+    }
+
+    public static MsgRoleEnum formType(Integer type) {
+        for (MsgRoleEnum msgRoleEnum : MsgRoleEnum.values()) {
+            if (Objects.equals(msgRoleEnum.getType(), type)) {
+                return msgRoleEnum;
+            }
+        }
         return null;
     }
 }

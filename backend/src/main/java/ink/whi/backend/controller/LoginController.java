@@ -3,18 +3,16 @@ package ink.whi.backend.controller;
 
 import ink.whi.backend.common.dto.ResVo;
 import ink.whi.backend.common.dto.user.BaseUserInfoDTO;
-import ink.whi.backend.common.dto.user.UserSaveReq;
 import ink.whi.backend.common.permission.Permission;
 import ink.whi.backend.common.permission.UserRole;
 import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.common.utils.JwtUtil;
 import ink.whi.backend.common.utils.SessionUtil;
-import ink.whi.backend.dao.entity.UserDO;
+import ink.whi.backend.dao.entity.User;
 import ink.whi.backend.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static ink.whi.backend.global.GlobalInitHelper.SESSION_KEY;
@@ -81,7 +79,7 @@ public class LoginController {
                                    @RequestParam("password") String password,
                                    HttpServletResponse response) {
 
-        UserDO user = userService.createUser(username, password);
+        User user = userService.createUser(username, password);
         Integer userId = user.getId();
         // 签发token
         String token = JwtUtil.createToken(userId);
