@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import { ChatRequest, MemoryChatRequest } from '../types';
+import { store } from '../store';
 
 // Configure axios defaults
 axios.defaults.baseURL = import.meta.env.VITE_HTTP_URL; // Assuming API is served from the same domain
@@ -42,21 +43,6 @@ export const streamChat = async (
   let fullContent = '';
   let buffer = ''; // 用于处理跨块的不完整数据
 
-  console.log('Starting chat request with:', JSON.stringify(request, null, 2));
-  
-  // 检查是否设置API URL和API Key
-  if (!request.modelConfig.apiUrl || request.modelConfig.apiUrl.trim() === '') {
-    console.error('API URL未设置:', request.modelConfig);
-    onError('请在设置页面配置API URL后再尝试发送消息。');
-    return () => {};
-  }
-  
-  if (!request.modelConfig.apiKey || request.modelConfig.apiKey.trim() === '') {
-    console.error('API Key未设置:', request.modelConfig);
-    onError('请在设置页面配置API Key后再尝试发送消息。');
-    return () => {};
-  }
-  
   // 创建AbortController用于取消请求
   const controller = new AbortController();
   const signal = controller.signal;
@@ -86,10 +72,13 @@ export const streamChat = async (
     }
     
     console.log('Processed request:', JSON.stringify(processedRequest, null, 2));
+    // 从store中获取当前聊天的模型ID
+    const currentChat = store.getState().chat.currentChat;
+    
     let chatMessage = {
       "conversationUuId": processedRequest.conversationUuId,
       "userMessage": processedRequest.messageList[processedRequest.messageList.length - 1].content,
-      "modelId": 1,
+      "modelId": currentChat?.currentModel?.id || 1,
       "toolList": processedRequest.toolList
     } 
     const response = await fetch('/api/chat/', {

@@ -159,6 +159,16 @@ const chatSlice = createSlice({
       if (state.currentChat) {
         state.currentChat.messageList = [];
       }
+    },
+    setCurrentModel: (state, action: PayloadAction<{ id: number; name: string } | null>) => {
+      if (state.currentChat && action.payload) {
+        if (!state.currentChat.currentModel) {
+          state.currentChat.currentModel = action.payload;
+        } else {
+          state.currentChat.currentModel.id = action.payload.id;
+          state.currentChat.currentModel.name = action.payload.name;
+        }
+      }
     }
   },
   extraReducers: (builder) => {
@@ -185,6 +195,7 @@ const chatSlice = createSlice({
       .addCase(fetchChatDetail.fulfilled, (state, action: PayloadAction<ChatDetail>) => {
         state.loading = false;
         state.currentChat = action.payload;
+        // currentModel 现在直接包含在 currentChat 中
       })
       .addCase(fetchChatDetail.rejected, (state, action) => {
         state.loading = false;
@@ -243,6 +254,7 @@ const chatSlice = createSlice({
         if (chatIndex !== -1) {
           if (title) state.chatList[chatIndex].title = title;
           if (description) state.chatList[chatIndex].description = description;
+          
         }
         
         // Update current chat if it's the same
@@ -257,5 +269,5 @@ const chatSlice = createSlice({
   }
 });
 
-export const { clearError, setStreaming, addMessage, updateLastMessage, clearMessages } = chatSlice.actions;
+export const { clearError, setStreaming, addMessage, updateLastMessage, clearMessages, setCurrentModel } = chatSlice.actions;
 export default chatSlice.reducer;

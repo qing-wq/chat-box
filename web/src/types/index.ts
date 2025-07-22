@@ -32,6 +32,7 @@ export interface ChatInfo {
 export interface ChatDetail{
   conversation: Conversation;
   messageList: Message[];
+  currentModel?: Model;
 }
 
 // Conversation types
@@ -96,3 +97,35 @@ export interface MemoryChatRequest {
 
 // Theme type
 export type ThemeMode = 'light' | 'dark';
+
+// Platform types
+export enum PlatformType {
+  "openai" = 0,
+  "openai-response" = 1,
+  "gemini" = 2,
+  "anthropic" = 3,
+  "azure_openai" = 4
+  // Add more platform types as needed
+}
+
+// Model types
+export interface Model {
+  id: number;
+  createTime: string;
+  updateTime: string;
+  name: string;
+  type: string;
+  platformId: number;
+}
+
+export interface Platform {
+  id: string;
+  name: string;
+  platformType: string;
+  apiKey: string;
+  baseUrl: string;
+  createTime?: string;
+  updateTime?: string;
+  modelList?: Model[];
+  enable?: boolean;
+}

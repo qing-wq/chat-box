@@ -166,6 +166,9 @@ const ChatInput: React.FC = () => {
           {/* File upload button */}
           <div className="relative">
             <input
+              aria-label="文件上传"
+              title="点击上传文件"
+              placeholder="选择要上传的文件"
               type="file"
               accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
               multiple

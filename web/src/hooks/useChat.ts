@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useAppSelector } from './useAppSelector';
 import { useAppDispatch } from './useAppDispatch';
-import { addMessage, updateLastMessage, setStreaming, updateChatMessages } from '../store/chatSlice';
+import { addMessage, updateLastMessage, setStreaming, updateChatMessages, fetchChatList } from '../store/chatSlice';
 import { Message, ChatRequest } from '../types';
 import { streamChat } from '../utils/api';
 
@@ -30,9 +30,9 @@ export const useChat = () => {
       role: 'user',
       content
     };
-    console.log('Adding user message:', userMessage);
+    // console.log('Adding user message:', userMessage);
     messageList.push(userMessage);
-    console.log('current messageList:', messageList);
+    // console.log('current messageList:', messageList);
     dispatch(addMessage(userMessage));
 
     // Add empty assistant message that will be updated with streaming content
@@ -51,7 +51,7 @@ export const useChat = () => {
     const chatRequest: ChatRequest = {
       conversationUuId,
       messageList,
-      modelConfig,
+      modelConfig, // 使用modelConfig，而不是currentModel
       toolList: useTools.length > 0 ? useTools : undefined
     };
 
@@ -112,6 +112,7 @@ export const useChat = () => {
           description:currentChat.conversation.description,
           systemMessage:currentChat.conversation.systemMessage
         }));
+        dispatch(fetchChatList());
       }
     );  
 

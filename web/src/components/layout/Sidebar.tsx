@@ -12,7 +12,8 @@ import {
   MoreHorizontal,
   Bot,
   Clock,
-  Sparkles
+  Sparkles,
+  Cpu
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import { fetchChatList, createNewChat, deleteChat, updateChatMessages } from '../../store/chatSlice';
@@ -280,19 +281,30 @@ const Sidebar: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col space-y-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate('/settings')}
-            className="h-9 px-3 text-xs hover:bg-accent"
+            className="h-9 px-3 text-xs hover:bg-accent justify-start"
             title="Settings"
           >
             <Settings className="w-4 h-4 mr-2" />
             Settings
           </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/platforms')}
+            className="h-9 px-3 text-xs hover:bg-accent justify-start"
+            title="Model Management"
+          >
+            <Cpu className="w-4 h-4 mr-2" />
+            Model Management
+          </Button>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 justify-end mt-2">
             <Button
               variant="ghost"
               size="icon"

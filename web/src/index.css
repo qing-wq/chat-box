@@ -99,6 +99,100 @@ body {
   @apply text-base leading-relaxed;
 }
 
+/* Modal theme adaptive styling */
+.modal-theme-adaptive .ant-modal-content {
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+}
+
+.modal-theme-adaptive .ant-modal-header {
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border-color: hsl(var(--border));
+}
+
+.modal-theme-adaptive .ant-modal-title {
+  color: hsl(var(--card-foreground));
+}
+
+.modal-theme-adaptive .ant-modal-close {
+  color: hsl(var(--muted-foreground));
+}
+
+.modal-theme-adaptive .ant-modal-close:hover {
+  color: hsl(var(--foreground));
+}
+
+.modal-overlay-theme-adaptive {
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
+.dark .modal-overlay-theme-adaptive {
+  background-color: rgba(0, 0, 0, 0.65);
+}
+
+/* Form theme adaptive styling */
+.modal-theme-adaptive .ant-form-item-label > label {
+  color: hsl(var(--foreground));
+}
+
+.modal-theme-adaptive .ant-input,
+.modal-theme-adaptive .ant-input-password,
+.modal-theme-adaptive .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  background-color: hsl(var(--background));
+  border-color: hsl(var(--border));
+  color: hsl(var(--foreground));
+}
+
+.modal-theme-adaptive .ant-input:hover,
+.modal-theme-adaptive .ant-input-password:hover,
+.modal-theme-adaptive .ant-select:not(.ant-select-customize-input) .ant-select-selector:hover {
+  border-color: hsl(var(--ring));
+}
+
+.modal-theme-adaptive .ant-input:focus,
+.modal-theme-adaptive .ant-input-focused,
+.modal-theme-adaptive .ant-input-password:focus,
+.modal-theme-adaptive .ant-input-password-focused,
+.modal-theme-adaptive .ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 2px hsla(var(--ring), 0.2);
+}
+
+.modal-theme-adaptive .ant-select-dropdown {
+  background-color: hsl(var(--popover));
+  border-color: hsl(var(--border));
+}
+
+.modal-theme-adaptive .ant-select-item-option-content {
+  color: hsl(var(--popover-foreground));
+}
+
+.modal-theme-adaptive .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: hsl(var(--accent));
+}
+
+.modal-theme-adaptive .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.modal-theme-adaptive .ant-btn-primary {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+}
+
+.modal-theme-adaptive .ant-btn-primary:hover {
+  background-color: hsla(var(--primary), 0.9);
+  border-color: hsla(var(--primary), 0.9);
+}
+
+.modal-theme-adaptive .ant-btn-default {
+  background-color: hsl(var(--secondary));
+  border-color: hsl(var(--border));
+  color: hsl(var(--secondary-foreground));
+}
+
 .markdown-body h1 {
   @apply text-2xl font-bold mt-6 mb-4;
 }
@@ -262,4 +356,22 @@ body {
 /* Focus styles */
 .focus-ring {
   @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50;
+}
+
+/* Ant Design Button Hover Styles */
+.modal-theme-adaptive .ant-modal-footer .ant-btn-primary:hover,
+.modal-theme-adaptive .ant-modal-footer .ant-btn-primary:focus,
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  background: linear-gradient(to right, hsl(262, 83%, 58%), hsla(262, 83%, 58%, 0.9)) !important;
+  border-color: hsl(262, 83%, 58%) !important;
+  color: #131212 !important;
+}
+
+.modal-theme-adaptive .ant-modal-footer .ant-btn:hover,
+.modal-theme-adaptive .ant-modal-footer .ant-btn:focus,
+.ant-btn:hover,
+.ant-btn:focus {
+  color: hsl(0, 2%, 10%) !important;
+  border-color: hsl(262, 85%, 57%) !important;
 }

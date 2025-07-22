@@ -10,6 +10,8 @@ import HomePage from './pages/HomePage';
 import ChatPage from './pages/ChatPage';
 import LoginPage from './pages/LoginPage';
 import SettingsPage from './pages/SettingsPage';
+import PlatformPage from './pages/PlatformPage';
+import ModelPage from './pages/ModelPage';
 import MarkdownDemo from './components/demo/MarkdownDemo';
 import SSETest from './components/demo/SSETest';
 
@@ -71,6 +73,8 @@ const AppContent: React.FC = () => {
             <Route index element={<HomePage />} />
             <Route path="chat/:chatId" element={<ChatPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="platforms" element={<PlatformPage />} />
+            <Route path="models/:modelId" element={<ModelPage />} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />
