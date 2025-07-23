@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
-import { ChatInfo, ChatDetail, Message, ResVo, ChatUpdateRequest, Conversation } from '../types';
+import { ChatInfo, ChatDetail, Message, ResVo, ChatUpdateRequest, Conversation, ChatListInfo } from '../types';
 
 
 import axios from 'axios';
 
 interface ChatState {
-  chatList: ChatInfo[];
+  chatList: ChatListInfo[];
   currentChat: ChatDetail | null;
   loading: boolean;
   error: string | null;
@@ -26,7 +26,7 @@ export const fetchChatList = createAsyncThunk(
   'chat/fetchChatList',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get<ResVo<ChatInfo[]>>(
+      const response = await axios.get<ResVo<ChatListInfo[]>>(
         '/api/conversation/list',
       );
 
@@ -252,6 +252,12 @@ const chatSlice = createSlice({
       })
       .addCase(fetchChatDetail.fulfilled, (state, action: PayloadAction<ChatDetail>) => {
         state.loading = false;
+        const chat = state.chatList.find((chat) => chat.uuid === action.payload.conversation.uuid);
+        if (chat) {
+          chat.updateTime = action.payload.conversation.updateTime;
+          chat.createTime = action.payload.conversation.createTime;
+          chat.title = action.payload.conversation.title;
+        }
         state.currentChat = action.payload;
         // currentModel 现在直接包含在 currentChat 中
       })
@@ -268,7 +274,12 @@ const chatSlice = createSlice({
 
       .addCase(createNewChat.fulfilled, (state, action: PayloadAction<ChatInfo>) => {
         state.loading = false;
-        state.chatList.unshift(action.payload);
+        state.chatList.unshift({
+          uuid: action.payload.uuid,
+          title: action.payload.title,
+          description: action.payload.description,
+          systemMessage: action.payload.systemMessage,
+        });
         state.currentChat = {
           conversation: action.payload,
           messageList: []

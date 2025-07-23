@@ -5,7 +5,7 @@ import { useAppSelector, useAppDispatch } from '../hooks';
 import { fetchChatDetail } from '../store/chatSlice';
 import MessageList from '../components/chat/MessageList';
 import ChatInput from '../components/chat/ChatInput';
-import ApiConfigAlert from '../components/common/ApiConfigAlert';
+import ModelConfigAlert from '../components/common/ModelConfigAlert';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
@@ -74,7 +74,7 @@ const ChatPage: React.FC = () => {
           <p className="text-muted-foreground mb-6">
             从侧边栏选择一个对话或创建新对话开始聊天。
           </p>
-          <ApiConfigAlert />
+          <ModelConfigAlert />
         </div>
       </div>
     );
@@ -94,10 +94,10 @@ const ChatPage: React.FC = () => {
         </div>
       </div>
 
-      {/* API配置提醒 */}
+      {/* 模型配置提醒 */}
       <div className="flex-shrink-0 px-4 sm:px-6 py-2">
         <div className="max-w-4xl mx-auto">
-          <ApiConfigAlert />
+          <ModelConfigAlert />
         </div>
       </div>
 

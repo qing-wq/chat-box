@@ -4,24 +4,16 @@ import {
   Plus,
   Trash2,
   Edit3,
-  Settings,
-  LogOut,
-  Sun,
-  Moon,
-  MessageSquare,
   MoreHorizontal,
+  MessageSquare,
   Bot,
   Clock,
-  Sparkles,
-  Cpu
+  Sparkles
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 
 import { fetchChatList, createNewChat, deleteChat, updateChatMessages } from '../../store/chatSlice';
 
-import { logout } from '../../store/userSlice';
-import { setTheme } from '../../store/configSlice';
-import { ThemeMode } from '../../types';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -40,7 +32,6 @@ const Sidebar: React.FC = () => {
 
   const { chatId } = useParams<{ chatId: string }>();//当前的路由上的uuid
   const { chatList, loading } = useAppSelector(state => state.chat);
-  const { theme } = useAppSelector(state => state.config);
 
   const [editingChatUuid, setEditingChatUuid] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
@@ -54,7 +45,7 @@ const Sidebar: React.FC = () => {
   const handleNewChat = async () => {
     const resultAction = await dispatch(createNewChat());
     if (createNewChat.fulfilled.match(resultAction)) {
-      navigate(`/chat/${resultAction.payload.id}`);
+      navigate(`/chat/${resultAction.payload.uuid}`);
     }
   };
 
@@ -107,18 +98,6 @@ const Sidebar: React.FC = () => {
     setEditTitle('');
   };
 
-  // Handle logout
-  const handleLogout = async () => {
-    await dispatch(logout());
-    navigate('/login');
-  };
-
-  // Handle theme toggle
-  const handleThemeToggle = () => {
-    const newTheme: ThemeMode = theme === 'light' ? 'dark' : 'light';
-    dispatch(setTheme(newTheme));
-  };
-
   // Format date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -131,11 +110,11 @@ const Sidebar: React.FC = () => {
       <div className="p-4 space-y-4">
         <div className="flex items-center gap-2 px-2">
           <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10">
-            <Bot className="w-5 h-5 text-primary" />
+            <MessageSquare className="w-5 h-5 text-primary" />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-sm font-semibold">Chat Box</h1>
-            <p className="text-xs text-muted-foreground">AI Assistant</p>
+            <h1 className="text-sm font-semibold">Chats</h1>
+            <p className="text-xs text-muted-foreground">Your conversations</p>
           </div>
         </div>
 
@@ -277,87 +256,8 @@ const Sidebar: React.FC = () => {
         </div>
       </ScrollArea>
 
-      <Separator className="mx-4" />
-
-      {/* Footer */}
-      <div className="p-4 space-y-3">
-        {/* User Info */}
-        <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-r from-muted/30 to-muted/20 hover:from-muted/40 hover:to-muted/30 transition-all duration-200 cursor-pointer group">
-          <div className="relative">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary via-primary/80 to-primary/60 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-200">
-              <span className="text-sm font-semibold text-white">U</span>
-            </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-background animate-pulse"></div>
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium truncate group-hover:text-primary transition-colors duration-200">
-              User
-            </div>
-            <div className="text-xs text-muted-foreground">
-              Free Plan • Online
-            </div>
-          </div>
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col space-y-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/settings')}
-            className="h-9 px-3 text-xs hover:bg-accent justify-start"
-            title="Settings"
-          >
-            <Settings className="w-4 h-4 mr-2" />
-            Settings
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/platforms')}
-            className="h-9 px-3 text-xs hover:bg-accent justify-start"
-            title="Model Management"
-          >
-            <Cpu className="w-4 h-4 mr-2" />
-            Model Management
-          </Button>
-
-          <div className="flex items-center gap-1 justify-end mt-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleThemeToggle}
-              className="h-8 w-8 hover:bg-accent"
-              title={
-                theme === 'light'
-                  ? 'Switch to dark mode'
-                  : 'Switch to light mode'
-              }
-            >
-              {theme === 'light' ? (
-                <Moon className="w-4 h-4" />
-              ) : (
-                <Sun className="w-4 h-4" />
-              )}
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleLogout}
-              className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
-              title="Logout"
-            >
-              <LogOut className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Stats */}
+      {/* Stats */}
+      <div className="p-4">
         <div className="flex items-center justify-between text-xs px-3 py-2 rounded-lg bg-muted/20">
           <div className="flex items-center gap-1.5 text-muted-foreground">
             <MessageSquare className="w-3 h-3" />

@@ -29,6 +29,13 @@ export interface ChatInfo {
   systemMessage?: string;
 }
 
+export interface ChatListInfo {
+  uuid: string;
+  title: string;
+  createTime: string;
+  updateTime: string;
+}
+
 export interface ChatDetail{
   conversation: Conversation;
   messageList: Message[];

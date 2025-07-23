@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Menu, Bot } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks';
@@ -11,25 +11,17 @@ import { setModelConfig } from '@/store/configSlice';
 import { setCurrentModel } from '@/store/chatSlice';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import GlobalSidebar from './GlobalSidebar';
 
-const MainLayout: React.FC = () => {
+const ChatMainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [modelListOpen, setModelListOpen] = useState(false);
-  const { theme, modelConfig } = useAppSelector(state => state.config);
+  const { modelConfig } = useAppSelector(state => state.config);
   const { modelList, loading } = useAppSelector(state => state.model);
   const { currentChat } = useAppSelector(state => state.chat);
   const currentModel = currentChat?.currentModel || null;
   const dispatch = useAppDispatch();
   
-  // Apply theme class to document
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
-
   // Handle responsive behavior
   useEffect(() => {
     const handleResize = () => {
@@ -71,10 +63,11 @@ const MainLayout: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Sidebar */}
+      <GlobalSidebar />
+      {/* Chat Sidebar */}
       <div
         className={cn(
-          'relative transition-all duration-300 ease-in-out h-full bg-card shadow-sm',
+          'relative transition-all duration-300 ease-in-out h-full bg-card shadow-sm animate-slideIn',
           collapsed ? 'w-0' : 'w-64 md:w-80',
         )}
       >
@@ -107,55 +100,59 @@ const MainLayout: React.FC = () => {
               }
             </Button>
 
-            <Separator orientation="vertical" className="h-6" />
+            {currentChat && (
+              <>
+                <Separator orientation="vertical" className="h-6" />
 
-            <Popover open={modelListOpen} onOpenChange={setModelListOpen}>
-              <PopoverTrigger asChild>
-                <div 
-                  className="flex items-center gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground p-2 rounded-md transition-colors"
-                  onClick={handleFetchModelList}
-                >
-                  <Bot className="w-5 h-5 text-primary" />
-                  <span className="text-sm sm:text-base font-medium truncate">
-                    {currentModel ? currentModel.name : (modelConfig.modelName || 'Chat Assistant')}
-                  </span>
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className="w-64 p-0" align="start">
-                <div className="p-2">
-                  <h4 className="font-medium mb-2">选择模型</h4>
-                  {loading ? (
-                    <div className="text-center py-2">加载中...</div>
-                  ) : modelList ? (
-                    <ScrollArea className="h-[300px]">
-                      {Object.entries(modelList).map(([category, models]) => (
-                        <div key={category} className="mb-3">
-                          <h5 className="text-xs text-muted-foreground mb-1">{category}</h5>
-                          {models.map(model => (
-                            <div 
-                              key={model.id}
-                              className="py-1.5 px-2 text-sm rounded-md cursor-pointer hover:bg-accent transition-colors"
-                              onClick={() => handleSelectModel(model.id, model.name)}
-                            >
-                              {model.name}
+                <Popover open={modelListOpen} onOpenChange={setModelListOpen}>
+                  <PopoverTrigger asChild>
+                    <div 
+                      className="flex items-center gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground p-2 rounded-md transition-colors"
+                      onClick={handleFetchModelList}
+                    >
+                      <Bot className="w-5 h-5 text-primary" />
+                      <span className="text-sm sm:text-base font-medium truncate">
+                        {currentModel ? currentModel.name: '选择模型'}
+                      </span>
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 p-0" align="start">
+                    <div className="p-2">
+                      <h4 className="font-medium mb-2">选择模型</h4>
+                      {loading ? (
+                        <div className="text-center py-2">加载中...</div>
+                      ) : modelList ? (
+                        <ScrollArea className="h-[300px]">
+                          {Object.entries(modelList).map(([category, models]) => (
+                            <div key={category} className="mb-3">
+                              <h5 className="text-xs text-muted-foreground mb-1">{category}</h5>
+                              {models.map(model => (
+                                <div 
+                                  key={model.id}
+                                  className="py-1.5 px-2 text-sm rounded-md cursor-pointer hover:bg-accent transition-colors"
+                                  onClick={() => handleSelectModel(model.id, model.name)}
+                                >
+                                  {model.name}
+                                </div>
+                              ))}
                             </div>
                           ))}
-                        </div>
-                      ))}
-                    </ScrollArea>
-                  ) : (
-                    <div className="text-center py-2">无可用模型</div>
-                  )}
-                </div>
-              </PopoverContent>
-            </Popover>
+                        </ScrollArea>
+                      ) : (
+                        <div className="text-center py-2">无可用模型</div>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </>
+            )}
           </div>
 
           {/* Right side of header */}
           <div className="flex items-center gap-2">
             <div className="hidden sm:block text-xs text-muted-foreground">
-              {theme === 'dark' ? '🌙' : '☀️'}
+              {/* 可以添加其他头部右侧内容 */}
             </div>
           </div>
         </header>
@@ -169,4 +166,4 @@ const MainLayout: React.FC = () => {
   );
 };
 
-export default MainLayout;
+export default ChatMainLayout;

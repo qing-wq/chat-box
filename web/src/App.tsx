@@ -10,7 +10,8 @@ import { store } from './store';
 import { useAppSelector } from './hooks';
 
 // Import pages and layouts
-import MainLayout from './components/layout/MainLayout';
+import ChatMainLayout from './components/layout/ChatMainLayout';
+import GlobalMainLayout from './components/layout/GlobalMainLayout';
 import HomePage from './pages/HomePage';
 import ChatPage from './pages/ChatPage';
 import LoginPage from './pages/LoginPage';
@@ -74,16 +75,28 @@ const AppContent: React.FC = () => {
           <Route path="/demo" element={<MarkdownDemo />} />
           <Route path="/sse-test" element={<SSETest />} />
 
+          {/* Chat routes with ChatMainLayout */}
           <Route
             path="/"
             element={
               <ProtectedRoute>
-                <MainLayout />
+                <ChatMainLayout />
               </ProtectedRoute>
             }
           >
             <Route index element={<HomePage />} />
             <Route path="chat/:chatId" element={<ChatPage />} />
+          </Route>
+          
+          {/* Global routes with GlobalMainLayout */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <GlobalMainLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route path="settings" element={<SettingsPage />} />
             <Route path="platforms" element={<PlatformPage />} />
             <Route path="models/:modelId" element={<ModelPage />} />
