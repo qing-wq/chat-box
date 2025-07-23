@@ -8,7 +8,7 @@ import java.io.File;
  * @author: qing
  * @Date: 2025/3/30
  */
-public class FileChatRequest extends BaseModelRequest{
+public class FileChatRequest extends ChatReq {
 
     @NotNull
     public File file;

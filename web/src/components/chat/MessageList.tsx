@@ -1,5 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { ChevronDown, MessageSquare, Sparkles, Code, Calculator } from 'lucide-react';
+import {
+  ChevronDown,
+  MessageSquare,
+  Sparkles,
+  Code,
+  Calculator,
+} from 'lucide-react';
 import { Message } from '../../types';
 import MessageItem from './MessageItem';
 import { useAppSelector } from '../../hooks';
@@ -14,14 +20,16 @@ interface MessageListProps {
 
 const MessageList: React.FC<MessageListProps> = ({ messages }) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const { streaming } = useAppSelector(state => state.chat);
+  const { streaming } = useAppSelector((state) => state.chat);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
 
   // Scroll to bottom when new messages are added or when streaming
   useEffect(() => {
     if (!isUserScrolling && scrollAreaRef.current) {
-      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      const scrollContainer = scrollAreaRef.current.querySelector(
+        '[data-radix-scroll-area-viewport]',
+      );
       if (scrollContainer) {
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
         setShowScrollButton(false);
@@ -45,7 +53,9 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
   // Scroll to bottom when the button is clicked
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
-      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      const scrollContainer = scrollAreaRef.current.querySelector(
+        '[data-radix-scroll-area-viewport]',
+      );
       if (scrollContainer) {
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
         setShowScrollButton(false);
@@ -128,7 +138,9 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
           <div className="flex items-center justify-center">
             <div className="flex items-center gap-2 px-6 py-3 bg-muted/50 rounded-full">
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium">在下方输入框中开始对话</span>
+              <span className="text-sm font-medium">
+                在下方输入框中开始对话
+              </span>
             </div>
           </div>
         </div>
@@ -151,8 +163,8 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
               <div
                 key={`${message.id}-${index}`}
                 className={cn(
-                  "animate-slideIn",
-                  index === messages.length - 1 && "animate-fadeIn"
+                  'animate-slideIn',
+                  index === messages.length - 1 && 'animate-fadeIn',
                 )}
                 style={{ animationDelay: `${Math.min(index * 50, 500)}ms` }}
               >
@@ -168,9 +180,18 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
           {streaming && (
             <div className="flex items-center gap-2 px-6 py-4 text-sm text-muted-foreground">
               <div className="flex gap-1">
-                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                <div
+                  className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                  style={{ animationDelay: '0ms' }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                  style={{ animationDelay: '150ms' }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                  style={{ animationDelay: '300ms' }}
+                ></div>
               </div>
               <span>AI 正在思考...</span>
             </div>
@@ -185,10 +206,10 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
           size="icon"
           onClick={scrollToBottom}
           className={cn(
-            "absolute bottom-6 right-6 w-12 h-12 rounded-full shadow-lg",
-            "bg-background/80 backdrop-blur-sm border-border/50",
-            "hover:bg-accent hover:scale-110 transition-all duration-200",
-            "animate-fadeIn"
+            'absolute bottom-6 right-6 w-12 h-12 rounded-full shadow-lg',
+            'bg-background/80 backdrop-blur-sm border-border/50',
+            'hover:bg-accent hover:scale-110 transition-all duration-200',
+            'animate-fadeIn',
           )}
           title="回到底部"
         >

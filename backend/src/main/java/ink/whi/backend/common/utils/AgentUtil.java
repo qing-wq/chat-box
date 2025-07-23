@@ -1,9 +1,11 @@
 package ink.whi.backend.common.utils;
 
+import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.model.chat.response.ChatResponseMetadata;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.service.TokenStream;
-import ink.whi.backend.common.enums.ChatMessageRoleEnum;
+import ink.whi.backend.common.enums.MsgRoleEnum;
 import ink.whi.backend.common.exception.BusinessException;
 import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.common.dto.message.MessageDTO;
@@ -15,9 +17,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 import static dev.langchain4j.data.message.SystemMessage.systemMessage;
 
@@ -40,14 +43,13 @@ public class AgentUtil {
     public static OpenAiStreamingChatModel buildStreamChatLanguagesModel(ModelConfig config) {
         OpenAiStreamingChatModel.OpenAiStreamingChatModelBuilder builder = OpenAiStreamingChatModel.builder()
                 .apiKey(config.getApiKey())
-                .baseUrl(config.getApiUrl())
+                .baseUrl(config.getBaseUrl())
                 .modelName(config.getModelName());
         buildModelParams(config.getModelParams(), builder);
         return builder.build();
     }
 
     public static List<ChatMessage> buildChatMessages(List<MessageDTO> messages, String systemMessage) {
-        // 构建消息列表
         List<ChatMessage> chatMessages = new ArrayList<>();
         // system message
         chatMessages.add(systemMessage(systemMessage));
@@ -56,11 +58,11 @@ public class AgentUtil {
             for (MessageDTO msgDTO : messages) {
                 ChatMessage chatMessage;
 
-                ChatMessageRoleEnum chatMessageRoleEnum = ChatMessageRoleEnum.fromRole(msgDTO.getRole());
-                if (chatMessageRoleEnum == null) {
+                MsgRoleEnum role = MsgRoleEnum.formRole(msgDTO.getRole());
+                if (role == null) {
                     throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "不支持的消息角色: " + msgDTO.getRole());
                 }
-                chatMessage = chatMessageRoleEnum.createMessage(msgDTO.getContent());
+                chatMessage = role.createMessage(msgDTO.getContent());
                 chatMessages.add(chatMessage);
             }
         }
@@ -85,18 +87,27 @@ public class AgentUtil {
         }
     }
 
-    public static void registerStreamingHandler(TokenStream tokenStream, SseEmitter emitter) {
-        tokenStream.onNext(token -> {
+    public static void registerStreamingHandler(TokenStream tokenStream, SseEmitter emitter, Consumer<AiMessage> consumer) {
+        tokenStream.onPartialResponse(token -> {
                     try {
-                        emitter.send(SseEmitter.event().data(token));
+                        // 将token封装为JSON格式 {v: token}
+                        Map<String, String> tokenData = new HashMap<>();
+                        tokenData.put("v", token);
+                        emitter.send(SseEmitter.event().data(tokenData));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 })
-                .onComplete((response) -> {
+                .onCompleteResponse((response) -> {
                     try {
                         emitter.complete();
+                        AiMessage aiMessage = response.aiMessage();
+                        ChatResponseMetadata metadata = response.metadata();
                         log.info("流式响应完成, response:{}", response);
+
+                        // save aiMessage
+                        consumer.accept(aiMessage);
+                        log.info("请求完成，消耗token{}", metadata.tokenUsage());
                     } catch (Exception e) {
                         log.error("关闭SSE连接失败", e);
                     }

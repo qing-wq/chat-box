@@ -1,16 +1,30 @@
 import React from 'react';
-import { Form, Input, Button, Card, Slider, Select, InputNumber, Divider, message } from 'antd';
+import {
+  Form,
+  Input,
+  Button,
+  Card,
+  Slider,
+  Select,
+  InputNumber,
+  Divider,
+  message,
+} from 'antd';
 import { useAppSelector, useAppDispatch } from '../hooks';
-import { setTheme, setModelConfig, updateModelParam } from '../store/configSlice';
+import {
+  setTheme,
+  setModelConfig,
+  updateModelParam,
+} from '../store/configSlice';
 import { ThemeMode, ModelConfig, ModelParams } from '../types';
 
 const { Option } = Select;
 
 const SettingsPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { theme, modelConfig } = useAppSelector(state => state.config);
+  const { theme, modelConfig } = useAppSelector((state) => state.config);
   const [form] = Form.useForm();
-  
+
   // Initialize form with current values
   React.useEffect(() => {
     form.setFieldsValue({
@@ -20,42 +34,42 @@ const SettingsPage: React.FC = () => {
       modelName: modelConfig.modelName,
       temperature: modelConfig.modelParams?.temperature || 0.7,
       topP: modelConfig.modelParams?.topP || 0.9,
-      maxTokens: modelConfig.modelParams?.maxTokens || 2000
+      maxTokens: modelConfig.modelParams?.maxTokens || 2000,
     });
   }, [form, theme, modelConfig]);
-  
+
   // Handle form submission
-  const handleSubmit = (values: any) => {
+  const handleSubmit = (values: Record<string, unknown>) => {
     // Update theme
     if (values.theme !== theme) {
       dispatch(setTheme(values.theme as ThemeMode));
     }
-    
+
     // Update model config
     const newModelConfig: ModelConfig = {
-      apiUrl: values.apiUrl,
-      apiKey: values.apiKey,
-      modelName: values.modelName,
+      apiUrl: values.apiUrl as string,
+      apiKey: values.apiKey as string,
+      modelName: values.modelName as string,
       modelParams: {
-        temperature: values.temperature,
-        topP: values.topP,
-        maxTokens: values.maxTokens
-      }
+        temperature: values.temperature as number,
+        topP: values.topP as number,
+        maxTokens: values.maxTokens as number,
+      },
     };
-    
+
     dispatch(setModelConfig(newModelConfig));
     message.success('Settings saved successfully');
   };
-  
+
   // Handle individual parameter changes
-  const handleParamChange = (key: keyof ModelParams, value: any) => {
+  const handleParamChange = (key: keyof ModelParams, value: unknown) => {
     dispatch(updateModelParam({ key, value }));
   };
-  
+
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <Card 
-        title="Settings" 
+    <div className="p-6 max-w-3xl mx-auto min-h-full">
+      <Card
+        title="Settings"
         bordered={false}
         className="bg-light-surface dark:bg-dark-surface shadow-md"
       >
@@ -70,30 +84,33 @@ const SettingsPage: React.FC = () => {
             modelName: modelConfig.modelName,
             temperature: modelConfig.modelParams?.temperature || 0.7,
             topP: modelConfig.modelParams?.topP || 0.9,
-            maxTokens: modelConfig.modelParams?.maxTokens || 2000
+            maxTokens: modelConfig.modelParams?.maxTokens || 2000,
           }}
         >
           {/* Theme Settings */}
           <div className="mb-6">
-            <h3 className="text-lg font-medium mb-4 text-light-text dark:text-dark-text">Appearance</h3>
-            
-            <Form.Item
-              name="theme"
-              label="Theme"
-            >
-              <Select onChange={(value) => dispatch(setTheme(value as ThemeMode))}>
+            <h3 className="text-lg font-medium mb-4 text-light-text dark:text-dark-text">
+              Appearance
+            </h3>
+
+            <Form.Item name="theme" label="Theme">
+              <Select
+                onChange={(value) => dispatch(setTheme(value as ThemeMode))}
+              >
                 <Option value="light">Light</Option>
                 <Option value="dark">Dark</Option>
               </Select>
             </Form.Item>
           </div>
-          
+
           <Divider />
-          
+
           {/* Model Settings */}
           <div className="mb-6">
-            <h3 className="text-lg font-medium mb-4 text-light-text dark:text-dark-text">Model Configuration</h3>
-            
+            <h3 className="text-lg font-medium mb-4 text-light-text dark:text-dark-text">
+              Model Configuration
+            </h3>
+
             <Form.Item
               name="apiUrl"
               label="API URL"
@@ -101,7 +118,7 @@ const SettingsPage: React.FC = () => {
             >
               <Input placeholder="https://api.example.com" />
             </Form.Item>
-            
+
             <Form.Item
               name="apiKey"
               label="API Key"
@@ -109,7 +126,7 @@ const SettingsPage: React.FC = () => {
             >
               <Input.Password placeholder="Your API Key" />
             </Form.Item>
-            
+
             <Form.Item
               name="modelName"
               label="Model"
@@ -126,19 +143,23 @@ const SettingsPage: React.FC = () => {
               </Select>
             </Form.Item>
           </div>
-          
+
           <Divider />
-          
+
           {/* Model Parameters */}
           <div>
-            <h3 className="text-lg font-medium mb-4 text-light-text dark:text-dark-text">Model Parameters</h3>
-            
+            <h3 className="text-lg font-medium mb-4 text-light-text dark:text-dark-text">
+              Model Parameters
+            </h3>
+
             <Form.Item
               name="temperature"
               label={
                 <div className="flex justify-between w-full">
                   <span>Temperature</span>
-                  <span className="text-gray-500">{modelConfig.modelParams?.temperature || 0.7}</span>
+                  <span className="text-gray-500">
+                    {modelConfig.modelParams?.temperature || 0.7}
+                  </span>
                 </div>
               }
             >
@@ -149,13 +170,15 @@ const SettingsPage: React.FC = () => {
                 onChange={(value) => handleParamChange('temperature', value)}
               />
             </Form.Item>
-            
+
             <Form.Item
               name="topP"
               label={
                 <div className="flex justify-between w-full">
                   <span>Top P</span>
-                  <span className="text-gray-500">{modelConfig.modelParams?.topP || 0.9}</span>
+                  <span className="text-gray-500">
+                    {modelConfig.modelParams?.topP || 0.9}
+                  </span>
                 </div>
               }
             >
@@ -166,11 +189,8 @@ const SettingsPage: React.FC = () => {
                 onChange={(value) => handleParamChange('topP', value)}
               />
             </Form.Item>
-            
-            <Form.Item
-              name="maxTokens"
-              label="Max Tokens"
-            >
+
+            <Form.Item name="maxTokens" label="Max Tokens">
               <InputNumber
                 min={100}
                 max={8000}
@@ -180,7 +200,7 @@ const SettingsPage: React.FC = () => {
               />
             </Form.Item>
           </div>
-          
+
           <Form.Item className="mt-6">
             <Button
               type="primary"

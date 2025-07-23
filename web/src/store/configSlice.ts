@@ -8,14 +8,14 @@ interface ConfigState {
 
 // Default model configuration
 const defaultModelConfig: ModelConfig = {
-  apiUrl: 'https://api.openai.com/v1',  // Default OpenAI API URL
-  apiKey: '',  // User needs to provide their own API key
-  modelName: 'gpt-3.5-turbo',  // Default to a more widely available model
+  apiUrl: 'https://api.openai.com/v1', // Default OpenAI API URL
+  apiKey: '', // User needs to provide their own API key
+  modelName: 'gpt-3.5-turbo', // Default to a more widely available model
   modelParams: {
     temperature: 0.7,
     topP: 0.9,
-    maxTokens: 2000
-  }
+    maxTokens: 2000,
+  },
 };
 
 // 尝试从localStorage加载保存的配置
@@ -23,24 +23,24 @@ const loadSavedConfig = (): ConfigState => {
   try {
     // 加载主题设置
     const savedTheme = localStorage.getItem('theme') as ThemeMode | null;
-    
+
     // 加载模型配置
     const savedModelConfigStr = localStorage.getItem('modelConfig');
     let savedModelConfig: ModelConfig | null = null;
-    
+
     if (savedModelConfigStr) {
       savedModelConfig = JSON.parse(savedModelConfigStr);
     }
-    
+
     return {
       theme: savedTheme || 'light',
-      modelConfig: savedModelConfig || defaultModelConfig
+      modelConfig: savedModelConfig || defaultModelConfig,
     };
   } catch (error) {
     console.error('Error loading saved config:', error);
     return {
       theme: 'light',
-      modelConfig: defaultModelConfig
+      modelConfig: defaultModelConfig,
     };
   }
 };
@@ -65,7 +65,10 @@ const configSlice = createSlice({
       state.modelConfig = action.payload;
       localStorage.setItem('modelConfig', JSON.stringify(action.payload));
     },
-    updateModelParam: (state, action: PayloadAction<{ key: keyof ModelParams, value: any }>) => {
+    updateModelParam: (
+      state,
+      action: PayloadAction<{ key: keyof ModelParams; value: any }>,
+    ) => {
       const { key, value } = action.payload;
       if (state.modelConfig.modelParams) {
         state.modelConfig.modelParams[key] = value;
@@ -73,9 +76,10 @@ const configSlice = createSlice({
         state.modelConfig.modelParams = { [key]: value } as ModelParams;
       }
       localStorage.setItem('modelConfig', JSON.stringify(state.modelConfig));
-    }
-  }
+    },
+  },
 });
 
-export const { setTheme, setModelConfig, updateModelParam } = configSlice.actions;
+export const { setTheme, setModelConfig, updateModelParam } =
+  configSlice.actions;
 export default configSlice.reducer;

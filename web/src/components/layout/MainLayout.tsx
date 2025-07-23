@@ -74,11 +74,11 @@ const MainLayout: React.FC = () => {
       {/* Sidebar */}
       <div
         className={cn(
-          "relative transition-all duration-300 ease-in-out h-full bg-card shadow-sm",
-          collapsed ? "w-0" : "w-64 md:w-80"
+          'relative transition-all duration-300 ease-in-out h-full bg-card shadow-sm',
+          collapsed ? 'w-0' : 'w-64 md:w-80',
         )}
       >
-        <div className={cn("h-full", collapsed ? "invisible" : "visible")}>
+        <div className={cn('h-full', collapsed ? 'invisible' : 'visible')}>
           <Sidebar />
         </div>
       </div>
@@ -161,7 +161,7 @@ const MainLayout: React.FC = () => {
         </header>
 
         {/* Content area */}
-        <main className="flex-1 overflow-hidden bg-background px-4">
+        <main className="flex-1 overflow-y-auto bg-background px-4">
           <Outlet />
         </main>
       </div>

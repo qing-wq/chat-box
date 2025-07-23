@@ -90,7 +90,7 @@ public class GlobalExceptionHandler {
         resp.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         resp.setHeader("Cache-Control", "no-cache, must-revalidate");
         setErrorCode(errStatus, resp);
-        log.error("capture ForumException: {}", errStatus.getMsg());
+        log.error("capture BusinessException: {}", errStatus.getMsg());
         return ResVo.fail(errStatus);
     }
 
@@ -121,7 +121,7 @@ public class GlobalExceptionHandler {
         resp.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         resp.setHeader("Cache-Control", "no-cache, must-revalidate");
         setErrorCode(errStatus, resp);
-        log.error("capture NestedRuntimeException: {}", e.getMessage());
+        log.error("capture NestedRuntimeException: ", e);
         return ResVo.fail(errStatus);
     }
 

@@ -25,7 +25,7 @@ import java.net.URLDecoder;
 @Slf4j
 @Component
 @Order(1)
- public class ReqInfoFilter implements Filter {
+public class ReqInfoFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(ReqInfoFilter.class);
 
@@ -58,7 +58,7 @@ import java.net.URLDecoder;
             reqInfo.setUserAgent(request.getHeader("User-Agent"));
             request = this.wrapperRequest(request, reqInfo);
             // 校验token
-            reqInfo.setUserId(1);  // 先临时设置userId为1
+            reqInfo.setUserId(1);  // TODO 先临时设置userId为1
             ReqInfoContext.addReqInfo(reqInfo);
         } catch (Exception e) {
             log.info("init reqInfo error: " + e.getMessage());
@@ -86,23 +86,19 @@ import java.net.URLDecoder;
 
         StringBuilder msg = new StringBuilder();
         msg.append("method=").append(request.getMethod()).append("; ");
+        msg.append("uri=").append(request.getRequestURI()).append("; ");
+        msg.append("payload=").append(req.getPayload()).append("; ");
+        if (req.getUserId() != null) {
+            // 打印用户信息
+            msg.append("user=").append(req.getUserId()).append("; ");
+        }
+        msg.append("cost=").append(costTime).append("; ");
+
         if (StringUtils.isNotBlank(req.getReferer())) {
             msg.append("referer=").append(URLDecoder.decode(req.getReferer())).append("; ");
         }
-        msg.append("; agent=").append(req.getUserAgent());
+        msg.append("agent=").append(req.getUserAgent());
 
-        if (req.getUserId() != null) {
-            // 打印用户信息
-            msg.append("; user=").append(req.getUserId());
-        }
-
-        msg.append("; uri=").append(request.getRequestURI());
-        if (StringUtils.isNotBlank(request.getQueryString())) {
-            msg.append('?').append(URLDecoder.decode(request.getQueryString()));
-        }
-
-        msg.append("; payload=").append(req.getPayload());
-        msg.append("; cost=").append(costTime);
         logger.info("{}", msg);
     }
 

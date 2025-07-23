@@ -52,7 +52,11 @@ public enum StatusEnum {
     TOKEN_CREATE_EXISTS(500_500_003, "token创建异常"),
 
     // 限流
-    ACCESS_FREQUENT(600_429_001, "访问过于频繁")
+    ACCESS_FREQUENT(600_429_001, "访问过于频繁"),
+
+    // 平台相关异常
+    PLATFORM_NOT_EXIST(700_404_001, "平台不存在"),
+    PLATFORM_NAME_EXIST(700_400_001, "平台名称已存在")
     ;
 
     private int code;

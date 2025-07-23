@@ -14,11 +14,11 @@ import lombok.*;
 public class MessageDTO extends BaseDTO {
 
     /**
-     * 消息角色：user, assistant, system
+     * 消息角色：user, assistant
      */
     private String role;
 
-    private Integer chatId;
+    private String conversationUuid;
     
     /**
      * 消息内容

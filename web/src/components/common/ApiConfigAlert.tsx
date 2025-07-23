@@ -5,23 +5,23 @@ import { useAppSelector } from '../../hooks';
 
 const ApiConfigAlert: React.FC = () => {
   const navigate = useNavigate();
-  const { modelConfig } = useAppSelector(state => state.config);
-  
+  const { modelConfig } = useAppSelector((state) => state.config);
+
   // 检查API配置是否完整
   const isConfigIncomplete = !modelConfig.apiUrl || !modelConfig.apiKey;
-  
+
   if (!isConfigIncomplete) {
     return null;
   }
-  
+
   return (
     <Alert
       message="API配置不完整"
       description={
         <div>
           <p>请在设置页面配置API URL和API Key以使用聊天功能。</p>
-          <Button 
-            type="primary" 
+          <Button
+            type="primary"
             onClick={() => navigate('/settings')}
             className="mt-2"
           >

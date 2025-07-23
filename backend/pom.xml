@@ -28,8 +28,8 @@
     </scm>
     <properties>
         <java.version>17</java.version>
-        <langchain4j.version>0.36.0</langchain4j.version>
-        <lombok.version>1.18.30</lombok.version>
+        <langchain4j.version>1.0.0-beta1</langchain4j.version>
+        <lombok.version>1.18.36</lombok.version>
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
     </properties>
     <dependencies>
@@ -74,7 +74,14 @@
             <artifactId>langchain4j-open-ai</artifactId>
             <version>${langchain4j.version}</version>
         </dependency>
-        
+
+        <!-- MCP 依赖 -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-mcp</artifactId>
+            <version>1.0.0-beta2</version>
+        </dependency>
+
         <!-- Lombok 依赖 -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -89,7 +96,7 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.5.0</version>
         </dependency>
-        
+
         <!-- 测试依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -101,6 +108,11 @@
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
             <version>4.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>22.0</version>
         </dependency>
     </dependencies>
 

@@ -9,7 +9,7 @@ const MarkdownDemo: React.FC = () => {
       id: 1,
       role: 'user',
       content: '请展示一些 Markdown 功能',
-      createTime: new Date().toISOString()
+      createTime: new Date().toISOString(),
     },
     {
       id: 2,
@@ -40,7 +40,7 @@ const MarkdownDemo: React.FC = () => {
 这些Slot是Sentinel责任链模式的重要组成部分，按特定顺序执行，形成一个完整的流量控制和系统保护机制。每个Slot专注于特定功能，协同工作以确保系统的高可用性。
 
 如果您有关于某个Slot的具体问题（如配置方式、代码实现或使用场景），或者需要更深入的讨论，请随时告知，我很乐意提供进一步帮助！😊`,
-      createTime: new Date().toISOString()
+      createTime: new Date().toISOString(),
     },
     {
       id: 2,
@@ -82,12 +82,12 @@ const MarkdownDemo: React.FC = () => {
 这些Slot是Sentinel责任链模式的重要组成部分，按特定顺序执行，形成一个完整的流量控制和系统保护机制。每个Slot专注于特定功能，协同工作以确保系统的高可用性。
 
 如果您有关于某个Slot的具体问题（如配置方式、代码实现或使用场景），或者需要更深入的讨论，请随时告知，我很乐意提供进一步帮助！😊`,
-      createTime: new Date().toISOString()
+      createTime: new Date().toISOString(),
     },
     {
       id: 3,
       role: 'user',
-      content: '测试换行符处理'
+      content: '测试换行符处理',
     },
     {
       id: 4,
@@ -136,7 +136,7 @@ greetUser("World");
 ---
 
 这样的格式化内容应该能够正确显示换行和各种 Markdown 元素！`,
-      createTime: new Date().toISOString()
+      createTime: new Date().toISOString(),
     },
     {
       id: 4,
@@ -156,13 +156,13 @@ $$f(x) = \\frac{1}{\\sqrt{2\\pi\\sigma^2}} e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}$$
 
 ### 求和公式
 $$\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}$$`,
-      createTime: new Date().toISOString()
+      createTime: new Date().toISOString(),
     },
     {
       id: 5,
       role: 'user',
       content: '请展示一个表格示例',
-      createTime: new Date().toISOString()
+      createTime: new Date().toISOString(),
     },
     {
       id: 6,
@@ -198,8 +198,8 @@ $$\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}$$`,
 | 测试部署 | ⏳ 待开始 | 0% |
 
 这些表格应该能够正确显示，包括对齐、边框和样式！`,
-      createTime: new Date().toISOString()
-    }
+      createTime: new Date().toISOString(),
+    },
   ];
 
   return (
@@ -210,7 +210,8 @@ $$\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}$$`,
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            以下展示了聊天消息中 Markdown 的渲染效果，包括代码高亮、数学公式、表格等功能。
+            以下展示了聊天消息中 Markdown
+            的渲染效果，包括代码高亮、数学公式、表格等功能。
           </p>
         </CardContent>
       </Card>

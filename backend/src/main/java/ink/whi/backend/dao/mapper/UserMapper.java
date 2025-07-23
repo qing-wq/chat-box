@@ -1,7 +1,7 @@
 package ink.whi.backend.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import ink.whi.backend.dao.entity.UserDO;
+import ink.whi.backend.dao.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
  */
 @Mapper
 @Repository
-public interface UserMapper extends BaseMapper<UserDO> {
+public interface UserMapper extends BaseMapper<User> {
 }

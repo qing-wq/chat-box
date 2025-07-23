@@ -1,7 +1,7 @@
 package ink.whi.backend.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import ink.whi.backend.dao.entity.ChatDO;
+import ink.whi.backend.dao.entity.Conversation;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -13,5 +13,5 @@ import org.springframework.stereotype.Repository;
  */
 @Mapper
 @Repository
-public interface ChatMapper extends BaseMapper<ChatDO> {
+public interface ChatMapper extends BaseMapper<Conversation> {
 }

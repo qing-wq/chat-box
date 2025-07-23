@@ -22,4 +22,19 @@ public class ModelParams {
      * 最大输出token数
      */
     private Integer maxTokens;
+
+    /**
+     * 上下文窗口
+     */
+    private Integer contextWindow;
+
+    /**
+     * 最大输入长度
+     */
+    private Integer maxInputTokens;
+
+    /**
+     * 最大输出长度
+     */
+    private Integer maxOutputTokens;
 }

@@ -10,27 +10,22 @@ import java.util.List;
  * 请求数据传输对象
  */
 @Data
-public class BaseModelRequest implements Serializable {
+public class ChatReq implements Serializable {
 
     /**
      * 对话id
      */
-    public Integer chatId;
+    private String conversationUuId;
 
     /**
      * 单条消息
      */
-    private String message;
-    
+    private String userMessage;
+
     /**
-     * 消息列表
+     * 模型
      */
-    private List<MessageDTO> messageList;
-    
-    /**
-     * 模型配置参数
-     */
-    private ModelConfig modelConfig;
+    private Integer modelId;
     
     /**
      * 工具列表（可选）
