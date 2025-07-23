@@ -8,11 +8,16 @@ import {
   MessageSquare,
   Bot,
   Clock,
-  Sparkles
+  Sparkles,
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 
-import { fetchChatList, createNewChat, deleteChat, updateChatMessages } from '../../store/chatSlice';
+import {
+  fetchChatList,
+  createNewChat,
+  deleteChat,
+  updateChatMessages,
+} from '../../store/chatSlice';
 
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -30,8 +35,8 @@ const Sidebar: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const { chatId } = useParams<{ chatId: string }>();//当前的路由上的uuid
-  const { chatList, loading } = useAppSelector(state => state.chat);
+  const { chatId } = useParams<{ chatId: string }>(); //当前的路由上的uuid
+  const { chatList, loading } = useAppSelector((state) => state.chat);
 
   const [editingChatUuid, setEditingChatUuid] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
@@ -82,11 +87,12 @@ const Sidebar: React.FC = () => {
 
   const handleEditSubmit = async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && editingChatUuid && editTitle.trim()) {
-
-      await dispatch(updateChatMessages({
-        uuid: editingChatUuid,
-        title: editTitle.trim()
-      }));
+      await dispatch(
+        updateChatMessages({
+          uuid: editingChatUuid,
+          title: editTitle.trim(),
+        })
+      );
 
       setEditingChatUuid(null);
       setEditTitle('');
@@ -123,14 +129,14 @@ const Sidebar: React.FC = () => {
           className={cn(
             'w-full h-10 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-sm',
             'hover:shadow-md hover:scale-[1.02] transition-all duration-200',
-            'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100',
+            'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100'
           )}
           disabled={loading}
         >
           <Plus
             className={cn(
               'w-4 h-4 mr-2 transition-transform duration-200',
-              loading && 'animate-spin',
+              loading && 'animate-spin'
             )}
           />
           {loading ? 'Creating...' : 'New Chat'}
@@ -173,7 +179,7 @@ const Sidebar: React.FC = () => {
                     'group relative flex items-start gap-3 rounded-xl px-3 py-3 cursor-pointer transition-all duration-200 animate-slideIn',
                     'hover:bg-accent/50 hover:shadow-sm hover:scale-[1.02]',
                     chatId === chat.uuid &&
-                      'bg-primary/10 border border-primary/20 shadow-sm scale-[1.02]',
+                      'bg-primary/10 border border-primary/20 shadow-sm scale-[1.02]'
                   )}
                   style={{ animationDelay: `${index * 50}ms` }}
                   onClick={() => handleSelectChat(chat.uuid)}
@@ -184,7 +190,7 @@ const Sidebar: React.FC = () => {
                       'flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5',
                       chatId === chat.uuid
                         ? 'bg-primary/20 text-primary'
-                        : 'bg-muted text-muted-foreground',
+                        : 'bg-muted text-muted-foreground'
                     )}
                   >
                     <MessageSquare className="w-4 h-4" />

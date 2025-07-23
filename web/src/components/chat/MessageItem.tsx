@@ -8,7 +8,8 @@ import rehypeKatex from 'rehype-katex';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Message } from '../../types';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import botPng from '@/assets/a00a9979-9c4f-4fb3-82fc-ad9c2200ca2a.png';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import 'katex/dist/katex.min.css';
@@ -38,73 +39,70 @@ const MessageItem: React.FC<MessageItemProps> = ({
   return (
     <div
       className={cn(
-        'py-6 px-4 sm:px-6 transition-all duration-200 border-b border-border/50 last:border-b-0',
-        !isUser && 'bg-muted/20',
+        'py-6 px-4 sm:px-6 transition-all duration-200 border-b border-border/50 last:border-b-0'
       )}
     >
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-start gap-4">
+        <div
+          className={cn('flex items-start gap-4', isUser && 'flex-row-reverse')}
+        >
           {/* Avatar */}
-          <div className="flex-shrink-0">
-            <Avatar
-              className={cn(
-                'h-8 w-8 transition-all duration-200',
-                isUser
-                  ? 'bg-blue-500 hover:bg-blue-600'
-                  : 'bg-primary hover:bg-primary/90',
-              )}
-            >
-              <AvatarFallback className="text-white">
-                {isUser ? (
-                  <User className="w-4 h-4" />
-                ) : (
-                  <Bot className="w-4 h-4" />
-                )}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-
-          {/* Message content */}
-          <div className="flex-1 min-w-0">
-            {/* Role label */}
-            <div className="flex items-center justify-between mb-2">
-              <span
+          {/* 仅AI消息显示头像 */}
+          {!isUser && (
+            <div className="flex-shrink-0">
+              <Avatar
                 className={cn(
-                  'text-sm font-semibold',
-                  isUser ? 'text-blue-600 dark:text-blue-400' : 'text-primary',
+                  'h-8 w-8 transition-all duration-200',
+                  'bg-primary hover:bg-primary/90'
                 )}
               >
-                {isUser ? '你' : 'AI助手'}
-              </span>
-
-              {/* Copy button */}
-              {!isUser && !isStreaming && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={copyToClipboard}
-                  className={cn(
-                    'h-6 w-6 p-0 transition-all duration-200',
-                    copied
-                      ? 'text-green-500'
-                      : 'text-muted-foreground hover:text-primary',
-                  )}
-                >
-                  {copied ? (
-                    <Check className="w-3 h-3" />
-                  ) : (
-                    <Copy className="w-3 h-3" />
-                  )}
-                </Button>
-              )}
+                <AvatarImage
+                  src={botPng}
+                  alt="AI机器人"
+                  className="object-cover object-center w-full h-full"
+                />
+                <AvatarFallback className="text-white">🤖</AvatarFallback>
+              </Avatar>
             </div>
+          )}
+
+          {/* Message content */}
+          <div className={cn('flex-1 min-w-0', isUser && 'text-right')}>
+            {/* 仅AI消息显示昵称和复制按钮 */}
+            {!isUser ? (
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold text-primary">
+                  AI助手
+                </span>
+                {/* Copy button */}
+                {!isStreaming && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={copyToClipboard}
+                    className={cn(
+                      'h-6 w-6 p-0 transition-all duration-200',
+                      copied
+                        ? 'text-green-500'
+                        : 'text-muted-foreground hover:text-primary'
+                    )}
+                  >
+                    {copied ? (
+                      <Check className="w-3 h-3" />
+                    ) : (
+                      <Copy className="w-3 h-3" />
+                    )}
+                  </Button>
+                )}
+              </div>
+            ) : null}
 
             {/* Message content */}
             <div
               className={cn(
-                'max-w-none',
-                isUser &&
-                  'bg-blue-50 dark:bg-blue-900/20 rounded-xl px-4 py-3 border border-blue-200 dark:border-blue-800 prose prose-sm sm:prose dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground',
+                isUser
+                  ? 'inline-block bg-blue-50 dark:bg-blue-900/20 rounded-xl px-4 py-3 border border-blue-200 dark:border-blue-800 prose prose-sm sm:prose dark:prose-invert max-w-[70%] prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground ml-auto'
+                  : 'max-w-none'
               )}
             >
               {isStreaming && !isUser && !message.content && (
@@ -165,7 +163,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
                           <code
                             className={cn(
                               className,
-                              'bg-muted px-1.5 py-0.5 rounded text-sm font-mono',
+                              'bg-muted px-1.5 py-0.5 rounded text-sm font-mono'
                             )}
                             {...props}
                           >
@@ -279,7 +277,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
                         <code
                           className={cn(
                             className,
-                            'bg-muted px-1.5 py-0.5 rounded text-sm font-mono',
+                            'bg-muted px-1.5 py-0.5 rounded text-sm font-mono'
                           )}
                           {...props}
                         >

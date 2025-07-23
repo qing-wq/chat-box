@@ -9,19 +9,24 @@ import { cn } from '@/lib/utils';
 import { fetchModelList } from '@/store/modelSlice';
 import { setModelConfig } from '@/store/configSlice';
 import { setCurrentModel } from '@/store/chatSlice';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import GlobalSidebar from './GlobalSidebar';
+import MoreButton from '../common/MoreButton';
 
 const ChatMainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [modelListOpen, setModelListOpen] = useState(false);
-  const { modelConfig } = useAppSelector(state => state.config);
-  const { modelList, loading } = useAppSelector(state => state.model);
-  const { currentChat } = useAppSelector(state => state.chat);
+  const { modelConfig } = useAppSelector((state) => state.config);
+  const { modelList, loading } = useAppSelector((state) => state.model);
+  const { currentChat } = useAppSelector((state) => state.chat);
   const currentModel = currentChat?.currentModel || null;
   const dispatch = useAppDispatch();
-  
+
   // Handle responsive behavior
   useEffect(() => {
     const handleResize = () => {
@@ -34,30 +39,32 @@ const ChatMainLayout: React.FC = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
+
   // 获取模型列表
   const handleFetchModelList = () => {
     setModelListOpen(true);
     dispatch(fetchModelList());
   };
-  
+
   // 选择模型
   const handleSelectModel = (modelId: number, modelName: string) => {
     // 更新模型配置
     const newModelConfig = {
       ...modelConfig,
-      modelName: modelName
+      modelName: modelName,
     };
-    
+
     // 更新configSlice中的modelConfig
     dispatch(setModelConfig(newModelConfig));
-    
+
     // 更新chatSlice中的currentModel
-    dispatch(setCurrentModel({
-      id: modelId,
-      name: modelName
-    }));
-    
+    dispatch(
+      setCurrentModel({
+        id: modelId,
+        name: modelName,
+      })
+    );
+
     setModelListOpen(false);
   };
 
@@ -68,7 +75,7 @@ const ChatMainLayout: React.FC = () => {
       <div
         className={cn(
           'relative transition-all duration-300 ease-in-out h-full bg-card shadow-sm animate-slideIn',
-          collapsed ? 'w-0' : 'w-64 md:w-80',
+          collapsed ? 'w-0' : 'w-64 md:w-80'
         )}
       >
         <div className={cn('h-full', collapsed ? 'invisible' : 'visible')}>
@@ -95,9 +102,26 @@ const ChatMainLayout: React.FC = () => {
               onClick={() => setCollapsed(!collapsed)}
               className="h-8 w-8"
             >
-              {collapsed ? <Menu className="w-4 h-4" /> : 
-              <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-left-to-line-icon lucide-arrow-left-to-line"><path d="M3 19V5"/><path d="m13 6-6 6 6 6"/><path d="M7 12h14"/></svg>
-              }
+              {collapsed ? (
+                <Menu className="w-4 h-4" />
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="1rem"
+                  height="1rem"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-arrow-left-to-line-icon lucide-arrow-left-to-line"
+                >
+                  <path d="M3 19V5" />
+                  <path d="m13 6-6 6 6 6" />
+                  <path d="M7 12h14" />
+                </svg>
+              )}
             </Button>
 
             {currentChat && (
@@ -106,13 +130,13 @@ const ChatMainLayout: React.FC = () => {
 
                 <Popover open={modelListOpen} onOpenChange={setModelListOpen}>
                   <PopoverTrigger asChild>
-                    <div 
+                    <div
                       className="flex items-center gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground p-2 rounded-md transition-colors"
                       onClick={handleFetchModelList}
                     >
                       <Bot className="w-5 h-5 text-primary" />
                       <span className="text-sm sm:text-base font-medium truncate">
-                        {currentModel ? currentModel.name: '选择模型'}
+                        {currentModel ? currentModel.name : '选择模型'}
                       </span>
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                     </div>
@@ -124,20 +148,26 @@ const ChatMainLayout: React.FC = () => {
                         <div className="text-center py-2">加载中...</div>
                       ) : modelList ? (
                         <ScrollArea className="h-[300px]">
-                          {Object.entries(modelList).map(([category, models]) => (
-                            <div key={category} className="mb-3">
-                              <h5 className="text-xs text-muted-foreground mb-1">{category}</h5>
-                              {models.map(model => (
-                                <div 
-                                  key={model.id}
-                                  className="py-1.5 px-2 text-sm rounded-md cursor-pointer hover:bg-accent transition-colors"
-                                  onClick={() => handleSelectModel(model.id, model.name)}
-                                >
-                                  {model.name}
-                                </div>
-                              ))}
-                            </div>
-                          ))}
+                          {Object.entries(modelList).map(
+                            ([category, models]) => (
+                              <div key={category} className="mb-3">
+                                <h5 className="text-xs text-muted-foreground mb-1">
+                                  {category}
+                                </h5>
+                                {models.map((model) => (
+                                  <div
+                                    key={model.id}
+                                    className="py-1.5 px-2 text-sm rounded-md cursor-pointer hover:bg-accent transition-colors"
+                                    onClick={() =>
+                                      handleSelectModel(model.id, model.name)
+                                    }
+                                  >
+                                    {model.name}
+                                  </div>
+                                ))}
+                              </div>
+                            )
+                          )}
                         </ScrollArea>
                       ) : (
                         <div className="text-center py-2">无可用模型</div>
@@ -154,6 +184,7 @@ const ChatMainLayout: React.FC = () => {
             <div className="hidden sm:block text-xs text-muted-foreground">
               {/* 可以添加其他头部右侧内容 */}
             </div>
+            <MoreButton />
           </div>
         </header>
 
