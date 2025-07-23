@@ -101,7 +101,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
             <div
               className={cn(
                 isUser
-                  ? 'inline-block bg-blue-50 dark:bg-blue-900/20 rounded-xl px-4 py-3 border border-blue-200 dark:border-blue-800 prose prose-sm sm:prose dark:prose-invert max-w-[70%] prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground ml-auto'
+                  ? 'inline-block bg-blue-50 dark:bg-blue-900/20 rounded-xl px-4 py-3 prose prose-sm sm:prose dark:prose-invert max-w-[70%] prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground ml-auto'
                   : 'max-w-none'
               )}
             >
