@@ -8,7 +8,8 @@ import rehypeKatex from 'rehype-katex';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Message } from '../../types';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import botPng from '@/assets/a00a9979-9c4f-4fb3-82fc-ad9c2200ca2a.png';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import 'katex/dist/katex.min.css';
@@ -38,8 +39,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
   return (
     <div
       className={cn(
-        'py-6 px-4 sm:px-6 transition-all duration-200 border-b border-border/50 last:border-b-0',
-        !isUser && 'bg-muted/20'
+        'py-6 px-4 sm:px-6 transition-all duration-200 border-b border-border/50 last:border-b-0'
       )}
     >
       <div className="max-w-4xl mx-auto">
@@ -56,9 +56,12 @@ const MessageItem: React.FC<MessageItemProps> = ({
                   'bg-primary hover:bg-primary/90'
                 )}
               >
-                <AvatarFallback className="text-white">
-                  <Bot className="w-4 h-4" />
-                </AvatarFallback>
+                <AvatarImage
+                  src={botPng}
+                  alt="AI机器人"
+                  className="object-cover object-center w-full h-full"
+                />
+                <AvatarFallback className="text-white">🤖</AvatarFallback>
               </Avatar>
             </div>
           )}
