@@ -6,7 +6,6 @@ import {
   Edit3,
   MoreHorizontal,
   MessageSquare,
-  Bot,
   Clock,
   Sparkles,
 } from 'lucide-react';
@@ -174,7 +173,7 @@ const Sidebar: React.FC = () => {
               </div>
               {chatList.map((chat, index) => (
                 <div
-                  key={chat.id}
+                  key={chat.uuid}
                   className={cn(
                     'group relative flex items-start gap-3 rounded-xl px-3 py-3 cursor-pointer transition-all duration-200 animate-slideIn',
                     'hover:bg-accent/50 hover:shadow-sm hover:scale-[1.02]',
@@ -213,7 +212,7 @@ const Sidebar: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="w-3 h-3" />
-                          {formatDate(chat.createTime)}
+                          {formatDate(chat.updateTime || chat.createTime)}
                         </div>
                       </div>
                     )}

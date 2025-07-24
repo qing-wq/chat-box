@@ -7,6 +7,7 @@ import {
   TooltipContent,
   TooltipProvider,
 } from '@/components/ui/tooltip';
+import axios from 'axios';
 
 interface Props {
   open: boolean;
@@ -21,9 +22,28 @@ const GlobalContextModal: React.FC<Props> = ({ open, onClose }) => {
   const [streamOutput, setStreamOutput] = useState(true);
   const [maxTokenEnabled, setMaxTokenEnabled] = useState(false);
   const [maxTokens, setMaxTokens] = useState(2048);
+  const [systemMessage, setSystemMessage] =
+    useState<string>(defaultSystemMessage);
 
   const dispatch = useAppDispatch();
   const currentChat = useAppSelector((state) => state.chat.currentChat);
+
+  React.useEffect(() => {
+    const fetchSystemMessage = async () => {
+      if (open && currentChat?.conversation?.uuid) {
+        try {
+          const res = await axios.get(
+            `/api/conversation/detail/${currentChat.conversation.uuid}`
+          );
+          const msg = res?.data?.data?.conversation?.systemMessage;
+          setSystemMessage(msg || defaultSystemMessage);
+        } catch (e) {
+          setSystemMessage(defaultSystemMessage);
+        }
+      }
+    };
+    fetchSystemMessage();
+  }, [open, currentChat]);
 
   const handleSave = () => {
     if (!currentChat) return;
@@ -276,7 +296,7 @@ const GlobalContextModal: React.FC<Props> = ({ open, onClose }) => {
           >
             默认系统消息
           </div>
-          <div className="text-sm text-gray-700">{defaultSystemMessage}</div>
+          <div className="text-sm text-gray-700">{systemMessage}</div>
         </div>
         {/* 预留保存按钮 */}
         <div className="mt-6 flex justify-end">
