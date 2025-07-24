@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Loader2, MessageSquare, Plus, Sparkles } from 'lucide-react';
 import { useAppSelector, useAppDispatch, useChat } from '../hooks';
@@ -20,6 +20,7 @@ const ChatPage: React.FC = () => {
     (state) => state.chat
   );
   const { isLoggedIn } = useAppSelector((state) => state.user);
+  const hasSentFirstMessage = useRef(false);
 
   // Redirect to login if not logged in
   useEffect(() => {
@@ -35,11 +36,18 @@ const ChatPage: React.FC = () => {
     }
   }, [chatId, dispatch, isLoggedIn]);
 
-  // 自动发送第一条消息
+  // 自动发送第一条消息（只发送一次，防止死循环）
   useEffect(() => {
-    if (location.state && location.state.firstMessage && currentChat) {
+    if (
+      !hasSentFirstMessage.current &&
+      location.state &&
+      location.state.firstMessage &&
+      currentChat &&
+      currentChat.messageList?.length === 0
+    ) {
       sendMessage(location.state.firstMessage, location.state.useTools || []);
-      // 清除 state，防止重复发送
+      hasSentFirstMessage.current = true;
+      // 清除 state，防止刷新后再次发送
       window.history.replaceState({}, document.title);
     }
   }, [location.state, currentChat, sendMessage]);
