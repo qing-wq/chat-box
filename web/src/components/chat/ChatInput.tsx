@@ -11,7 +11,11 @@ interface FileItem {
   status?: string;
 }
 
-const ChatInput: React.FC = () => {
+interface ChatInputProps {
+  onSend?: (content: string, useTools: string[]) => void;
+}
+
+const ChatInput: React.FC<ChatInputProps> = ({ onSend }) => {
   const [messageText, setMessageText] = useState('');
   const [fileList, setFileList] = useState<FileItem[]>([]);
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
@@ -58,7 +62,11 @@ const ChatInput: React.FC = () => {
       console.log('About to call sendMessage function');
 
       try {
-        sendMessage(content, useTools);
+        if (onSend) {
+          onSend(content, useTools);
+        } else {
+          sendMessage(content, useTools);
+        }
         console.log('sendMessage called successfully');
       } catch (error) {
         console.error('Error calling sendMessage:', error);
@@ -203,7 +211,7 @@ const ChatInput: React.FC = () => {
               'h-10 w-10 transition-all duration-200',
               webSearchEnabled
                 ? 'text-primary bg-primary/10'
-                : 'text-muted-foreground hover:text-primary',
+                : 'text-muted-foreground hover:text-primary'
             )}
             title={webSearchEnabled ? '已启用网络搜索' : '启用网络搜索'}
           >

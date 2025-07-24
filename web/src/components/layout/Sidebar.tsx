@@ -6,7 +6,6 @@ import {
   Edit3,
   MoreHorizontal,
   MessageSquare,
-  Bot,
   Clock,
   Sparkles,
 } from 'lucide-react';
@@ -14,9 +13,9 @@ import { useAppSelector, useAppDispatch } from '../../hooks';
 
 import {
   fetchChatList,
-  createNewChat,
   deleteChat,
   updateChatMessages,
+  setPendingChat, // 新增
 } from '../../store/chatSlice';
 
 import { Button } from '@/components/ui/button';
@@ -47,11 +46,8 @@ const Sidebar: React.FC = () => {
   }, [dispatch]);
 
   // Handle creating a new chat
-  const handleNewChat = async () => {
-    const resultAction = await dispatch(createNewChat());
-    if (createNewChat.fulfilled.match(resultAction)) {
-      navigate(`/chat/${resultAction.payload.uuid}`);
-    }
+  const handleNewChat = () => {
+    navigate('/'); // 只跳转到首页
   };
 
   // Handle selecting a chat
@@ -174,7 +170,7 @@ const Sidebar: React.FC = () => {
               </div>
               {chatList.map((chat, index) => (
                 <div
-                  key={chat.id}
+                  key={chat.uuid}
                   className={cn(
                     'group relative flex items-start gap-3 rounded-xl px-3 py-3 cursor-pointer transition-all duration-200 animate-slideIn',
                     'hover:bg-accent/50 hover:shadow-sm hover:scale-[1.02]',
@@ -213,7 +209,7 @@ const Sidebar: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="w-3 h-3" />
-                          {formatDate(chat.createTime)}
+                          {formatDate(chat.updateTime || chat.createTime)}
                         </div>
                       </div>
                     )}

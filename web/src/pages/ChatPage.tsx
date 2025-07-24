@@ -1,20 +1,26 @@
-import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2, MessageSquare } from 'lucide-react';
-import { useAppSelector, useAppDispatch } from '../hooks';
+import React, { useEffect, useRef } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Loader2, MessageSquare, Plus, Sparkles } from 'lucide-react';
+import { useAppSelector, useAppDispatch, useChat } from '../hooks';
 import { fetchChatDetail } from '../store/chatSlice';
 import MessageList from '../components/chat/MessageList';
 import ChatInput from '../components/chat/ChatInput';
 import ModelConfigAlert from '../components/common/ModelConfigAlert';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
 const ChatPage: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
+  const location = useLocation();
+  const { sendMessage } = useChat();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { currentChat, loading, error } = useAppSelector((state) => state.chat);
+  const { currentChat, loading, error, pendingChat } = useAppSelector(
+    (state) => state.chat
+  );
   const { isLoggedIn } = useAppSelector((state) => state.user);
+  const hasSentFirstMessage = useRef(false);
 
   // Redirect to login if not logged in
   useEffect(() => {
@@ -29,6 +35,22 @@ const ChatPage: React.FC = () => {
       dispatch(fetchChatDetail(chatId));
     }
   }, [chatId, dispatch, isLoggedIn]);
+
+  // 自动发送第一条消息（只发送一次，防止死循环）
+  useEffect(() => {
+    if (
+      !hasSentFirstMessage.current &&
+      location.state &&
+      location.state.firstMessage &&
+      currentChat &&
+      currentChat.messageList?.length === 0
+    ) {
+      sendMessage(location.state.firstMessage, location.state.useTools || []);
+      hasSentFirstMessage.current = true;
+      // 清除 state，防止刷新后再次发送
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, currentChat, sendMessage]);
 
   if (!isLoggedIn) {
     return null; // Will redirect to login

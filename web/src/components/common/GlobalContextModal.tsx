@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import { updateChatMessages } from '@/store/chatSlice';
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from '@/components/ui/tooltip';
+import axios from 'axios';
 
 interface Props {
   open: boolean;
@@ -15,9 +22,28 @@ const GlobalContextModal: React.FC<Props> = ({ open, onClose }) => {
   const [streamOutput, setStreamOutput] = useState(true);
   const [maxTokenEnabled, setMaxTokenEnabled] = useState(false);
   const [maxTokens, setMaxTokens] = useState(2048);
+  const [systemMessage, setSystemMessage] =
+    useState<string>(defaultSystemMessage);
 
   const dispatch = useAppDispatch();
   const currentChat = useAppSelector((state) => state.chat.currentChat);
+
+  React.useEffect(() => {
+    const fetchSystemMessage = async () => {
+      if (open && currentChat?.conversation?.uuid) {
+        try {
+          const res = await axios.get(
+            `/api/conversation/detail/${currentChat.conversation.uuid}`
+          );
+          const msg = res?.data?.data?.conversation?.systemMessage;
+          setSystemMessage(msg || defaultSystemMessage);
+        } catch (e) {
+          setSystemMessage(defaultSystemMessage);
+        }
+      }
+    };
+    fetchSystemMessage();
+  }, [open, currentChat]);
 
   const handleSave = () => {
     if (!currentChat) return;
@@ -61,7 +87,49 @@ const GlobalContextModal: React.FC<Props> = ({ open, onClose }) => {
         </div>
         {/* 模型温度设置 */}
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">模型温度</label>
+          <label className="block text-sm font-medium mb-1 flex items-center">
+            模型温度
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span
+                    className="ml-1 cursor-pointer text-gray-400 flex items-center"
+                    style={{ lineHeight: 0 }}
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle
+                        cx="8"
+                        cy="8"
+                        r="7"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        fill="none"
+                      />
+                      <text
+                        x="8"
+                        y="12"
+                        textAnchor="middle"
+                        fontSize="10"
+                        fill="currentColor"
+                        fontFamily="Arial, sans-serif"
+                      >
+                        ?
+                      </text>
+                    </svg>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  控制生成内容的随机性，值越高越随机
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </label>
           <input
             type="range"
             min={0}
@@ -82,7 +150,49 @@ const GlobalContextModal: React.FC<Props> = ({ open, onClose }) => {
         </div>
         {/* 上下文数设置 */}
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">上下文数</label>
+          <label className="block text-sm font-medium mb-1 flex items-center">
+            上下文数
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span
+                    className="ml-1 cursor-pointer text-gray-400 flex items-center"
+                    style={{ lineHeight: 0 }}
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle
+                        cx="8"
+                        cy="8"
+                        r="7"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        fill="none"
+                      />
+                      <text
+                        x="8"
+                        y="12"
+                        textAnchor="middle"
+                        fontSize="10"
+                        fill="currentColor"
+                        fontFamily="Arial, sans-serif"
+                      >
+                        ?
+                      </text>
+                    </svg>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  影响模型能记住多少轮对话，数值越大消耗越多资源
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </label>
           <input
             type="range"
             min={1}
@@ -113,7 +223,50 @@ const GlobalContextModal: React.FC<Props> = ({ open, onClose }) => {
         </div>
         {/* 最大Token数设置 */}
         <div className="mb-4 flex items-center justify-between">
-          <span className="text-sm">最大 Token 数</span>
+          <span className="text-sm flex items-center">
+            最大 Token 数
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span
+                    className="ml-1 cursor-pointer text-gray-400 flex items-center"
+                    style={{ lineHeight: 0 }}
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle
+                        cx="8"
+                        cy="8"
+                        r="7"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        fill="none"
+                      />
+                      <text
+                        x="8"
+                        y="12"
+                        textAnchor="middle"
+                        fontSize="10"
+                        fill="currentColor"
+                        fontFamily="Arial, sans-serif"
+                      >
+                        ?
+                      </text>
+                    </svg>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  单次交互所用的最大 Token
+                  数，会影响返回结果的长度。要根据模型上下文限制来设置，否则会报错
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </span>
           <input
             type="checkbox"
             checked={maxTokenEnabled}
@@ -143,7 +296,7 @@ const GlobalContextModal: React.FC<Props> = ({ open, onClose }) => {
           >
             默认系统消息
           </div>
-          <div className="text-sm text-gray-700">{defaultSystemMessage}</div>
+          <div className="text-sm text-gray-700">{systemMessage}</div>
         </div>
         {/* 预留保存按钮 */}
         <div className="mt-6 flex justify-end">
