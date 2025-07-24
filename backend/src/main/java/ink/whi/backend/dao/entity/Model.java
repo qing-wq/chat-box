@@ -20,9 +20,14 @@ public class Model extends BaseEntity {
     private String name;
 
     /**
-     * 模型类型 {@link ModelTypeEnum}
+     * 模型类型
      */
-    private String type;
+    private ModelTypeEnum type;
+
+    /**
+     * 模型创建
+     */
+    private String description;
 
     /**
      * 模型平台

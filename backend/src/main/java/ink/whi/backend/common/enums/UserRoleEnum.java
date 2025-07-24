@@ -1,5 +1,6 @@
 package ink.whi.backend.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
 import java.util.Objects;
@@ -13,6 +14,7 @@ public enum UserRoleEnum {
     NORMAL(0, "普通用户"),
     ADMIN(1, "超级用户");
 
+    @EnumValue
     private int role;
     private String desc;
 

@@ -9,8 +9,11 @@ import ink.whi.backend.common.exception.BusinessException;
 import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.dao.entity.Platform;
 import ink.whi.backend.dao.mapper.PlatformMapper;
+import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +24,9 @@ import java.util.List;
  */
 @Service
 public class PlatformService extends ServiceImpl<PlatformMapper, Platform> {
+
+    @Resource
+    private ModelService modelService;
 
     /**
      * 创建平台
@@ -39,9 +45,9 @@ public class PlatformService extends ServiceImpl<PlatformMapper, Platform> {
         // 默认OPENAI
         PlatformTypeEnum type = PlatformTypeEnum.formName(req.getType());
         if (type == null) {
-            throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "type非法");
+            throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "platformType非法");
         }
-        platform.setPlatformType(type.getType());
+        platform.setPlatformType(type);
         platform.setApiKey(req.getApiKey());
         platform.setBaseUrl(req.getBaseUrl());
         platform.setUserId(ReqInfoContext.getUserId());
@@ -103,13 +109,19 @@ public class PlatformService extends ServiceImpl<PlatformMapper, Platform> {
     /**
      * 删除平台
      * @param platformId 平台ID
-     * @return 是否成功
+     * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public void deletePlatform(Integer platformId) {
         Platform platform = getById(platformId);
         checkStatus(platform);
         removeById(platformId);
+
+        // 删除相关模型
+        modelService.deleteAll(platformId);
     }
+
+
 
     public void checkStatus(Platform platform) {
         if (platform == null) {

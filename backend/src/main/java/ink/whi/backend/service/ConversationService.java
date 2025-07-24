@@ -7,7 +7,6 @@ import ink.whi.backend.common.exception.BusinessException;
 import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.dao.entity.Conversation;
 import ink.whi.backend.dao.mapper.ChatMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;

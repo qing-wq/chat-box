@@ -14,14 +14,13 @@ import java.util.Optional;
 public class PlatformConverter {
 
     public static PlatformDetailDTO toPlatformDetailDTO(Platform platform) {
+        if (platform == null) {
+            return null;
+        }
         PlatformDetailDTO dto = new PlatformDetailDTO();
-
         dto.setId(platform.getId());
         dto.setName(platform.getName());
-
-        PlatformTypeEnum.formType(platform.getPlatformType())
-                .ifPresent(t -> dto.setPlatformType(t.getName()));
-
+        dto.setPlatformType(platform.getPlatformType().getName());
         dto.setEnable(platform.getEnable());
         dto.setApiKey(platform.getApiKey());
         dto.setBaseUrl(platform.getBaseUrl());

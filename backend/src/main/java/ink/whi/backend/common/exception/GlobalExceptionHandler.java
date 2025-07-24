@@ -90,7 +90,7 @@ public class GlobalExceptionHandler {
         resp.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         resp.setHeader("Cache-Control", "no-cache, must-revalidate");
         setErrorCode(errStatus, resp);
-        log.error("capture BusinessException: {}", errStatus.getMsg());
+        log.error("capture BusinessException: {}", ex.getStatus().getMsg(), ex);
         return ResVo.fail(errStatus);
     }
 
@@ -101,7 +101,7 @@ public class GlobalExceptionHandler {
         resp.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         resp.setHeader("Cache-Control", "no-cache, must-revalidate");
         setErrorCode(errStatus, resp);
-        log.error("capture HttpMediaTypeNotAcceptableException: {}", ExceptionUtils.getStackTrace(e));
+        log.error("capture HttpMediaTypeNotAcceptableException: ", e);
         return ResVo.fail(errStatus);
     }
 
@@ -111,7 +111,7 @@ public class GlobalExceptionHandler {
         resp.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         resp.setHeader("Cache-Control", "no-cache, must-revalidate");
         setErrorCode(errStatus, resp);
-        log.error("capture MissingServletRequestParameterException: {}", ExceptionUtils.getStackTrace(e));
+        log.error("capture MissingServletRequestParameterException: ", e);
         return ResVo.fail(errStatus);
     }
 

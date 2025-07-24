@@ -1,5 +1,7 @@
 package ink.whi.backend.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import ink.whi.backend.dao.entity.Platform;
 import lombok.Getter;
 
@@ -18,7 +20,10 @@ public enum PlatformTypeEnum {
     ANTHROPIC(3, "anthropic"),
     AZURE_OPENAI(4, "azure_openai");
 
+    @EnumValue
     public int type;
+
+    @JsonValue
     public String name;
 
     PlatformTypeEnum(int type, String name) {

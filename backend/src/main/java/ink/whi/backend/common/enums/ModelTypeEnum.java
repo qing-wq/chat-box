@@ -1,5 +1,6 @@
 package ink.whi.backend.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
 /**
@@ -14,9 +15,20 @@ public enum ModelTypeEnum {
     EMBEDDING("embedding"),
     RERANK("rerank");
 
-    private String type;
+    @EnumValue
+    private final String type;
 
     ModelTypeEnum( String type) {
         this.type = type;
+    }
+
+    public static ModelTypeEnum of(String type) {
+        for (ModelTypeEnum typeEnum : ModelTypeEnum.values()) {
+            if (typeEnum.getType().equals(type)) {
+                return typeEnum;
+            }
+        }
+
+        return null;
     }
 }

@@ -5,6 +5,7 @@ import ink.whi.backend.common.dto.conversation.ConvUpdateReq;
 import ink.whi.backend.common.dto.conversation.ConversationVO;
 import ink.whi.backend.common.dto.conversation.SimpleConvDTO;
 import ink.whi.backend.dao.entity.Conversation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -36,7 +37,7 @@ public class ConversationConverter {
         dto.setId(conversationDO.getId());
         dto.setUuid(conversationDO.getUuid());
         dto.setTitle(conversationDO.getTitle());
-        dto.setSystemMessage(conversationDO.getSystemMessage());
+        dto.setSystemMessage(StringUtils.isEmpty(conversationDO.getSystemMessage()) ? "" : conversationDO.getSystemMessage());
         dto.setCreateTime(conversationDO.getCreateTime());
         dto.setUpdateTime(conversationDO.getUpdateTime());
         return dto;

@@ -14,12 +14,7 @@ public class ModelParams {
     private Double temperature;
 
     /**
-     * 核采样参数 (0-1.0)
-     */
-    private Double topP;
-
-    /**
-     * 最大输出token数
+     * 最大token数
      */
     private Integer maxTokens;
 
@@ -27,14 +22,4 @@ public class ModelParams {
      * 上下文窗口
      */
     private Integer contextWindow;
-
-    /**
-     * 最大输入长度
-     */
-    private Integer maxInputTokens;
-
-    /**
-     * 最大输出长度
-     */
-    private Integer maxOutputTokens;
 }

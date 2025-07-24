@@ -18,10 +18,7 @@ public class Platform extends BaseEntity{
 
     private String name;
 
-    /**
-     * {@link PlatformTypeEnum}
-     */
-    private Integer platformType;
+    private PlatformTypeEnum platformType;
 
     private String apiKey;
 

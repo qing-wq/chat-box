@@ -27,9 +27,6 @@ import java.util.Map;
 public class ModelController {
 
     @Autowired
-    private PMService pMService;
-
-    @Autowired
     private ModelService modelService;
 
     @Autowired
@@ -42,28 +39,17 @@ public class ModelController {
      */
     @PostMapping("/create")
     public ResVo<Model> createModel(@RequestBody ModelCreReq req) {
-        Model model = pMService.createModel(req);
+        Model model = modelService.createModel(req);
         return ResVo.ok(model);
     }
 
     /**
-     * 获取当前使用的模型
-     * @return
-     */
-    @GetMapping("/current")
-    public ResVo<SimpleModelDTO> getCurrentModel() {
-        Message lastMessage = messageService.getLastMessage();
-        Model model = modelService.getById(lastMessage.getModelId());
-        return ResVo.ok(ModelConverter.toSimpleDTO(model));
-    }
-
-    /**
-     * 获取可用模型列表（对话模块）
+     * 模型选择接口
      * @return 模型列表
      */
     @GetMapping("/list")
     public ResVo<Map<String, List<SimpleModelDTO>>> getUserModelList() {
-        Map<String, List<SimpleModelDTO>> map = pMService.getUserModelList();
+        Map<String, List<SimpleModelDTO>> map = modelService.getUserModelList();
         return ResVo.ok(map);
     }
 

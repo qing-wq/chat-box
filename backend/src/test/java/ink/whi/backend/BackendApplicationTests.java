@@ -18,7 +18,7 @@ class BackendApplicationTests {
 
     @Test
     void contextLoads() {
-        String pwd = UserPwdEncoderUtil.encoder("sai2024");
+        String pwd = UserPwdEncoderUtil.encoder("123456");
         System.out.println(pwd);
     }
 

@@ -1,5 +1,7 @@
 package ink.whi.backend.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -30,7 +32,10 @@ public enum MsgRoleEnum {
         }
     };
 
+    @EnumValue
     private int type;
+
+    @JsonValue
     private String role;
 
     MsgRoleEnum(int type, String role) {

@@ -28,49 +28,11 @@ public class PMService {
     private final ModelService modelService;
 
 
-    public Model createModel(ModelCreReq req) {
-        // check
-        platformService.getOrThrow(req.getPlatformId());
-        return modelService.createModel(req);
-    }
 
-    /**
-     * 获取可用模型列表（对话模块）
-     * @return 模型列表
-     */
-    public Map<String, List<SimpleModelDTO>> getUserModelList() {
-        Map<String, List<SimpleModelDTO>> map = Maps.newHashMap();
 
-        List<Platform> platforms = platformService.getAllPlatforms();
-        platforms.forEach(platform -> {
-            List<Model> models = modelService.getModelsByPlatformId(platform.getId());
-            map.put(platform.getName(), ModelConverter.toSimpleDTOs(models));
-        });
 
-        return map;
-    }
 
-    public ModelConfig buildModelConfig(Integer modelId) {
-        Model model = modelService.getById(modelId);
-        Platform platform = platformService.getById(model.getPlatformId());
-        platformService.checkStatus(platform);
 
-        return ModelConfig.builder()
-                .apiKey(platform.getApiKey())
-                .baseUrl(platform.getBaseUrl())
-                .modelName(model.getName())
-                .build();
-    }
 
-    /**
-     * 删除平台
-     * @param platformId 平台ID
-     * @return 是否成功
-     */
-    public void deletePlatform(Integer platformId) {
-        platformService.deletePlatform(platformId);
 
-        // 删除相关模型
-        modelService.deleteAll(platformId);
-    }
 }

@@ -9,13 +9,20 @@ import ink.whi.backend.common.dto.conversation.ConvUpdateReq;
 import ink.whi.backend.common.dto.conversation.ConversationVO;
 import ink.whi.backend.common.dto.conversation.SimpleConvDTO;
 import ink.whi.backend.common.dto.message.MessageDTO;
+import ink.whi.backend.common.exception.BusinessException;
+import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.dao.entity.Conversation;
+import ink.whi.backend.dao.entity.Message;
+import ink.whi.backend.dao.entity.Model;
 import ink.whi.backend.service.ConversationService;
 import ink.whi.backend.service.MessageService;
+import ink.whi.backend.service.ModelService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 对话接口
@@ -30,6 +37,7 @@ public class ConversationController {
 
     private final ConversationService convService;
     private final MessageService messageService;
+    private final ModelService modelService;
 
     /**
      * 创建新的对话
@@ -38,6 +46,10 @@ public class ConversationController {
      */
     @PostMapping("/{uuid}")
     public ResVo<ConversationDTO> createConv(@PathVariable String uuid) {
+        if (StringUtils.isBlank(uuid)) {
+            throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "uuid不能为空");
+        }
+
         Conversation conversation = new Conversation();
         conversation.setTitle("新建对话");
         conversation.setUuid(uuid);
@@ -62,6 +74,13 @@ public class ConversationController {
 
         List<MessageDTO> messages = messageService.queryMessageList(uuid);
         vo.setMessageList(messages);
+
+        Message lastMessage = messageService.getLastMessage();
+        if (lastMessage != null) {
+            Integer modelId = lastMessage.getModelId();
+            Model model = modelService.getById(modelId);
+            vo.setCurrentModel(model);
+        }
 
         return ResVo.ok(vo);
     }

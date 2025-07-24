@@ -1,6 +1,7 @@
 package ink.whi.backend.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import ink.whi.backend.common.enums.UserRoleEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,8 +14,10 @@ import lombok.EqualsAndHashCode;
 @TableName("user")
 public class User extends BaseEntity {
     private String username;
+
     private String password;
 
-    private Integer role;
+    private UserRoleEnum role;
+
     private String avatar;
 }

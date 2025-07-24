@@ -82,6 +82,7 @@ CREATE TABLE IF NOT EXISTS `model`
     `type`        varchar(50)  NULL COMMENT '模型类型',
     `platform_id` int          NOT NULL COMMENT '平台ID',
     `name`        varchar(100) NOT NULL COMMENT '模型名称',
+    `description` varchar(500)          DEFAULT '' COMMENT '描述',
     `create_time` timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),

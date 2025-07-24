@@ -20,7 +20,7 @@ public class ModelConverter {
         ModelDTO dto = new ModelDTO();
         dto.setId(model.getId());
         dto.setName(model.getName());
-        dto.setType(model.getType());
+        dto.setType(model.getType().getType());
         dto.setPlatformId(model.getPlatformId());
         dto.setCreateTime(model.getCreateTime());
         dto.setUpdateTime(model.getUpdateTime());

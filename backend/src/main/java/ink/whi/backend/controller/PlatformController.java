@@ -25,8 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PlatformController {
 
-    private final PMService pmService;
-
     private final PlatformService platformService;
 
     private final ModelService modelService;
@@ -59,11 +57,10 @@ public class PlatformController {
      */
     @GetMapping("/detail/{platformId}")
     public ResVo<PlatformDetailDTO> getPlatformById(@PathVariable Integer platformId) {
-        Platform platform = platformService.getById(platformId);
-        platformService.checkStatus(platform);
+        Platform platform = platformService.getOrThrow(platformId);
+        PlatformDetailDTO detail = PlatformConverter.toPlatformDetailDTO(platform);
 
         List<Model> models = modelService.getModelsByPlatformId(platformId);
-        PlatformDetailDTO detail = PlatformConverter.toPlatformDetailDTO(platform);
         detail.setModelList(models);
 
         return ResVo.ok(detail);
@@ -88,7 +85,7 @@ public class PlatformController {
      */
     @GetMapping("/delete/{platformId}")
     public ResVo<String> deletePlatform(@PathVariable Integer platformId) {
-        pmService.deletePlatform(platformId);
+        platformService.deletePlatform(platformId);
         return ResVo.ok("ok");
     }
 }
