@@ -6,7 +6,9 @@ import {
   updateLastMessage,
   setStreaming,
   updateChatMessages,
-  fetchChatList
+  fetchChatList,
+  createNewChat,
+  setPendingChat,
 } from '../store/chatSlice';
 import { Message, ChatRequest } from '../types';
 import { streamChat } from '../utils/api';
@@ -14,12 +16,17 @@ import { streamChat } from '../utils/api';
 export const useChat = () => {
   const dispatch = useAppDispatch();
   const { modelConfig } = useAppSelector((state: any) => state.config);
-
+  // 删除 pendingChat 相关内容，彻底还原为原始 useChat 逻辑
   const [error, setError] = useState<string | null>(null);
   const currentChat = useAppSelector((state) => state.chat.currentChat);
 
-  const sendMessage = useCallback((content: string, useTools: string[] = []) => {
-    console.log('sendMessage called with content:', content, 'and tools:', useTools);
+  const _sendMessage = async (content: string, useTools: string[] = []) => {
+    console.log(
+      'sendMessage called with content:',
+      content,
+      'and tools:',
+      useTools
+    );
 
     const conversationUuId = currentChat?.conversation?.uuid;
     if (!conversationUuId) {
@@ -28,12 +35,12 @@ export const useChat = () => {
     }
 
     // Get current message list
-    const messageList = [...currentChat?.messageList || []];
+    const messageList = [...(currentChat?.messageList || [])];
 
     // Add user message to the chat
     const userMessage: Message = {
       role: 'user',
-      content
+      content,
     };
     console.log('Adding user message:', userMessage);
     messageList.push(userMessage);
@@ -43,7 +50,7 @@ export const useChat = () => {
     // Add empty assistant message that will be updated with streaming content
     const assistantMessage: Message = {
       role: 'assistant',
-      content: ''
+      content: '',
     };
 
     dispatch(addMessage(assistantMessage));
@@ -57,7 +64,7 @@ export const useChat = () => {
       conversationUuId,
       messageList,
       modelConfig, // 使用modelConfig，而不是currentModel
-      toolList: useTools.length > 0 ? useTools : undefined
+      toolList: useTools.length > 0 ? useTools : undefined,
     };
 
     console.log('Created chat request:', JSON.stringify(chatRequest, null, 2));
@@ -100,29 +107,41 @@ export const useChat = () => {
         messagesToSave.push({
           role: 'user',
           content: userMessage.content,
-          conversationUuId
+          conversationUuId,
         });
 
         // 添加助手消息
         messagesToSave.push({
           role: 'assistant',
           content: assistantResponse,
-          conversationUuId
+          conversationUuId,
         });
-        
-        console.log('Saving updated messages to backend:', JSON.stringify(messagesToSave));
-        dispatch(updateChatMessages({
-          uuid: conversationUuId,
-          title: currentChat.conversation.title,
-          description: currentChat.conversation.description,
-          systemMessage: currentChat.conversation.systemMessage
-        }));
+
+        console.log(
+          'Saving updated messages to backend:',
+          JSON.stringify(messagesToSave)
+        );
+        dispatch(
+          updateChatMessages({
+            uuid: conversationUuId,
+            title: currentChat.conversation.title,
+            description: currentChat.conversation.description,
+            systemMessage: currentChat.conversation.systemMessage,
+          })
+        );
         dispatch(fetchChatList());
       }
     );
 
     return cleanup;
-  }, [modelConfig, dispatch, currentChat]);
+  };
+
+  const sendMessage = useCallback(
+    (content: string, useTools: string[] = []) => {
+      _sendMessage(content, useTools);
+    },
+    [modelConfig, dispatch, currentChat]
+  );
 
   const clearError = useCallback(() => {
     setError(null);

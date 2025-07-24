@@ -13,9 +13,9 @@ import { useAppSelector, useAppDispatch } from '../../hooks';
 
 import {
   fetchChatList,
-  createNewChat,
   deleteChat,
   updateChatMessages,
+  setPendingChat, // 新增
 } from '../../store/chatSlice';
 
 import { Button } from '@/components/ui/button';
@@ -46,11 +46,8 @@ const Sidebar: React.FC = () => {
   }, [dispatch]);
 
   // Handle creating a new chat
-  const handleNewChat = async () => {
-    const resultAction = await dispatch(createNewChat());
-    if (createNewChat.fulfilled.match(resultAction)) {
-      navigate(`/chat/${resultAction.payload.uuid}`);
-    }
+  const handleNewChat = () => {
+    navigate('/'); // 只跳转到首页
   };
 
   // Handle selecting a chat

@@ -1,19 +1,24 @@
 import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2, MessageSquare } from 'lucide-react';
-import { useAppSelector, useAppDispatch } from '../hooks';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Loader2, MessageSquare, Plus, Sparkles } from 'lucide-react';
+import { useAppSelector, useAppDispatch, useChat } from '../hooks';
 import { fetchChatDetail } from '../store/chatSlice';
 import MessageList from '../components/chat/MessageList';
 import ChatInput from '../components/chat/ChatInput';
 import ModelConfigAlert from '../components/common/ModelConfigAlert';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
 const ChatPage: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
+  const location = useLocation();
+  const { sendMessage } = useChat();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { currentChat, loading, error } = useAppSelector((state) => state.chat);
+  const { currentChat, loading, error, pendingChat } = useAppSelector(
+    (state) => state.chat
+  );
   const { isLoggedIn } = useAppSelector((state) => state.user);
 
   // Redirect to login if not logged in
@@ -29,6 +34,15 @@ const ChatPage: React.FC = () => {
       dispatch(fetchChatDetail(chatId));
     }
   }, [chatId, dispatch, isLoggedIn]);
+
+  // 自动发送第一条消息
+  useEffect(() => {
+    if (location.state && location.state.firstMessage && currentChat) {
+      sendMessage(location.state.firstMessage, location.state.useTools || []);
+      // 清除 state，防止重复发送
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, currentChat, sendMessage]);
 
   if (!isLoggedIn) {
     return null; // Will redirect to login

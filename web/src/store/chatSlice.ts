@@ -1,7 +1,14 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
-import { ChatInfo, ChatDetail, Message, ResVo, ChatUpdateRequest, Conversation, ChatListInfo } from '../types';
-
+import {
+  ChatInfo,
+  ChatDetail,
+  Message,
+  ResVo,
+  ChatUpdateRequest,
+  Conversation,
+  ChatListInfo,
+} from '../types';
 
 import axios from 'axios';
 
@@ -27,7 +34,7 @@ export const fetchChatList = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get<ResVo<ChatListInfo[]>>(
-        '/api/conversation/list',
+        '/api/conversation/list'
       );
 
       if (response.data.status.code === 0) {
@@ -38,12 +45,12 @@ export const fetchChatList = createAsyncThunk(
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         return rejectWithValue(
-          error.response.data.status?.msg || 'Failed to fetch chat list',
+          error.response.data.status?.msg || 'Failed to fetch chat list'
         );
       }
       return rejectWithValue('Failed to fetch chat list. Please try again.');
     }
-  },
+  }
 );
 
 export const fetchChatDetail = createAsyncThunk(
@@ -51,7 +58,7 @@ export const fetchChatDetail = createAsyncThunk(
   async (uuid: string, { rejectWithValue }) => {
     try {
       const response = await axios.get<ResVo<ChatDetail>>(
-        `/api/conversation/detail/${uuid}`,
+        `/api/conversation/detail/${uuid}`
       );
 
       if (response.data.status.code === 0) {
@@ -62,12 +69,12 @@ export const fetchChatDetail = createAsyncThunk(
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         return rejectWithValue(
-          error.response.data.status?.msg || 'Failed to fetch chat details',
+          error.response.data.status?.msg || 'Failed to fetch chat details'
         );
       }
       return rejectWithValue('Failed to fetch chat details. Please try again.');
     }
-  },
+  }
 );
 
 export const createNewChat = createAsyncThunk(
@@ -76,8 +83,9 @@ export const createNewChat = createAsyncThunk(
     try {
       const uuid = crypto.randomUUID();
 
-      const response = await axios.post<ResVo<Conversation>>(`/api/conversation/${uuid}`);
-      
+      const response = await axios.post<ResVo<Conversation>>(
+        `/api/conversation/${uuid}`
+      );
 
       if (response.data.status.code === 0) {
         return response.data.data;
@@ -87,12 +95,12 @@ export const createNewChat = createAsyncThunk(
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         return rejectWithValue(
-          error.response.data.status?.msg || 'Failed to create new chat',
+          error.response.data.status?.msg || 'Failed to create new chat'
         );
       }
       return rejectWithValue('Failed to create new chat. Please try again.');
     }
-  },
+  }
 );
 
 export const updateChatInfo = createAsyncThunk(
@@ -104,7 +112,7 @@ export const updateChatInfo = createAsyncThunk(
         {
           conversationUUid: chatUpdateRequest.uuid,
           title: chatUpdateRequest.title,
-        },
+        }
       );
 
       if (response.data.status.code === 0) {
@@ -115,22 +123,21 @@ export const updateChatInfo = createAsyncThunk(
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         return rejectWithValue(
-          error.response.data.status?.msg || 'Failed to update chat',
+          error.response.data.status?.msg || 'Failed to update chat'
         );
       }
       return rejectWithValue('Failed to update chat. Please try again.');
     }
-  },
+  }
 );
-
 
 export const deleteChat = createAsyncThunk(
   'chat/deleteChat',
   async (uuid: string, { rejectWithValue }) => {
     try {
-
-      const response = await axios.get<ResVo<string>>(`/api/conversation/del/${uuid}`);
-      
+      const response = await axios.get<ResVo<string>>(
+        `/api/conversation/del/${uuid}`
+      );
 
       if (response.data.status.code === 0) {
         return uuid;
@@ -140,27 +147,41 @@ export const deleteChat = createAsyncThunk(
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         return rejectWithValue(
-          error.response.data.status?.msg || 'Failed to delete chat',
+          error.response.data.status?.msg || 'Failed to delete chat'
         );
       }
       return rejectWithValue('Failed to delete chat. Please try again.');
     }
-  },
+  }
 );
 // TODO 待修改
 export const updateChatMessages = createAsyncThunk(
   'chat/updateChatMessages',
 
-  async ({ uuid, title, description, systemMessage }: { uuid: string, title?: string, description?: string, systemMessage?: string }, { rejectWithValue, dispatch }) => {
-
+  async (
+    {
+      uuid,
+      title,
+      description,
+      systemMessage,
+    }: {
+      uuid: string;
+      title?: string;
+      description?: string;
+      systemMessage?: string;
+    },
+    { rejectWithValue, dispatch }
+  ) => {
     try {
-      const response = await axios.post<ResVo<string>>('/api/conversation/update', {
-        uuid,
-        title,
-        ...(description ? { description } : {}),
-        ...(systemMessage ? { systemMessage } : {})
-      });
-      
+      const response = await axios.post<ResVo<string>>(
+        '/api/conversation/update',
+        {
+          uuid,
+          title,
+          ...(description ? { description } : {}),
+          ...(systemMessage ? { systemMessage } : {}),
+        }
+      );
 
       if (response.data.status.code === 0) {
         // 更新后重新获取聊天详情并返回
@@ -168,7 +189,9 @@ export const updateChatMessages = createAsyncThunk(
         if (fetchChatDetail.fulfilled.match(detailResponse)) {
           return detailResponse.payload;
         } else {
-          return rejectWithValue(detailResponse.payload || 'Failed to fetch updated chat detail');
+          return rejectWithValue(
+            detailResponse.payload || 'Failed to fetch updated chat detail'
+          );
         }
       } else {
         return rejectWithValue(response.data.status.msg);
@@ -176,14 +199,14 @@ export const updateChatMessages = createAsyncThunk(
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         return rejectWithValue(
-          error.response.data.status?.msg || 'Failed to update chat messages',
+          error.response.data.status?.msg || 'Failed to update chat messages'
         );
       }
       return rejectWithValue(
-        'Failed to update chat messages. Please try again.',
+        'Failed to update chat messages. Please try again.'
       );
     }
-  },
+  }
 );
 
 const chatSlice = createSlice({
@@ -215,7 +238,10 @@ const chatSlice = createSlice({
         state.currentChat.messageList = [];
       }
     },
-    setCurrentModel: (state, action: PayloadAction<{ id: number; name: string } | null>) => {
+    setCurrentModel: (
+      state,
+      action: PayloadAction<{ id: number; name: string } | null>
+    ) => {
       if (state.currentChat && action.payload) {
         if (!state.currentChat.currentModel) {
           state.currentChat.currentModel = action.payload;
@@ -224,7 +250,7 @@ const chatSlice = createSlice({
           state.currentChat.currentModel.name = action.payload.name;
         }
       }
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -238,7 +264,7 @@ const chatSlice = createSlice({
         (state, action: PayloadAction<ChatInfo[]>) => {
           state.loading = false;
           state.chatList = action.payload;
-        },
+        }
       )
       .addCase(fetchChatList.rejected, (state, action) => {
         state.loading = false;
@@ -250,17 +276,22 @@ const chatSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchChatDetail.fulfilled, (state, action: PayloadAction<ChatDetail>) => {
-        state.loading = false;
-        const chat = state.chatList.find((chat) => chat.uuid === action.payload.conversation.uuid);
-        if (chat) {
-          chat.updateTime = action.payload.conversation.updateTime;
-          chat.createTime = action.payload.conversation.createTime;
-          chat.title = action.payload.conversation.title;
+      .addCase(
+        fetchChatDetail.fulfilled,
+        (state, action: PayloadAction<ChatDetail>) => {
+          state.loading = false;
+          const chat = state.chatList.find(
+            (chat) => chat.uuid === action.payload.conversation.uuid
+          );
+          if (chat) {
+            chat.updateTime = action.payload.conversation.updateTime;
+            chat.createTime = action.payload.conversation.createTime;
+            chat.title = action.payload.conversation.title;
+          }
+          state.currentChat = action.payload;
+          // currentModel 现在直接包含在 currentChat 中
         }
-        state.currentChat = action.payload;
-        // currentModel 现在直接包含在 currentChat 中
-      })
+      )
       .addCase(fetchChatDetail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
@@ -272,25 +303,27 @@ const chatSlice = createSlice({
         state.error = null;
       })
 
-      .addCase(createNewChat.fulfilled, (state, action: PayloadAction<ChatInfo>) => {
-        state.loading = false;
-        state.chatList.unshift({
-          uuid: action.payload.uuid,
-          title: action.payload.title,
-          description: action.payload.description,
-          systemMessage: action.payload.systemMessage,
-        });
-        state.currentChat = {
-          conversation: action.payload,
-          messageList: []
-        }}
-    )
+      .addCase(
+        createNewChat.fulfilled,
+        (state, action: PayloadAction<ChatInfo>) => {
+          state.loading = false;
+          state.chatList.unshift({
+            uuid: action.payload.uuid,
+            title: action.payload.title,
+            description: action.payload.description,
+            systemMessage: action.payload.systemMessage,
+          });
+          state.currentChat = {
+            conversation: action.payload,
+            messageList: [],
+          };
+        }
+      )
 
       .addCase(createNewChat.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
-
 
       // Update chat info
       .addCase(updateChatInfo.pending, (state) => {
@@ -305,7 +338,7 @@ const chatSlice = createSlice({
 
           // Update in chat list
           const chatIndex = state.chatList.findIndex(
-            (chat) => chat.uuid === uuid,
+            (chat) => chat.uuid === uuid
           );
           if (chatIndex !== -1 && title) {
             state.chatList[chatIndex].title = title;
@@ -315,13 +348,12 @@ const chatSlice = createSlice({
           if (state.currentChat && state.currentChat.uuid === uuid && title) {
             state.currentChat.title = title;
           }
-        },
+        }
       )
       .addCase(updateChatInfo.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
-
 
       // Delete chat
       .addCase(deleteChat.pending, (state) => {
@@ -331,12 +363,14 @@ const chatSlice = createSlice({
       .addCase(deleteChat.fulfilled, (state, action: PayloadAction<string>) => {
         state.loading = false;
         state.chatList = state.chatList.filter(
-          (chat) => chat.uuid !== action.payload,
+          (chat) => chat.uuid !== action.payload
         );
 
         // Clear current chat if it's the deleted one
-        if (state.currentChat && state.currentChat.conversation.uuid === action.payload) {
-
+        if (
+          state.currentChat &&
+          state.currentChat.conversation.uuid === action.payload
+        ) {
           state.currentChat = null;
         }
       })
@@ -351,23 +385,31 @@ const chatSlice = createSlice({
         state.error = null;
       })
 
-      .addCase(updateChatMessages.fulfilled, (state, action: PayloadAction<ChatDetail>) => {
-        state.loading = false;
-        const { uuid, title, description } = action.payload.conversation;
-        
-        // Update in chat list
-        const chatIndex = state.chatList.findIndex(chat => chat.uuid === uuid);
-        if (chatIndex !== -1) {
-          if (title) state.chatList[chatIndex].title = title;
-          if (description) state.chatList[chatIndex].description = description;
-          
+      .addCase(
+        updateChatMessages.fulfilled,
+        (state, action: PayloadAction<ChatDetail>) => {
+          state.loading = false;
+          const { uuid, title, description } = action.payload.conversation;
+
+          // Update in chat list
+          const chatIndex = state.chatList.findIndex(
+            (chat) => chat.uuid === uuid
+          );
+          if (chatIndex !== -1) {
+            if (title) state.chatList[chatIndex].title = title;
+            if (description)
+              state.chatList[chatIndex].description = description;
+          }
+
+          // Update current chat if it's the same
+          if (
+            state.currentChat &&
+            state.currentChat.conversation.uuid === uuid
+          ) {
+            state.currentChat = action.payload;
+          }
         }
-        
-        // Update current chat if it's the same
-        if (state.currentChat && state.currentChat.conversation.uuid === uuid) {
-          state.currentChat = action.payload;
-        }
-      })
+      )
 
       .addCase(updateChatMessages.rejected, (state, action) => {
         state.loading = false;
@@ -376,5 +418,12 @@ const chatSlice = createSlice({
   },
 });
 
-export const { clearError, setStreaming, addMessage, updateLastMessage, clearMessages, setCurrentModel } = chatSlice.actions;
+export const {
+  clearError,
+  setStreaming,
+  addMessage,
+  updateLastMessage,
+  clearMessages,
+  setCurrentModel,
+} = chatSlice.actions;
 export default chatSlice.reducer;
