@@ -29,32 +29,33 @@ public class MessageConverter {
         }
         MessageDTO dto = new MessageDTO();
         dto.setId(messageDO.getId());
-        dto.setRole(MsgRoleEnum.formType(messageDO.getRole()).getRole());
+        dto.setRole(messageDO.getRole().getRole());
         dto.setConversationUuid(messageDO.getConversationUuid());
         dto.setContent(messageDO.getContent());
         dto.setCreateTime(messageDO.getCreateTime());
         dto.setUpdateTime(messageDO.getUpdateTime());
+        dto.setTokenUsage(messageDO.getTokenUsage());
         return dto;
     }
 
     /**
      * MessageDTO 转 MessageDO
      *
-     * @param MessageDTO 消息DTO对象
+     * @param dto 消息DTO对象
      * @return 消息DO对象
      */
-    public static Message toDO(MessageDTO MessageDTO) {
-        if (MessageDTO == null) {
+    public static Message toDO(MessageDTO dto) {
+        if (dto == null) {
             return null;
         }
         Message message = new Message();
-        message.setContent(MessageDTO.getContent());
-        message.setConversationUuid(MessageDTO.getConversationUuid());
-        MsgRoleEnum role = MsgRoleEnum.formRole(MessageDTO.getRole());
+        message.setContent(dto.getContent());
+        message.setConversationUuid(dto.getConversationUuid());
+        MsgRoleEnum role = MsgRoleEnum.formRole(dto.getRole());
         if (role == null) {
-            throw new IllegalArgumentException("Invalid role: " + MessageDTO.getRole());
+            throw new IllegalArgumentException("Invalid role: " + dto.getRole());
         }
-        message.setRole(role.getType());
+        message.setRole(MsgRoleEnum.formRole(dto.getRole()));
         return message;
     }
 

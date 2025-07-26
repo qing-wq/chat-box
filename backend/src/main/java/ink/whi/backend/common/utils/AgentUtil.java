@@ -2,9 +2,12 @@ package ink.whi.backend.common.utils;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.chat.response.ChatResponseMetadata;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
+import dev.langchain4j.model.output.TokenUsage;
 import dev.langchain4j.service.TokenStream;
+import ink.whi.backend.common.context.ReqInfoContext;
 import ink.whi.backend.common.enums.MsgRoleEnum;
 import ink.whi.backend.common.exception.BusinessException;
 import ink.whi.backend.common.status.StatusEnum;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static dev.langchain4j.data.message.SystemMessage.systemMessage;
@@ -78,16 +82,14 @@ public class AgentUtil {
             builder.temperature(params.getTemperature());
         }
 
-        if (params.getTopP() != null) {
-            builder.topP(params.getTopP());
-        }
-
         if (params.getMaxTokens() != null) {
             builder.maxTokens(params.getMaxTokens());
         }
     }
 
-    public static void registerStreamingHandler(TokenStream tokenStream, SseEmitter emitter, Consumer<AiMessage> consumer) {
+    public static void registerStreamingHandler(TokenStream tokenStream, SseEmitter emitter, BiConsumer<AiMessage, ChatResponse> consumer) {
+        // TODO sse start
+
         tokenStream.onPartialResponse(token -> {
                     try {
                         // 将token封装为JSON格式 {v: token}
@@ -102,23 +104,20 @@ public class AgentUtil {
                     try {
                         emitter.complete();
                         AiMessage aiMessage = response.aiMessage();
-                        ChatResponseMetadata metadata = response.metadata();
-                        log.info("流式响应完成, response:{}", response);
+                        log.info("流式响应完成, response:{}", response.metadata());
 
                         // save aiMessage
-                        consumer.accept(aiMessage);
-                        log.info("请求完成，消耗token{}", metadata.tokenUsage());
+                        consumer.accept(aiMessage, response);
+                        log.info("请求完成，响应：{}", response);
                     } catch (Exception e) {
                         log.error("关闭SSE连接失败", e);
                     }
                 })
+                .onToolExecuted(toolExecution -> log.info("toolExecution:{}", toolExecution))
                 .onError(e -> handleError(emitter, e.getMessage()))
                 .start();
     }
 
-    /**
-     * 处理错误情况
-     */
     public static void handleError(SseEmitter emitter, String errorMessage) {
         try {
             // 发送错误消息和错误码

@@ -12,6 +12,7 @@ import ink.whi.backend.common.enums.MsgRoleEnum;
 import ink.whi.backend.dao.entity.Conversation;
 import ink.whi.backend.service.ConversationService;
 import ink.whi.backend.service.MessageService;
+import ink.whi.backend.service.ModelService;
 import ink.whi.backend.service.PMService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +37,13 @@ public class ChatAgent {
     private MessageService messageService;
 
     @Autowired
-    private PMService pmService;
-
-    @Autowired
     private ConversationService conversationService;
 
     private static final String PROMPT = """
             你是一个智能的AI助手，能够帮助用户回答问题、提供信息和解决问题。
             """;
+    @Autowired
+    private ModelService modelService;
 
     public SseEmitter streamingChat(ChatReq request) {
         SseEmitter emitter = createEmitter();
@@ -51,38 +51,39 @@ public class ChatAgent {
         Conversation conv = conversationService.getAndCheck(request.getConversationUuId());
 
         // save user message
-        messageService.saveUserMessage(request.getUserMessage(), request.getConversationUuId());
+        messageService.saveUserMessage(request);
 
         // build model
         ModelConfig config = buildModelConfig(request);
-
         if (conv.getModelParams() != null) {
-            // TODO 处理额外参数
+            config.setModelParams(conv.getModelParams());
         }
 
-//        ModelConfig modelConfig = ModelConfig.builder().modelName(TempModelConfig.MODEL_NAME)
-//                .baseUrl(TempModelConfig.BASE_URL)
-//                .apiKey(TempModelConfig.API_KEY)
-//                .build();
         OpenAiStreamingChatModel chatModel = buildStreamChatLanguagesModel(config);
 
         // TODO tools
 //        buildTools(request.getToolList());
-
         ChatAssistant chatAssistant = AiServices.builder(ChatAssistant.class)
                 .streamingChatLanguageModel(chatModel)
 //                .tools()
                 .build();
 
+        if (conv.getModelParams() != null && conv.getModelParams().getContextWindow() != null) {
+            // TODO 上下文限制
+        }
+
         MessageDTO msg = new MessageDTO();
         msg.setRole(MsgRoleEnum.User.getRole());
         msg.setContent(request.getUserMessage());
-        List<ChatMessage> chatMessages = buildChatMessages(List.of(msg), PROMPT);
+
+        List<MessageDTO> messages = messageService.queryMessageList(conv.getUuid());
+        messages.add(msg);
+        List<ChatMessage> chatMessages = buildChatMessages(messages, PROMPT);
 
         TokenStream tokenStream = chatAssistant.chatMessages(chatMessages);
-        registerStreamingHandler(tokenStream, emitter, aiMessage -> {
+        registerStreamingHandler(tokenStream, emitter, (aiMessage, response) -> {
             // TODO 考虑事务
-            messageService.saveAiMessage(aiMessage.text(), request.getConversationUuId());
+            messageService.saveAiMessage(aiMessage.text(), request, response);
             conversationService.updateTime(conv);
         });
 
@@ -91,6 +92,6 @@ public class ChatAgent {
 
     public ModelConfig buildModelConfig(ChatReq request) {
         Integer modelId = request.getModelId();
-        return pmService.buildModelConfig(modelId);
+        return modelService.buildModelConfig(modelId);
     }
 }

@@ -31,4 +31,9 @@ public class ChatReq implements Serializable {
      * 工具列表（可选）
      */
     private List<String> toolList;
+
+    /**
+     * 附件列表（可选）
+     */
+    private List<String> imageUrls;
 }

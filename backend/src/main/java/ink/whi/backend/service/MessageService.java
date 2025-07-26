@@ -33,8 +33,17 @@ public class MessageService extends ServiceImpl<MessageMapper, Message> {
         lambdaUpdate().eq(Message::getConversationUuid, uuid).remove();
     }
 
-    public void saveUserMessage(String userMessage, String uuid, Integer modelId) {
-        saveMessage(userMessage, MsgRoleEnum.User, uuid, modelId);
+    public void saveUserMessage(ChatReq req) {
+        Message message = new Message();
+        message.setUserId(ReqInfoContext.getUserId());
+        message.setContent(req.getUserMessage());
+        message.setRole(MsgRoleEnum.User);
+        message.setConversationUuid(req.getConversationUuId());
+        message.setModelId(req.getModelId());
+
+        message.setTools(req.getToolList());
+        message.setAttachments(String.join(",", req.getImageUrls()));
+        save(message);
     }
 
     public void saveAiMessage(String aiMessage, ChatReq request, ChatResponse response) {
@@ -46,8 +55,6 @@ public class MessageService extends ServiceImpl<MessageMapper, Message> {
         message.setModelId(request.getModelId());
 
         message.setTokenUsage(response.tokenUsage());
-        message.setTools(request.getToolList());
-        message.setAttachments(String.join(",", request.getImageUrls()));
         save(message);
     }
 

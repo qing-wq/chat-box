@@ -1,5 +1,6 @@
 package ink.whi.backend.common.dto.message;
 
+import dev.langchain4j.model.output.TokenUsage;
 import ink.whi.backend.common.dto.BaseDTO;
 import lombok.*;
 
@@ -24,4 +25,6 @@ public class MessageDTO extends BaseDTO {
      * 消息内容
      */
     private String content;
+
+    private TokenUsage tokenUsage;
 }
