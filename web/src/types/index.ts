@@ -36,7 +36,7 @@ export interface ChatListInfo {
   updateTime: string;
 }
 
-export interface ChatDetail{
+export interface ChatDetail {
   conversation: Conversation;
   messageList: Message[];
   currentModel?: Model;
@@ -52,6 +52,7 @@ export interface Conversation {
   remark?: string;
   description?: string;
   systemMessage?: string;
+  modelParams?: ModelParams;
 }
 
 // Message types
@@ -107,11 +108,11 @@ export type ThemeMode = 'light' | 'dark';
 
 // Platform types
 export enum PlatformType {
-  "openai" = 0,
-  "openai-response" = 1,
-  "gemini" = 2,
-  "anthropic" = 3,
-  "azure_openai" = 4
+  'openai' = 0,
+  'openai-response' = 1,
+  'gemini' = 2,
+  'anthropic' = 3,
+  'azure_openai' = 4,
   // Add more platform types as needed
 }
 

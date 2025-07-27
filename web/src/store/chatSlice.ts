@@ -82,9 +82,19 @@ export const createNewChat = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const uuid = crypto.randomUUID();
+      // 默认参数
+      const DEFAULT_TEMPERATURE = 1;
+      const DEFAULT_MAX_TOKENS = 2048;
+      const DEFAULT_CONTEXT_WINDOW = 8;
 
       const response = await axios.post<ResVo<Conversation>>(
-        `/api/conversation/${uuid}`
+        `/api/conversation/${uuid}`,
+        {
+          uuid,
+          temperature: DEFAULT_TEMPERATURE,
+          maxTokens: DEFAULT_MAX_TOKENS,
+          contextWindow: DEFAULT_CONTEXT_WINDOW,
+        }
       );
 
       if (response.data.status.code === 0) {

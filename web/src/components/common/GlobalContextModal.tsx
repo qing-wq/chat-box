@@ -29,20 +29,51 @@ const GlobalContextModal: React.FC<Props> = ({ open, onClose }) => {
   const currentChat = useAppSelector((state) => state.chat.currentChat);
 
   React.useEffect(() => {
-    const fetchSystemMessage = async () => {
+    const fetchConversationDetail = async () => {
       if (open && currentChat?.conversation?.uuid) {
         try {
           const res = await axios.get(
             `/api/conversation/detail/${currentChat.conversation.uuid}`
           );
-          const msg = res?.data?.data?.conversation?.systemMessage;
-          setSystemMessage(msg || defaultSystemMessage);
+          const conversation = res?.data?.data?.conversation;
+          if (conversation) {
+            // 设置系统消息
+            const msg = conversation.systemMessage;
+            setSystemMessage(msg || defaultSystemMessage);
+
+            // 设置模型参数
+            const modelParams = conversation.modelParams;
+            if (modelParams) {
+              if (
+                modelParams.temperature !== null &&
+                modelParams.temperature !== undefined
+              ) {
+                setTemperature(modelParams.temperature);
+              }
+              if (
+                modelParams.contextWindow !== null &&
+                modelParams.contextWindow !== undefined
+              ) {
+                setContextWindow(modelParams.contextWindow);
+              }
+              if (
+                modelParams.maxTokens !== null &&
+                modelParams.maxTokens !== undefined
+              ) {
+                setMaxTokens(modelParams.maxTokens);
+                setMaxTokenEnabled(true);
+              } else {
+                setMaxTokenEnabled(false);
+              }
+            }
+          }
         } catch (e) {
+          console.error('Failed to fetch conversation detail:', e);
           setSystemMessage(defaultSystemMessage);
         }
       }
     };
-    fetchSystemMessage();
+    fetchConversationDetail();
   }, [open, currentChat]);
 
   const handleSave = () => {
@@ -51,7 +82,7 @@ const GlobalContextModal: React.FC<Props> = ({ open, onClose }) => {
       updateChatMessages({
         uuid: currentChat.conversation.uuid,
         title: currentChat.conversation.title,
-        systemMessage: currentChat.conversation.systemMessage,
+        systemMessage: systemMessage, // 使用用户在界面上修改的值
         temperature,
         contextWindow,
         maxTokens: maxTokenEnabled ? maxTokens : undefined,
