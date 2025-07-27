@@ -164,11 +164,17 @@ export const updateChatMessages = createAsyncThunk(
       title,
       description,
       systemMessage,
+      temperature,
+      contextWindow,
+      maxTokens,
     }: {
       uuid: string;
       title?: string;
       description?: string;
       systemMessage?: string;
+      temperature?: number;
+      contextWindow?: number;
+      maxTokens?: number;
     },
     { rejectWithValue, dispatch }
   ) => {
@@ -180,6 +186,9 @@ export const updateChatMessages = createAsyncThunk(
           title,
           ...(description ? { description } : {}),
           ...(systemMessage ? { systemMessage } : {}),
+          ...(temperature !== undefined ? { temperature } : {}),
+          ...(contextWindow !== undefined ? { contextWindow } : {}),
+          ...(maxTokens !== undefined ? { maxTokens } : {}),
         }
       );
 
