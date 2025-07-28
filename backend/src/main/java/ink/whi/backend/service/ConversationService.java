@@ -2,7 +2,6 @@ package ink.whi.backend.service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ink.whi.backend.common.context.ReqInfoContext;
-import ink.whi.backend.common.dto.agent.ModelParams;
 import ink.whi.backend.common.dto.conversation.ConvUpdateReq;
 import ink.whi.backend.common.exception.BusinessException;
 import ink.whi.backend.common.status.StatusEnum;
@@ -43,27 +42,7 @@ public class ConversationService extends ServiceImpl<ChatMapper, Conversation> {
 
         if (req.getSystemMessage() != null) {
             conv.setSystemMessage(req.getSystemMessage());
-        }
-
-        // 处理模型参数
-        if (req.getTemperature() != null || req.getContextWindow() != null || req.getMaxTokens() != null) {
-            ModelParams modelParams = conv.getModelParams();
-            if (modelParams == null) {
-                modelParams = new ModelParams();
-            }
-            
-            if (req.getTemperature() != null) {
-                modelParams.setTemperature(req.getTemperature());
-            }
-            if (req.getContextWindow() != null) {
-                modelParams.setContextWindow(req.getContextWindow());
-            }
-            if (req.getMaxTokens() != null) {
-                modelParams.setMaxTokens(req.getMaxTokens());
-            }
-            
-            conv.setModelParams(modelParams);
-        }
+        }       
 
         updateById(conv);
     }
