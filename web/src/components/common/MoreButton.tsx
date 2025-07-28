@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
+import { useAppSelector } from '../../hooks';
 import GlobalContextModal from './GlobalContextModal';
 
 const MoreButton: React.FC = () => {
   const [open, setOpen] = useState(false);
+  const currentChat = useAppSelector((state) => state.chat.currentChat);
+
+  const hasCurrentChat = currentChat?.conversation?.uuid;
+
   return (
     <>
       <button
@@ -15,7 +20,7 @@ const MoreButton: React.FC = () => {
           backgroundColor: 'rgb(134,74,239)',
           borderRadius: '6px',
         }}
-        className="shadow hover:bg-[rgba(134,74,239,0.85)] transition-all"
+        className="shadow hover:bg-[rgba(134,74,239,0.85)] transition-all cursor-pointer"
         onClick={() => setOpen(true)}
         aria-label="更多"
       >

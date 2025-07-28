@@ -76,6 +76,7 @@ export interface ModelParams {
   temperature?: number;
   topP?: number;
   maxTokens?: number;
+  contextWindow?: number;
   stop?: string[];
 }
 
