@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import { updateChatMessages, fetchChatDetail } from '@/store/chatSlice';
+import { updateGlobalSettings } from '@/store/settingsSlice';
 import {
   Tooltip,
   TooltipTrigger,
@@ -16,18 +17,26 @@ interface Props {
 const defaultSystemMessage = '这里是默认系统消息内容，可以自定义。';
 
 const GlobalContextModal: React.FC<Props> = ({ open, onClose }) => {
-  const [temperature, setTemperature] = useState(1);
-  const [contextWindow, setContextWindow] = useState(8);
-  const [streamOutput, setStreamOutput] = useState(true);
-  const [maxTokenEnabled, setMaxTokenEnabled] = useState(false);
-  const [maxTokens, setMaxTokens] = useState(2048);
-  const [systemMessage, setSystemMessage] =
-    useState<string>(defaultSystemMessage);
-  const [isSaving, setIsSaving] = useState(false);
-
   const dispatch = useAppDispatch();
   const currentChat = useAppSelector((state) => state.chat.currentChat);
   const { loading, error } = useAppSelector((state) => state.chat);
+  const globalSettings = useAppSelector((state) => state.settings);
+
+  const [temperature, setTemperature] = useState(globalSettings.temperature);
+  const [contextWindow, setContextWindow] = useState(
+    globalSettings.contextWindow
+  );
+  const [streamOutput, setStreamOutput] = useState(globalSettings.streamOutput);
+  const [maxTokenEnabled, setMaxTokenEnabled] = useState(
+    globalSettings.maxTokens !== null
+  );
+  const [maxTokens, setMaxTokens] = useState<number | null>(
+    globalSettings.maxTokens
+  );
+  const [systemMessage, setSystemMessage] = useState<string>(
+    globalSettings.systemMessage
+  );
+  const [isSaving, setIsSaving] = useState(false);
 
   // 当弹窗打开时，获取最新的对话详情（只在没有当前数据时）
   useEffect(() => {
@@ -78,6 +87,7 @@ const GlobalContextModal: React.FC<Props> = ({ open, onClose }) => {
           setMaxTokens(modelParams.maxTokens);
           setMaxTokenEnabled(true);
         } else {
+          setMaxTokens(null);
           setMaxTokenEnabled(false);
         }
       }
@@ -85,32 +95,41 @@ const GlobalContextModal: React.FC<Props> = ({ open, onClose }) => {
   }, [currentChat]);
 
   const handleSave = async () => {
-    if (!currentChat?.conversation?.uuid) {
-      console.error('No current chat available');
-      return;
-    }
-
     setIsSaving(true);
     try {
-      const result = await dispatch(
-        updateChatMessages({
-          uuid: currentChat.conversation.uuid,
-          title: currentChat.conversation.title,
-          systemMessage: systemMessage,
+      // 更新全局设置
+      dispatch(
+        updateGlobalSettings({
           temperature,
           contextWindow,
-          maxTokens: maxTokenEnabled ? maxTokens : undefined,
+          maxTokens: maxTokenEnabled ? maxTokens : null,
+          systemMessage,
+          streamOutput,
         })
       );
 
-      if (updateChatMessages.fulfilled.match(result)) {
-        // 保存成功
-        console.log('Settings saved successfully');
-        onClose();
-      } else {
-        // 保存失败
-        console.error('Failed to save settings:', result.payload);
+      // 如果有当前对话，也更新对话设置
+      if (currentChat?.conversation?.uuid) {
+        const result = await dispatch(
+          updateChatMessages({
+            uuid: currentChat.conversation.uuid,
+            title: currentChat.conversation.title,
+            systemMessage: systemMessage,
+            temperature,
+            contextWindow,
+            maxTokens:
+              maxTokenEnabled && maxTokens !== null ? maxTokens : undefined,
+          })
+        );
+
+        if (updateChatMessages.fulfilled.match(result)) {
+          console.log('Settings saved successfully');
+        } else {
+          console.error('Failed to save settings:', result.payload);
+        }
       }
+
+      onClose();
     } catch (error) {
       console.error('Error saving settings:', error);
     } finally {
@@ -349,8 +368,10 @@ const GlobalContextModal: React.FC<Props> = ({ open, onClose }) => {
                 type="number"
                 min={1}
                 max={32768}
-                value={maxTokens}
-                onChange={(e) => setMaxTokens(Number(e.target.value))}
+                value={maxTokens || ''}
+                onChange={(e) =>
+                  setMaxTokens(e.target.value ? Number(e.target.value) : null)
+                }
                 className="border rounded px-2 py-1 w-28 text-sm"
                 style={{ borderColor: 'rgb(134,74,239)' }}
               />
