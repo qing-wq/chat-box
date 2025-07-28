@@ -121,12 +121,21 @@ export const useChat = () => {
           'Saving updated messages to backend:',
           JSON.stringify(messagesToSave)
         );
+        // 检查当前对话是否有模型参数，如果没有则使用默认值
+        const currentModelParams = currentChat.conversation.modelParams;
+        const defaultTemperature = 1;
+        const defaultMaxTokens = 2048;
+        const defaultContextWindow = 8;
+
         dispatch(
           updateChatMessages({
             uuid: conversationUuId,
             title: currentChat.conversation.title,
             description: currentChat.conversation.description,
             systemMessage: currentChat.conversation.systemMessage,
+            temperature: currentModelParams?.temperature ?? defaultTemperature,
+            maxTokens: currentModelParams?.maxTokens ?? defaultMaxTokens,
+            contextWindow: currentModelParams?.contextWindow ?? defaultContextWindow,
           })
         );
         dispatch(fetchChatList());

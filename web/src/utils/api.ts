@@ -20,7 +20,7 @@ axios.interceptors.request.use(
   },
   (error: AxiosError) => {
     return Promise.reject(error);
-  },
+  }
 );
 
 // Add response interceptor to handle common errors
@@ -34,7 +34,7 @@ axios.interceptors.response.use(
       window.location.href = '/login';
     }
     return Promise.reject(error);
-  },
+  }
 );
 
 // Function to handle chat with SSE (Server-Sent Events)
@@ -42,7 +42,7 @@ export const streamChat = async (
   request: ChatRequest,
   onMessage: (content: string) => void,
   onError: (error: string) => void,
-  onComplete: () => void,
+  onComplete: () => void
 ) => {
   let fullContent = '';
   let buffer = ''; // 用于处理跨块的不完整数据
@@ -75,18 +75,27 @@ export const streamChat = async (
         return () => {};
       }
     }
-    
-    console.log('Processed request:', JSON.stringify(processedRequest, null, 2));
+
+    console.log(
+      'Processed request:',
+      JSON.stringify(processedRequest, null, 2)
+    );
     // 从store中获取当前聊天的模型ID
     const currentChat = store.getState().chat.currentChat;
-    
-    let chatMessage = {
 
-      "conversationUuId": processedRequest.conversationUuId,
-      "userMessage": processedRequest.messageList[processedRequest.messageList.length - 1].content,
-      "modelId": currentChat?.currentModel?.id || 1,
-      "toolList": processedRequest.toolList
-    } 
+    let chatMessage = {
+      conversationUuId: processedRequest.conversationUuId,
+      userMessage:
+        processedRequest.messageList[processedRequest.messageList.length - 1]
+          .content,
+      modelId: currentChat?.currentModel?.id || 1,
+      toolList: processedRequest.toolList,
+    };
+
+    console.log(
+      'Sending request to /api/chat/ with data:',
+      JSON.stringify(chatMessage, null, 2)
+    );
 
     const response = await fetch('/api/chat/', {
       method: 'POST',
@@ -99,8 +108,10 @@ export const streamChat = async (
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('Chat API error:', response.status, errorText);
+      console.error('Response headers:', response.headers);
       throw new Error(
-        `HTTP error! Status: ${response.status}, Data: ${errorText}`,
+        `HTTP error! Status: ${response.status}, Data: ${errorText}`
       );
     }
 
@@ -142,7 +153,9 @@ export const streamChat = async (
             const errorData = axiosError.response.data;
             console.error('Axios error response:', errorData);
             onError(
-              `请求错误: HTTP error! Status: ${axiosError.response.status}, Data: ${JSON.stringify(errorData)}`,
+              `请求错误: HTTP error! Status: ${
+                axiosError.response.status
+              }, Data: ${JSON.stringify(errorData)}`
             );
           } else if (axiosError.request) {
             // 请求已发出但没有收到响应
@@ -203,7 +216,7 @@ export const streamChat = async (
           // JSON解析失败时的处理，去掉未使用的parseError变量
           console.warn(
             'Failed to parse SSE JSON, treating as plain text:',
-            jsonStr,
+            jsonStr
           );
           // 如果JSON解析失败，可能是纯文本，直接添加
           fullContent += jsonStr;
@@ -262,13 +275,13 @@ export const streamChatWithMemory = (
   request: MemoryChatRequest,
   onMessage: (content: string) => void,
   onError: (error: string) => void,
-  onComplete: () => void,
+  onComplete: () => void
 ) => {
   let fullContent = '';
 
   console.log(
     'Starting memory chat request with:',
-    JSON.stringify(request, null, 2),
+    JSON.stringify(request, null, 2)
   );
 
   // 检查是否设置API URL和API Key
@@ -298,7 +311,7 @@ export const streamChatWithMemory = (
       console.log('Memory chat initialization response:', response);
       console.log(
         'Memory chat response data:',
-        JSON.stringify(response.data, null, 2),
+        JSON.stringify(response.data, null, 2)
       );
 
       // 检查初始化响应
@@ -318,7 +331,7 @@ export const streamChatWithMemory = (
             const data = event.data;
             console.log(
               'Received memory chat SSE message:',
-              JSON.stringify(data),
+              JSON.stringify(data)
             );
 
             // 处理data:开头的SSE格式
@@ -334,7 +347,7 @@ export const streamChatWithMemory = (
                 if (jsonData.content !== undefined) {
                   console.log(
                     'Memory chat JSON content:',
-                    JSON.stringify(jsonData.content),
+                    JSON.stringify(jsonData.content)
                   );
                   fullContent += jsonData.content;
                   onMessage(fullContent);
