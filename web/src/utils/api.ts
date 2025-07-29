@@ -6,8 +6,40 @@ import axios, {
 import { ChatRequest, MemoryChatRequest } from '../types';
 import { store } from '../store';
 
+// Cookie管理工具函数
+export const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
+};
+
+export const setCookie = (name: string, value: string, days: number = 30): void => {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+};
+
+export const removeCookie = (name: string): void => {
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+};
+
+// Session cookie管理
+export const getSessionCookie = (): string | null => {
+  return localStorage.getItem('chat-box-session');
+};
+
+export const setSessionCookie = (value: string): void => {
+  localStorage.setItem('chat-box-session', value);
+};
+
+export const removeSessionCookie = (): void => {
+  localStorage.removeItem('chat-box-session');
+};
+
 // Configure axios defaults
-axios.defaults.baseURL = import.meta.env.VITE_HTTP_URL; // Assuming API is served from the same domain
+// 移除baseURL设置，让所有请求都通过vite代理
+// axios.defaults.baseURL = import.meta.env.VITE_HTTP_URL;
 
 axios.defaults.timeout = 30000;
 // 不设置全局 Content-Type，让 axios 根据数据类型自动设置
@@ -15,7 +47,8 @@ axios.defaults.timeout = 30000;
 // Add request interceptor to handle auth
 axios.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    // You can add auth token here if needed
+    // 移除手动设置Cookie头，让浏览器自动管理
+    // 如果需要传递session信息，可以通过其他方式（如Authorization头）
     return config;
   },
   (error: AxiosError) => {
@@ -101,9 +134,11 @@ export const streamChat = async (
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        // 移除手动设置Cookie头，让浏览器自动管理
       },
       body: JSON.stringify(chatMessage),
       signal: signal,
+      credentials: 'include', // 确保包含cookie
     });
 
     if (!response.ok) {

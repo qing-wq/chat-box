@@ -48,6 +48,19 @@ const LoginPage: React.FC = () => {
     try {
       const result = await dispatch(login(loginForm));
       console.log('Login result:', result);
+
+      // 添加调试信息
+      if (result.meta.requestStatus === 'fulfilled') {
+        console.log('=== 登录成功，Cookie状态检查 ===');
+        console.log(
+          'localStorage中的session cookie:',
+          localStorage.getItem('chat-box-session')
+        );
+        console.log('document.cookie:', document.cookie);
+        console.log('用户信息:', localStorage.getItem('chat-box-userInfo'));
+        console.log('登录状态:', localStorage.getItem('chat-box-isLoggedIn'));
+      }
+
       navigate('/');
     } catch (error) {
       console.log('Login failed:', error);
@@ -70,7 +83,7 @@ const LoginPage: React.FC = () => {
         register({
           username: registerForm.username,
           password: registerForm.password,
-        }),
+        })
       );
 
       console.log('Register result:', result);
