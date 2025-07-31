@@ -42,7 +42,7 @@ public class ConversationService extends ServiceImpl<ChatMapper, Conversation> {
 
         if (req.getSystemMessage() != null) {
             conv.setSystemMessage(req.getSystemMessage());
-        }
+        }       
 
         updateById(conv);
     }

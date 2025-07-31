@@ -6,8 +6,40 @@ import axios, {
 import { ChatRequest, MemoryChatRequest } from '../types';
 import { store } from '../store';
 
+// Cookie管理工具函数
+export const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
+};
+
+export const setCookie = (name: string, value: string, days: number = 30): void => {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+};
+
+export const removeCookie = (name: string): void => {
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+};
+
+// Session cookie管理
+export const getSessionCookie = (): string | null => {
+  return localStorage.getItem('chat-box-session');
+};
+
+export const setSessionCookie = (value: string): void => {
+  localStorage.setItem('chat-box-session', value);
+};
+
+export const removeSessionCookie = (): void => {
+  localStorage.removeItem('chat-box-session');
+};
+
 // Configure axios defaults
-axios.defaults.baseURL = import.meta.env.VITE_HTTP_URL; // Assuming API is served from the same domain
+// 移除baseURL设置，让所有请求都通过vite代理
+// axios.defaults.baseURL = import.meta.env.VITE_HTTP_URL;
 
 axios.defaults.timeout = 30000;
 // 不设置全局 Content-Type，让 axios 根据数据类型自动设置
@@ -15,12 +47,13 @@ axios.defaults.timeout = 30000;
 // Add request interceptor to handle auth
 axios.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    // You can add auth token here if needed
+    // 移除手动设置Cookie头，让浏览器自动管理
+    // 如果需要传递session信息，可以通过其他方式（如Authorization头）
     return config;
   },
   (error: AxiosError) => {
     return Promise.reject(error);
-  },
+  }
 );
 
 // Add response interceptor to handle common errors
@@ -34,7 +67,7 @@ axios.interceptors.response.use(
       window.location.href = '/login';
     }
     return Promise.reject(error);
-  },
+  }
 );
 
 // Function to handle chat with SSE (Server-Sent Events)
@@ -42,7 +75,7 @@ export const streamChat = async (
   request: ChatRequest,
   onMessage: (content: string) => void,
   onError: (error: string) => void,
-  onComplete: () => void,
+  onComplete: () => void
 ) => {
   let fullContent = '';
   let buffer = ''; // 用于处理跨块的不完整数据
@@ -75,32 +108,45 @@ export const streamChat = async (
         return () => {};
       }
     }
-    
-    console.log('Processed request:', JSON.stringify(processedRequest, null, 2));
+
+    console.log(
+      'Processed request:',
+      JSON.stringify(processedRequest, null, 2)
+    );
     // 从store中获取当前聊天的模型ID
     const currentChat = store.getState().chat.currentChat;
-    
-    let chatMessage = {
 
-      "conversationUuId": processedRequest.conversationUuId,
-      "userMessage": processedRequest.messageList[processedRequest.messageList.length - 1].content,
-      "modelId": currentChat?.currentModel?.id || 1,
-      "toolList": processedRequest.toolList
-    } 
+    let chatMessage = {
+      conversationUuId: processedRequest.conversationUuId,
+      userMessage:
+        processedRequest.messageList[processedRequest.messageList.length - 1]
+          .content,
+      modelId: currentChat?.currentModel?.id || 1,
+      toolList: processedRequest.toolList,
+    };
+
+    console.log(
+      'Sending request to /api/chat/ with data:',
+      JSON.stringify(chatMessage, null, 2)
+    );
 
     const response = await fetch('/api/chat/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        // 移除手动设置Cookie头，让浏览器自动管理
       },
       body: JSON.stringify(chatMessage),
       signal: signal,
+      credentials: 'include', // 确保包含cookie
     });
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('Chat API error:', response.status, errorText);
+      console.error('Response headers:', response.headers);
       throw new Error(
-        `HTTP error! Status: ${response.status}, Data: ${errorText}`,
+        `HTTP error! Status: ${response.status}, Data: ${errorText}`
       );
     }
 
@@ -142,7 +188,9 @@ export const streamChat = async (
             const errorData = axiosError.response.data;
             console.error('Axios error response:', errorData);
             onError(
-              `请求错误: HTTP error! Status: ${axiosError.response.status}, Data: ${JSON.stringify(errorData)}`,
+              `请求错误: HTTP error! Status: ${
+                axiosError.response.status
+              }, Data: ${JSON.stringify(errorData)}`
             );
           } else if (axiosError.request) {
             // 请求已发出但没有收到响应
@@ -203,7 +251,7 @@ export const streamChat = async (
           // JSON解析失败时的处理，去掉未使用的parseError变量
           console.warn(
             'Failed to parse SSE JSON, treating as plain text:',
-            jsonStr,
+            jsonStr
           );
           // 如果JSON解析失败，可能是纯文本，直接添加
           fullContent += jsonStr;
@@ -262,13 +310,13 @@ export const streamChatWithMemory = (
   request: MemoryChatRequest,
   onMessage: (content: string) => void,
   onError: (error: string) => void,
-  onComplete: () => void,
+  onComplete: () => void
 ) => {
   let fullContent = '';
 
   console.log(
     'Starting memory chat request with:',
-    JSON.stringify(request, null, 2),
+    JSON.stringify(request, null, 2)
   );
 
   // 检查是否设置API URL和API Key
@@ -298,7 +346,7 @@ export const streamChatWithMemory = (
       console.log('Memory chat initialization response:', response);
       console.log(
         'Memory chat response data:',
-        JSON.stringify(response.data, null, 2),
+        JSON.stringify(response.data, null, 2)
       );
 
       // 检查初始化响应
@@ -318,7 +366,7 @@ export const streamChatWithMemory = (
             const data = event.data;
             console.log(
               'Received memory chat SSE message:',
-              JSON.stringify(data),
+              JSON.stringify(data)
             );
 
             // 处理data:开头的SSE格式
@@ -334,7 +382,7 @@ export const streamChatWithMemory = (
                 if (jsonData.content !== undefined) {
                   console.log(
                     'Memory chat JSON content:',
-                    JSON.stringify(jsonData.content),
+                    JSON.stringify(jsonData.content)
                   );
                   fullContent += jsonData.content;
                   onMessage(fullContent);

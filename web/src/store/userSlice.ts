@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { UserInfo, ResVo } from '../types';
 import axios from 'axios';
+import { getCookie, setSessionCookie, removeSessionCookie } from '../utils/api';
 
 // 使用从types导入的ResVo类型
 
@@ -15,16 +16,19 @@ const initialState: UserState = {
   userInfo: localStorage.getItem('chat-box-userInfo')
     ? JSON.parse(localStorage.getItem('chat-box-userInfo')!)
     : null,
-  isLoggedIn: localStorage.getItem('chat-box-isLoggedIn') === 'true',
+  isLoggedIn:
+    localStorage.getItem('chat-box-isLoggedIn') === 'true' &&
+    localStorage.getItem('chat-box-session') !== null,
   loading: false,
   error: null,
 };
+
 // Async thunks for authentication
 export const login = createAsyncThunk(
   'user/login',
   async (
     { username, password }: { username: string; password: string },
-    { rejectWithValue },
+    { rejectWithValue }
   ) => {
     try {
       // 创建 FormData 对象
@@ -32,48 +36,74 @@ export const login = createAsyncThunk(
       formData.append('username', username);
       formData.append('password', password);
 
-      // 确保不手动设置 Content-Type，让浏览器自动设置为 multipart/form-data
-      const response = await axios.post<ResVo<UserInfo>>(
-        '/api/login',
-        formData,
-        {
-          headers: {
-            // 移除 Content-Type，让浏览器自动设置
-            'Content-Type': undefined,
-          },
-        },
-      );
+      // 使用fetch而不是axios，以便获取响应头
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include', // 重要：包含cookie
+      });
 
-      console.log('Login response:', response.data);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-      if (response.data.status.code === 0) {
-        console.log('Login successful, user info:', response.data.data);
+      const data = await response.json();
+      console.log('Login response:', data);
+
+      if (data.status.code === 0) {
+        console.log('Login successful, user info:', data.data);
+
         // 保存登录信息到localStorage
-        localStorage.setItem(
-          'chat-box-userInfo',
-          JSON.stringify(response.data.data),
-        );
+        localStorage.setItem('chat-box-userInfo', JSON.stringify(data.data));
         localStorage.setItem('chat-box-isLoggedIn', 'true');
-        return response.data.data;
+
+        // 从响应头中获取Set-Cookie
+        const setCookieHeader = response.headers.get('Set-Cookie');
+        console.log('Set-Cookie header:', setCookieHeader);
+
+        if (setCookieHeader) {
+          // 解析Set-Cookie头，提取box-session的值
+          const sessionMatch = setCookieHeader.match(/box-session=([^;]+)/);
+          if (sessionMatch) {
+            const sessionValue = sessionMatch[1];
+            setSessionCookie(sessionValue);
+            console.log('Session cookie extracted and saved:', sessionValue);
+          } else {
+            console.warn('No box-session found in Set-Cookie header');
+          }
+        } else {
+          // 如果响应头中没有Set-Cookie，尝试从document.cookie获取
+          const sessionCookie = getCookie('box-session');
+          if (sessionCookie) {
+            setSessionCookie(sessionCookie);
+            console.log(
+              'Session cookie found in document.cookie:',
+              sessionCookie
+            );
+          } else {
+            console.warn(
+              'No session cookie found in response headers or document.cookie'
+            );
+          }
+        }
+
+        return data.data;
       } else {
-        console.log('Login failed:', response.data.status.msg);
-        return rejectWithValue(response.data.status.msg);
+        console.log('Login failed:', data.status.msg);
+        return rejectWithValue(data.status.msg);
       }
     } catch (error) {
       console.error('Login error:', error);
-      if (axios.isAxiosError(error) && error.response) {
-        return rejectWithValue(error.response.data.msg || 'Login failed');
-      }
       return rejectWithValue('Login failed. Please try again.');
     }
-  },
+  }
 );
 
 export const register = createAsyncThunk(
   'user/register',
   async (
     { username, password }: { username: string; password: string },
-    { rejectWithValue },
+    { rejectWithValue }
   ) => {
     try {
       // 创建注册请求的 FormData
@@ -89,7 +119,7 @@ export const register = createAsyncThunk(
           headers: {
             'Content-Type': 'multipart/form-data',
           },
-        },
+        }
       );
 
       if (response.data.status.code === 0) {
@@ -106,7 +136,7 @@ export const register = createAsyncThunk(
             headers: {
               'Content-Type': 'multipart/form-data',
             },
-          },
+          }
         );
 
         if (loginResponse.data.status.code === 0) {
@@ -121,12 +151,12 @@ export const register = createAsyncThunk(
       console.error('Registration error:', error);
       if (axios.isAxiosError(error) && error.response) {
         return rejectWithValue(
-          error.response.data.msg || 'Registration failed',
+          error.response.data.msg || 'Registration failed'
         );
       }
       return rejectWithValue('Registration failed. Please try again.');
     }
-  },
+  }
 );
 
 export const logout = createAsyncThunk(
@@ -139,17 +169,26 @@ export const logout = createAsyncThunk(
         // 清除localStorage中的登录信息
         localStorage.removeItem('chat-box-userInfo');
         localStorage.removeItem('chat-box-isLoggedIn');
+        // 清除localStorage中的session cookie
+        removeSessionCookie();
+        console.log('Session cookie removed from localStorage');
         return true;
       } else {
         return rejectWithValue(response.data.status.msg);
       }
     } catch (error) {
+      // 即使请求失败，也要清除本地存储
+      localStorage.removeItem('chat-box-userInfo');
+      localStorage.removeItem('chat-box-isLoggedIn');
+      removeSessionCookie();
+      console.log('Session cookie removed from localStorage (logout failed)');
+
       if (axios.isAxiosError(error) && error.response) {
         return rejectWithValue(error.response.data.msg || 'Logout failed');
       }
       return rejectWithValue('Logout failed. Please try again.');
     }
-  },
+  }
 );
 
 const userSlice = createSlice({

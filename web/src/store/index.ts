@@ -4,6 +4,7 @@ import chatReducer from './chatSlice';
 import configReducer from './configSlice';
 import platformReducer from './platformSlice';
 import modelReducer from './modelSlice';
+import settingsReducer from './settingsSlice';
 import knowledgeBaseReducer from './knowledgeBaseSlice';
 
 export const store = configureStore({
@@ -13,8 +14,9 @@ export const store = configureStore({
     config: configReducer,
     platform: platformReducer,
     model: modelReducer,
+    settings: settingsReducer,
     knowledgeBase: knowledgeBaseReducer
-  }
+  },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useAppSelector } from './useAppSelector';
 import { useAppDispatch } from './useAppDispatch';
+import { store } from '../store';
 import {
   addMessage,
   updateLastMessage,
@@ -121,14 +122,26 @@ export const useChat = () => {
           'Saving updated messages to backend:',
           JSON.stringify(messagesToSave)
         );
-        dispatch(
-          updateChatMessages({
-            uuid: conversationUuId,
-            title: currentChat.conversation.title,
-            description: currentChat.conversation.description,
-            systemMessage: currentChat.conversation.systemMessage,
-          })
-        );
+        // 检查当前对话是否有模型参数，如果没有则使用全局设置中的默认值
+        const currentModelParams = currentChat.conversation.modelParams;
+        const globalSettings = store.getState().settings;
+
+        // 如果是第一条消息且没有模型参数，使用全局设置中的默认值更新对话
+        if (messageList.length === 2 && !currentModelParams) {
+          dispatch(
+            updateChatMessages({
+              uuid: conversationUuId,
+              title: currentChat.conversation.title,
+              description: currentChat.conversation.description,
+              systemMessage:
+                currentChat.conversation.systemMessage ||
+                globalSettings.systemMessage,
+              temperature: globalSettings.temperature,
+              maxTokens: globalSettings.maxTokens,
+              contextWindow: globalSettings.contextWindow,
+            })
+          );
+        }
         dispatch(fetchChatList());
       }
     );
