@@ -6,7 +6,7 @@ import Sidebar from './Sidebar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { fetchModelList } from '@/store/modelSlice';
+import { fetchModelList, ModelType } from '@/store/modelSlice';
 import { setModelConfig } from '@/store/configSlice';
 import { setCurrentModel } from '@/store/chatSlice';
 import {
@@ -41,9 +41,13 @@ const ChatMainLayout: React.FC = () => {
   }, []);
 
   // 获取模型列表
-  const handleFetchModelList = () => {
+  const handleFetchModelList = async () => {
     setModelListOpen(true);
-    dispatch(fetchModelList());
+    // 同时获取文本和图像模型
+    await Promise.all([
+      dispatch(fetchModelList(ModelType.TEXT)),
+      dispatch(fetchModelList(ModelType.IMAGE))
+    ]);
   };
 
   // 选择模型
@@ -148,25 +152,67 @@ const ChatMainLayout: React.FC = () => {
                         <div className="text-center py-2">加载中...</div>
                       ) : modelList ? (
                         <ScrollArea className="h-[300px]">
-                          {Object.entries(modelList).map(
-                            ([category, models]) => (
-                              <div key={category} className="mb-3">
-                                <h5 className="text-xs text-muted-foreground mb-1">
-                                  {category}
-                                </h5>
-                                {models.map((model) => (
-                                  <div
-                                    key={model.id}
-                                    className="py-1.5 px-2 text-sm rounded-md cursor-pointer hover:bg-accent transition-colors"
-                                    onClick={() =>
-                                      handleSelectModel(model.id, model.name)
-                                    }
-                                  >
-                                    {model.name}
-                                  </div>
-                                ))}
-                              </div>
-                            )
+                          {Array.isArray(modelList) ? (
+                            // 如果 modelList 是数组，直接渲染模型列表
+                            <div className="mb-3">
+                              <h5 className="text-xs text-muted-foreground mb-1">
+                                模型列表
+                              </h5>
+                              {modelList.map((model) => (
+                                <div
+                                  key={model.id}
+                                  className="py-1.5 px-2 text-sm rounded-md cursor-pointer hover:bg-accent transition-colors"
+                                  onClick={() =>
+                                    handleSelectModel(model.id, model.name)
+                                  }
+                                >
+                                  {model.name}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            // 如果 modelList 是对象，只展示 TEXT 和 IMAGE 类型的模型
+                            <>
+                              {/* 文本模型 */}
+                              {modelList[ModelType.TEXT] && (
+                                <div className="mb-3">
+                                  <h5 className="text-xs text-muted-foreground mb-1">
+                                    文本模型
+                                  </h5>
+                                  {modelList[ModelType.TEXT].map((model) => (
+                                    <div
+                                      key={model.id}
+                                      className="py-1.5 px-2 text-sm rounded-md cursor-pointer hover:bg-accent transition-colors"
+                                      onClick={() =>
+                                        handleSelectModel(model.id, model.name)
+                                      }
+                                    >
+                                      {model.name}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              
+                              {/* 图像模型 */}
+                              {modelList[ModelType.IMAGE] && (
+                                <div className="mb-3">
+                                  <h5 className="text-xs text-muted-foreground mb-1">
+                                    图像模型
+                                  </h5>
+                                  {modelList[ModelType.IMAGE].map((model) => (
+                                    <div
+                                      key={model.id}
+                                      className="py-1.5 px-2 text-sm rounded-md cursor-pointer hover:bg-accent transition-colors"
+                                      onClick={() =>
+                                        handleSelectModel(model.id, model.name)
+                                      }
+                                    >
+                                      {model.name}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </>
                           )}
                         </ScrollArea>
                       ) : (

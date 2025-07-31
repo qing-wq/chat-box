@@ -79,38 +79,22 @@ export const createModel = createAsyncThunk(
   }
 );
 
-// 获取当前使用的模型
-export const fetchCurrentModel = createAsyncThunk(
-  'model/fetchCurrentModel',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await axios.get<ResVo<CurrentModel>>('/api/model/current');
-      
-      if (response.data.status.code === 0) {
-        return response.data.data;
-      } else {
-        return rejectWithValue(response.data.status.msg);
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        return rejectWithValue(error.response.data.status?.msg || '获取当前模型失败');
-      }
-      return rejectWithValue('获取当前模型失败，请重试。');
-    }
-  }
-);
 
-// 根据平台ID获取模型列表的接口已删除
 
 // 获取模型选择列表
 export const fetchModelList = createAsyncThunk(
   'model/fetchModelList',
-  async (_, { rejectWithValue }) => {
+  async (type?: ModelType, { rejectWithValue }) => {
     try {
-      const response = await axios.get<ResVo<ModelListResponse>>('/api/model/list');
+      // 构建请求URL，如果提供了type参数，则添加到路径中
+      const url = type ? `/api/model/list/${type}` : '/api/model/list';
+      const response = await axios.get<ResVo<ModelListResponse>>(url);
       
       if (response.data.status.code === 0) {
-        return response.data.data;
+        return {
+          type, // 添加类型信息，用于在reducer中区分不同类型的模型
+          data: response.data.data
+        };
       } else {
         return rejectWithValue(response.data.status.msg);
       }
@@ -221,31 +205,49 @@ const modelSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      
-      // 获取当前模型
-      .addCase(fetchCurrentModel.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchCurrentModel.fulfilled, (state, action: PayloadAction<CurrentModel>) => {
-        state.loading = false;
-        state.currentModel = action.payload;
-      })
-      .addCase(fetchCurrentModel.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-      
-      // 根据平台ID获取模型列表的处理逻辑已删除
-      
+        
       // 获取模型选择列表
       .addCase(fetchModelList.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchModelList.fulfilled, (state, action: PayloadAction<ModelListResponse>) => {
+      .addCase(fetchModelList.fulfilled, (state, action) => {
         state.loading = false;
-        state.modelList = action.payload;
+        
+        const { type, data } = action.payload;
+        
+        // 初始化modelList为对象（如果为null）
+        if (!state.modelList) {
+          state.modelList = {};
+        }
+        
+        // 根据模型类型组织模型信息
+        if (type) {
+          // 如果指定了类型，则更新该类型的模型列表
+          // 检查data是否直接是数组，或者是否有type键
+          if (Array.isArray(data)) {
+            // 如果data直接是数组，则使用该数组作为指定类型的模型列表
+            state.modelList = {
+              ...state.modelList,
+              [type]: data
+            };
+          } else if (data[type]) {
+            // 如果data有type键，则使用data[type]作为指定类型的模型列表
+            state.modelList = {
+              ...state.modelList,
+              [type]: data[type]
+            };
+          } else {
+            // 如果data既不是数组也没有type键，则保持原样
+            console.warn(`获取${type}类型的模型列表失败：API返回的数据格式不正确`, data);
+          }
+        } else {
+          // 如果没有指定类型，则更新所有类型的模型列表
+          state.modelList = {
+            ...state.modelList,
+            ...data
+          };
+        }
       })
       .addCase(fetchModelList.rejected, (state, action) => {
         state.loading = false;

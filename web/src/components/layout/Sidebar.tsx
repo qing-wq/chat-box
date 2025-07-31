@@ -139,7 +139,7 @@ const Sidebar: React.FC = () => {
         </Button>
       </div>
 
-      <Separator className="mx-4" />
+      <Separator />
 
       {/* Chat list */}
       <ScrollArea className="flex-1 px-3">

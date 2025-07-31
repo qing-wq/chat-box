@@ -256,30 +256,30 @@ const chatSlice = createSlice({
     builder
       // Fetch chat list
       .addCase(fetchChatList.pending, (state) => {
-        state.loading = true;
+        // state.loading = true;
         state.error = null;
       })
       .addCase(
         fetchChatList.fulfilled,
         (state, action: PayloadAction<ChatInfo[]>) => {
-          state.loading = false;
+          // state.loading = false;
           state.chatList = action.payload;
         }
       )
       .addCase(fetchChatList.rejected, (state, action) => {
-        state.loading = false;
+        // state.loading = false;
         state.error = action.payload as string;
       })
 
       // Fetch chat detail
       .addCase(fetchChatDetail.pending, (state) => {
-        state.loading = true;
+        // state.loading = true;
         state.error = null;
       })
       .addCase(
         fetchChatDetail.fulfilled,
         (state, action: PayloadAction<ChatDetail>) => {
-          state.loading = false;
+          // state.loading = false;
           const chat = state.chatList.find(
             (chat) => chat.uuid === action.payload.conversation.uuid
           );
@@ -293,7 +293,7 @@ const chatSlice = createSlice({
         }
       )
       .addCase(fetchChatDetail.rejected, (state, action) => {
-        state.loading = false;
+        // state.loading = false;
         state.error = action.payload as string;
       })
 
@@ -381,14 +381,14 @@ const chatSlice = createSlice({
 
       // Update chat messages
       .addCase(updateChatMessages.pending, (state) => {
-        state.loading = true;
+        // state.loading = true;
         state.error = null;
       })
 
       .addCase(
         updateChatMessages.fulfilled,
         (state, action: PayloadAction<ChatDetail>) => {
-          state.loading = false;
+          // state.loading = false;
           const { uuid, title, description } = action.payload.conversation;
 
           // Update in chat list
@@ -412,7 +412,7 @@ const chatSlice = createSlice({
       )
 
       .addCase(updateChatMessages.rejected, (state, action) => {
-        state.loading = false;
+        // state.loading = false;
         state.error = action.payload as string;
       });
   },

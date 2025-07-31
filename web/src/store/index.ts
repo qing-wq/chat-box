@@ -4,6 +4,7 @@ import chatReducer from './chatSlice';
 import configReducer from './configSlice';
 import platformReducer from './platformSlice';
 import modelReducer from './modelSlice';
+import knowledgeBaseReducer from './knowledgeBaseSlice';
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
     chat: chatReducer,
     config: configReducer,
     platform: platformReducer,
-    model: modelReducer
+    model: modelReducer,
+    knowledgeBase: knowledgeBaseReducer
   }
 });
 

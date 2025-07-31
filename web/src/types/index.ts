@@ -115,6 +115,9 @@ export enum PlatformType {
   // Add more platform types as needed
 }
 
+// Export knowledge base types
+export * from './knowledgeBase';
+
 // Model types
 export interface Model {
   id: number;

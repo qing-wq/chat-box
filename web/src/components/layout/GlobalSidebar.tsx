@@ -8,7 +8,8 @@ import {
   Bot,
   Cpu,
   Home,
-  MessageSquare
+  MessageSquare,
+  Database
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import { logout } from '../../store/userSlice';
@@ -100,6 +101,27 @@ const GlobalSidebar: React.FC = () => {
             </TooltipTrigger>
             <TooltipContent side="right">
               <p>Model Management</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/knowledge-base')}
+                className={cn(
+                  "h-10 w-10 rounded-lg hover:bg-accent",
+                  isActive('/knowledge-base') && "bg-primary/20 text-primary shadow-sm"
+                )}
+              >
+                <Database className="w-5 h-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>Knowledge Base</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
