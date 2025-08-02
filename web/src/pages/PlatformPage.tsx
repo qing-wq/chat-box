@@ -272,10 +272,10 @@ const PlatformPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      <div className="flex h-full">
+      <div className="flex h-screen">
         {/* Left Sidebar for Platform List */}
-        <div className="w-80 flex-shrink-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-r border-slate-200/50 dark:border-slate-700/50">
-          <div className="p-6">
+        <div className="w-80 flex-shrink-0 bg-white dark:bg-slate-800 border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col">
+          <div className="p-6 flex-1 overflow-y-auto">
             <div className="mb-6">
               <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
                 模型平台管理
@@ -382,7 +382,7 @@ const PlatformPage: React.FC = () => {
         </div>
 
         {/* Right Content Area */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-6 overflow-y-auto">
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <div className="w-8 h-8 border-4 border-[rgb(135,75,238)] border-t-transparent rounded-full animate-spin"></div>
