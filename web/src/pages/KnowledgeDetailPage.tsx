@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { fetchKnowledgeBaseDetail, fetchKnowledgeBaseItems, updateKnowledgeBase, uploadDocsToKnowledgeBase, deleteKnowledgeBaseItem } from '../store/knowledgeBaseSlice';
@@ -25,6 +25,7 @@ const KnowledgeDetailPage: React.FC = () => {
   const { kbId } = useParams<KnowledgeDetailPageParams>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
   const { currentKnowledgeBase, knowledgeBaseItems, loading, error } = useAppSelector(state => state.knowledgeBase);
   const { modelList } = useAppSelector(state => state.model);
   
@@ -145,20 +146,18 @@ const KnowledgeDetailPage: React.FC = () => {
   };
 
   // 获取嵌入模型名称
-  const getModelName = (modelId: string) => {
-    if (!modelList?.embedding || !modelId) return modelId;
-    const model = modelList.embedding.find(m => m.id.toString() === modelId.toString());
-    console.log("嵌入模型名称:",model?.name);
-    return model?.name || modelId;
-  };
+  const embeddingModelName = useMemo(() => {
+    if (!modelList?.embedding || !formData.embeddingModelId) return "选择嵌入模型";
+    const model = modelList.embedding.find(m => m.id.toString() === formData.embeddingModelId.toString());
+    return model?.name || formData.embeddingModelId;
+  }, [modelList?.embedding, formData.embeddingModelId]);
 
   // 获取问答模型名称
-  const getQaModelName = (modelId: string) => {
-    if (!modelList?.text || !modelId) return modelId;
-    const model = modelList.text.find(m => m.id.toString() === modelId.toString());
-    console.log("问答模型名称:",model?.name);
-    return model?.name || modelId;
-  };
+  const qaModelName = useMemo(() => {
+    if (!modelList?.text || !formData.qaModelId) return "选择问答模型";
+    const model = modelList.text.find(m => m.id.toString() === formData.qaModelId.toString());
+    return model?.name || formData.qaModelId;
+  }, [modelList?.text, formData.qaModelId]);
 
   // 处理文件上传
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -325,7 +324,7 @@ const KnowledgeDetailPage: React.FC = () => {
                     >
                       <SelectTrigger className="mt-1 ml-1 w-[97%]">
                         <SelectValue>
-                          {formData.embeddingModelId ? getModelName(formData.embeddingModelId) : "选择嵌入模型"}
+                          {embeddingModelName}
                         </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
@@ -349,7 +348,7 @@ const KnowledgeDetailPage: React.FC = () => {
                     >
                       <SelectTrigger className="mt-1 ml-1 w-[97%]">
                         <SelectValue>
-                          {formData.qaModelId ? getQaModelName(formData.qaModelId) : "选择问答模型"}
+                          {qaModelName}
                         </SelectValue>
                       </SelectTrigger>
                       <SelectContent>

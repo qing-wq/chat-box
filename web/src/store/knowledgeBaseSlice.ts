@@ -122,11 +122,11 @@ export const uploadDocsToKnowledgeBase = createAsyncThunk(
     try {
       const formData = new FormData();
       files.forEach(file => {
-        formData.append('files', file);
+        formData.append('file', file);
       });
 
       const response = await axios.post<ResVo<string>>(
-        `/api/kb-item/uploadDocs?kbId=${kbId}`,
+        `/api/kb-item/upload/${kbId}`,
         formData,
         {
           headers: {

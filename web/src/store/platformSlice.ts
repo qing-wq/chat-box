@@ -60,7 +60,7 @@ export const createPlatform = createAsyncThunk(
 // 更新平台
 export const updatePlatformApi = createAsyncThunk(
   'platform/updatePlatformApi',
-  async (platform: { id: number, apiKey?: string, baseUrl?: string, name?: string, platformType?: string }, { rejectWithValue }) => {
+  async (platform: { id?: number, apiKey?: string, baseUrl?: string }, { rejectWithValue }) => {
     try {
       const response = await axios.post<ResVo<string>>('/api/platform/update', platform);
       

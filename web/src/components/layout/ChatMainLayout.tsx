@@ -127,102 +127,169 @@ const ChatMainLayout: React.FC = () => {
                 </svg>
               )}
             </Button>
-
-            {currentChat && (
               <>
                 <Separator orientation="vertical" className="h-6" />
 
                 <Popover open={modelListOpen} onOpenChange={setModelListOpen}>
                   <PopoverTrigger asChild>
-                    <div
-                      className="flex items-center gap-2 cursor-pointer hover:bg-accent hover:text-accent-foreground p-2 rounded-md transition-colors"
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2 h-9 px-3 border-dashed hover:border-solid transition-all duration-200 hover:shadow-sm"
                       onClick={handleFetchModelList}
                     >
-                      <Bot className="w-5 h-5 text-primary" />
-                      <span className="text-sm sm:text-base font-medium truncate">
+                      <Bot className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium truncate max-w-[120px] sm:max-w-[160px]">
                         {currentModel ? currentModel.name : '选择模型'}
                       </span>
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    </div>
+                      {currentModel && (
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse flex-shrink-0"></div>
+                      )}
+                    </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-64 p-0" align="start">
-                    <div className="p-2">
-                      <h4 className="font-medium mb-2">选择模型</h4>
+                  <PopoverContent className="w-80 p-0" align="start" sideOffset={8}>
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-semibold text-base">选择模型</h4>
+                        {loading && (
+                          <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        )}
+                      </div>
+                      
                       {loading ? (
-                        <div className="text-center py-2">加载中...</div>
+                        <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3"></div>
+                          <p className="text-sm">正在加载模型列表...</p>
+                        </div>
                       ) : modelList ? (
-                        <ScrollArea className="h-[300px]">
+                        <ScrollArea className="h-[320px] pr-2">
                           {Array.isArray(modelList) ? (
                             // 如果 modelList 是数组，直接渲染模型列表
-                            <div className="mb-3">
-                              <h5 className="text-xs text-muted-foreground mb-1">
-                                模型列表
-                              </h5>
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2 mb-3">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <h5 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                  模型列表 ({modelList.length})
+                                </h5>
+                              </div>
                               {modelList.map((model) => (
                                 <div
                                   key={model.id}
-                                  className="py-1.5 px-2 text-sm rounded-md cursor-pointer hover:bg-accent transition-colors"
-                                  onClick={() =>
-                                    handleSelectModel(model.id, model.name)
-                                  }
+                                  className={cn(
+                                    "group relative flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200",
+                                    "hover:bg-accent hover:shadow-sm border border-transparent hover:border-border",
+                                    currentModel?.id === model.id && "bg-primary/10 border-primary/20 shadow-sm"
+                                  )}
+                                  onClick={() => handleSelectModel(model.id, model.name)}
                                 >
-                                  {model.name}
+                                  <div className="flex-shrink-0">
+                                    <Bot className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium truncate">{model.name}</p>
+                                  </div>
+                                  {currentModel?.id === model.id && (
+                                    <div className="flex-shrink-0 w-2 h-2 bg-primary rounded-full"></div>
+                                  )}
                                 </div>
                               ))}
                             </div>
                           ) : (
                             // 如果 modelList 是对象，只展示 TEXT 和 IMAGE 类型的模型
-                            <>
+                            <div className="space-y-4">
                               {/* 文本模型 */}
-                              {modelList[ModelType.TEXT] && (
-                                <div className="mb-3">
-                                  <h5 className="text-xs text-muted-foreground mb-1">
-                                    文本模型
-                                  </h5>
-                                  {modelList[ModelType.TEXT].map((model) => (
-                                    <div
-                                      key={model.id}
-                                      className="py-1.5 px-2 text-sm rounded-md cursor-pointer hover:bg-accent transition-colors"
-                                      onClick={() =>
-                                        handleSelectModel(model.id, model.name)
-                                      }
-                                    >
-                                      {model.name}
-                                    </div>
-                                  ))}
+                              {modelList[ModelType.TEXT] && modelList[ModelType.TEXT].length > 0 && (
+                                <div>
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                    <h5 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                      文本模型 ({modelList[ModelType.TEXT].length})
+                                    </h5>
+                                  </div>
+                                  <div className="space-y-1">
+                                    {modelList[ModelType.TEXT].map((model) => (
+                                      <div
+                                        key={model.id}
+                                        className={cn(
+                                          "group relative flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200",
+                                          "hover:bg-accent hover:shadow-sm border border-transparent hover:border-border",
+                                          currentModel?.id === model.id && "bg-primary/10 border-primary/20 shadow-sm"
+                                        )}
+                                        onClick={() => handleSelectModel(model.id, model.name)}
+                                      >
+                                        <div className="flex-shrink-0">
+                                          <Bot className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-sm font-medium truncate">{model.name}</p>
+                                        </div>
+                                        {currentModel?.id === model.id && (
+                                          <div className="flex-shrink-0 w-2 h-2 bg-primary rounded-full"></div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
                               )}
                               
                               {/* 图像模型 */}
-                              {modelList[ModelType.IMAGE] && (
-                                <div className="mb-3">
-                                  <h5 className="text-xs text-muted-foreground mb-1">
-                                    图像模型
-                                  </h5>
-                                  {modelList[ModelType.IMAGE].map((model) => (
-                                    <div
-                                      key={model.id}
-                                      className="py-1.5 px-2 text-sm rounded-md cursor-pointer hover:bg-accent transition-colors"
-                                      onClick={() =>
-                                        handleSelectModel(model.id, model.name)
-                                      }
-                                    >
-                                      {model.name}
-                                    </div>
-                                  ))}
+                              {modelList[ModelType.IMAGE] && modelList[ModelType.IMAGE].length > 0 && (
+                                <div>
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                    <h5 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                      图像模型 ({modelList[ModelType.IMAGE].length})
+                                    </h5>
+                                  </div>
+                                  <div className="space-y-1">
+                                    {modelList[ModelType.IMAGE].map((model) => (
+                                      <div
+                                        key={model.id}
+                                        className={cn(
+                                          "group relative flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200",
+                                          "hover:bg-accent hover:shadow-sm border border-transparent hover:border-border",
+                                          currentModel?.id === model.id && "bg-primary/10 border-primary/20 shadow-sm"
+                                        )}
+                                        onClick={() => handleSelectModel(model.id, model.name)}
+                                      >
+                                        <div className="flex-shrink-0">
+                                          <Bot className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-sm font-medium truncate">{model.name}</p>
+                                        </div>
+                                        {currentModel?.id === model.id && (
+                                          <div className="flex-shrink-0 w-2 h-2 bg-primary rounded-full"></div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
                               )}
-                            </>
+                              
+                              {/* 无模型提示 */}
+                              {(!modelList[ModelType.TEXT] || modelList[ModelType.TEXT].length === 0) &&
+                               (!modelList[ModelType.IMAGE] || modelList[ModelType.IMAGE].length === 0) && (
+                                <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                                  <Bot className="w-12 h-12 mb-3 opacity-50" />
+                                  <p className="text-sm font-medium mb-1">暂无可用模型</p>
+                                  <p className="text-xs text-center">请先在平台管理中配置模型</p>
+                                </div>
+                              )}
+                            </div>
                           )}
                         </ScrollArea>
                       ) : (
-                        <div className="text-center py-2">无可用模型</div>
+                        <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                          <Bot className="w-12 h-12 mb-3 opacity-50" />
+                          <p className="text-sm font-medium mb-1">无可用模型</p>
+                          <p className="text-xs text-center">请先在平台管理中配置模型</p>
+                        </div>
                       )}
                     </div>
                   </PopoverContent>
                 </Popover>
               </>
-            )}
+            
           </div>
 
           {/* Right side of header */}

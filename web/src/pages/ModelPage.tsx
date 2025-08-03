@@ -159,7 +159,7 @@ const ModelPage: React.FC = () => {
         // 调用更新模型的API
         await dispatch(
           updateModel({
-            id: Number(modelId),
+            modelId: Number(modelId),
             name: values.name,
             type: values.type,
             description: values.description, // 添加description字段

@@ -122,7 +122,7 @@ const PlatformPage: React.FC = () => {
     platformForm.setFieldsValue({
       ...platform,
       name: platform.name,
-      platformType: platform.platformType,
+      type: platform.platformType,
     });
   };
 
@@ -191,15 +191,12 @@ const PlatformPage: React.FC = () => {
       const values = await platformForm.validateFields();
 
       if (editingPlatform) {
-        // 更新平台 - 只更新API密钥和基础URL，保留原有的平台名称和类型
+        // 更新平台 - 只更新API密钥和基础URL
         await dispatch(
           updatePlatformApi({
             id: Number(editingPlatform.id),
             apiKey: values.apiKey,
             baseUrl: values.baseUrl,
-            // 确保不会修改平台名称和类型
-            name: editingPlatform.name,
-            platformType: editingPlatform.platformType,
           })
         ).unwrap();
         message.success('平台更新成功');
@@ -208,7 +205,7 @@ const PlatformPage: React.FC = () => {
         await dispatch(
           createPlatform({
             name: values.name,
-            platformType: values.platformType,
+            type: values.type,
             apiKey: values.apiKey,
             baseUrl: values.baseUrl,
           })
@@ -538,7 +535,6 @@ const PlatformPage: React.FC = () => {
           <Form.Item
             name="name"
             label={<span>平台名称</span>}
-            rules={[{ required: true, message: '请输入平台名称!' }]}
           >
             <Input
               placeholder="例如：OpenAI, 智谱AI"
@@ -547,9 +543,8 @@ const PlatformPage: React.FC = () => {
             />
           </Form.Item>
           <Form.Item
-            name="platformType"
+            name="type"
             label={<span>平台类型</span>}
-            rules={[{ required: true, message: '请选择平台类型!' }]}
           >
             <Select
               placeholder="选择平台类型"
@@ -567,14 +562,12 @@ const PlatformPage: React.FC = () => {
           <Form.Item
             name="apiKey"
             label="API密钥"
-            rules={[{ required: true, message: '请输入API密钥!' }]}
           >
             <Input.Password placeholder="您的API密钥" />
           </Form.Item>
           <Form.Item
             name="baseUrl"
             label="基础URL"
-            rules={[{ required: true, message: '请输入基础URL!' }]}
           >
             <Input placeholder="例如：https://api.openai.com/v1" />
           </Form.Item>

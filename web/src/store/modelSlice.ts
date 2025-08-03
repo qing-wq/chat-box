@@ -31,11 +31,11 @@ export interface CreateModelRequest {
 
 // 定义模型更新请求接口
 export interface UpdateModelRequest {
-  id: number;
+  modelId?: number;
   createTime?: string;
   updateTime?: string;
   name?: string;
-  type?: string;
+  type?: ModelType;
   platformId?: number;
   description?: string;
 }
@@ -137,7 +137,7 @@ export const updateModel = createAsyncThunk(
       
       if (response.data.status.code === 0) {
         // 更新成功后获取模型详情
-        const detailResponse = await axios.get<ResVo<Model>>(`/api/model/detail/${modelData.id}`);
+        const detailResponse = await axios.get<ResVo<Model>>(`/api/model/detail/${modelData.modelId}`);
         if (detailResponse.data.status.code === 0) {
           return detailResponse.data.data;
         } else {

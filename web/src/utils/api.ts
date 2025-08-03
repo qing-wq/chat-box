@@ -121,7 +121,7 @@ export const streamChat = async (
       userMessage:
         processedRequest.messageList[processedRequest.messageList.length - 1]
           .content,
-      modelId: currentChat?.currentModel?.id || 1,
+      modelId: currentChat?.currentModel?.id,
       toolList: processedRequest.toolList,
     };
 
