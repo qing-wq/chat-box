@@ -22,7 +22,7 @@ public class ConvUpdateReq {
     private Double temperature;
 
     /**
-     * 最大输出token数
+     * 最大token数
      */
     private Integer maxTokens;
 
@@ -30,14 +30,4 @@ public class ConvUpdateReq {
      * 上下文窗口
      */
     private Integer contextWindow;
-
-    /**
-     * 最大输入长度
-     */
-    private Integer maxInputTokens;
-
-    /**
-     * 最大输出长度
-     */
-    private Integer maxOutputTokens;
 }

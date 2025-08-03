@@ -1,4 +1,4 @@
-package ink.whi.backend.common.converter;
+package ink.whi.backend.dao.converter;
 
 import ink.whi.backend.common.dto.conversation.ConversationDTO;
 import ink.whi.backend.common.dto.conversation.ConvUpdateReq;
@@ -38,6 +38,7 @@ public class ConversationConverter {
         dto.setUuid(conversationDO.getUuid());
         dto.setTitle(conversationDO.getTitle());
         dto.setSystemMessage(StringUtils.isEmpty(conversationDO.getSystemMessage()) ? "" : conversationDO.getSystemMessage());
+        dto.setModelParams(conversationDO.getModelParams());
         dto.setCreateTime(conversationDO.getCreateTime());
         dto.setUpdateTime(conversationDO.getUpdateTime());
         return dto;

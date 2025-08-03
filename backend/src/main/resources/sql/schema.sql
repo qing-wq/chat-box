@@ -95,26 +95,60 @@ CREATE TABLE IF NOT EXISTS `model`
 DROP TABLE IF EXISTS `knowledge_base`;
 CREATE TABLE IF NOT EXISTS `knowledge_base`
 (
-    `id`                    int          NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `title`                 varchar(100) NOT NULL COMMENT '知识库标题',
-    `remark`                varchar(500)          DEFAULT NULL COMMENT '描述',
-    `is_public`             tinyint(1)            DEFAULT 0 COMMENT '是否公开',
-    `is_strict`             tinyint(1)            DEFAULT 0 COMMENT '严格模式',
-    `item_count`            int                   DEFAULT 0 COMMENT '知识点数量',
-    `embedding_count`       int                   DEFAULT 0 COMMENT '向量数',
-    `owner_id`              bigint       NOT NULL COMMENT '拥有者ID',
-    `owner_name`            varchar(50)  NOT NULL COMMENT '拥有者名称',
-    `ingest_max_overlap`    int                   DEFAULT 200 COMMENT '文档切割时重叠数量',
-    `ingest_model_name`     varchar(100)          DEFAULT NULL COMMENT '索引文档时使用的LLM名称',
-    `ingest_model_id`       bigint                DEFAULT NULL COMMENT '索引文档时使用的LLM ID',
-    `retrieve_max_results`  int                   DEFAULT 10 COMMENT '文档召回最大数量',
-    `retrieve_min_score`    decimal(5, 4)         DEFAULT 0.0000 COMMENT '文档召回最小分数',
-    `query_llm_temperature` decimal(3, 2)         DEFAULT 0.70 COMMENT '请求LLM时的temperature',
-    `query_system_message`  text                  DEFAULT NULL COMMENT '请求LLM时的系统提示词',
-    `create_time`           timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`           timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `id`                   int          NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `title`                varchar(100) NOT NULL COMMENT '知识库标题',
+    `remark`               varchar(500)          DEFAULT NULL COMMENT '描述',
+    `is_public`            tinyint(1)            DEFAULT 0 COMMENT '是否公开',
+    `owner_id`             bigint       NOT NULL COMMENT '拥有者ID',
+    `embedding_model_id`   bigint                DEFAULT NULL COMMENT '嵌入模型ID',
+    `qa_model_id`          int                   DEFAULT NULL COMMENT '问答模型ID',
+    `process_type`         varchar(50)           DEFAULT NULL COMMENT '处理方式',
+    `block_size`           int                   DEFAULT 1000 COMMENT '分块大小(100-3000)',
+    `max_overlap`          varchar(50)           DEFAULT '200' COMMENT '文档切割时重叠数量(按token计)',
+    `qa_prompt`            text                  DEFAULT NULL COMMENT '问答提示词',
+    `retrieve_max_results` int                   DEFAULT 10 COMMENT '文档召回最大数量',
+    `retrieve_min_score`   double                DEFAULT 0.0 COMMENT '文档召回最小分数',
+    `create_time`          timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`          timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY `idx_owner_id` (`owner_id`),
     KEY `idx_title` (`title`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='知识库表';
+
+-- 知识库条目表
+DROP TABLE IF EXISTS knowledge_base_item;
+CREATE TABLE IF NOT EXISTS `kb_item`
+(
+    `id`                           int          NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `kb_id`                        bigint       NOT NULL COMMENT '所属知识库ID',
+    `title`                        varchar(200) NOT NULL COMMENT '条目标题',
+    `brief`                        varchar(500)          DEFAULT NULL COMMENT '内容摘要',
+    `remark`                       text                  DEFAULT NULL COMMENT '完整内容',
+    `is_enable`                    tinyint(1)   NOT NULL DEFAULT 1 COMMENT '是否启用',
+    `embedding_status`             int          NOT NULL DEFAULT 0 COMMENT '向量化状态：0-待处理，1-切分中，2-已索引，3-失败',
+    `embedding_status_change_time` timestamp             DEFAULT NULL COMMENT '向量化状态变更时间',
+    `create_time`                  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`                  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_kb_id` (`kb_id`),
+    KEY `idx_title` (`title`),
+    KEY `idx_embedding_status` (`embedding_status`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='知识库条目表';
+
+CREATE TABLE `base_file`
+(
+    `id`          INT          NOT NULL AUTO_INCREMENT  COMMENT '主键ID',
+    `user_id`     INT          NOT NULL                 COMMENT '用户ID',
+    `uuid`        VARCHAR(64)  NOT NULL                 COMMENT '文件唯一标识符',
+    `file_name`   VARCHAR(255) NOT NULL                 COMMENT '原始文件名',
+    `file_size`   INT                   DEFAULT NULL    COMMENT '文件大小（字节）',
+    `path`        VARCHAR(512) NOT NULL                 COMMENT '文件存储路径',
+    `ext`         VARCHAR(32)           DEFAULT NULL    COMMENT '文件扩展名',
+    `create_time` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_uuid` (`uuid`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='文件信息表';

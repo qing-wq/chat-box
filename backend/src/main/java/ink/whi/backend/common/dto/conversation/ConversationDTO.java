@@ -1,6 +1,7 @@
 package ink.whi.backend.common.dto.conversation;
 
 import ink.whi.backend.common.dto.BaseDTO;
+import ink.whi.backend.common.dto.agent.ModelParams;
 import ink.whi.backend.common.dto.message.MessageDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,4 +24,6 @@ public class ConversationDTO extends BaseDTO {
     private String title;
 
     private String systemMessage;
+
+    private ModelParams modelParams;
 }

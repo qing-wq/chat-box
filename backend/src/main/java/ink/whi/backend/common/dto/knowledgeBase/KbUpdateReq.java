@@ -1,22 +1,16 @@
-package ink.whi.backend.dao.entity;
+package ink.whi.backend.common.dto.knowledgeBase;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import ink.whi.backend.common.enums.ProcessTypeEnum;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * @author: qing
- * @Date: 2025/6/18
+ * @Date: 2025/7/26
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("knowledge_base")
-public class KnowledgeBase extends BaseEntity {
+public class KbUpdateReq {
 
-    /**
-     * 标题
-     */
+    private Integer id;
+
     private String title;
 
     /**
@@ -24,9 +18,10 @@ public class KnowledgeBase extends BaseEntity {
      */
     private String remark;
 
+    /**
+     * 是否公开
+     */
     private Boolean isPublic;
-
-    private Integer ownerId;
 
     /**
      * 嵌入模型id
@@ -34,16 +29,16 @@ public class KnowledgeBase extends BaseEntity {
     private Long embeddingModelId;
 
     /**
-     * 问答模型
+     * 问答模型id
      */
     private Integer qaModelId;
 
     // =================数据处理设置==================
 
     /**
-     * 处理方式
+     * 处理方式 direct,qa
      */
-    private ProcessTypeEnum processType;
+    private String processType;
 
     /**
      * 分块大小(100-3000)
@@ -59,7 +54,6 @@ public class KnowledgeBase extends BaseEntity {
      * 问答提示词（可选）
      */
     private String qaPrompt;
-
 
     // ==================召回设置==================
 

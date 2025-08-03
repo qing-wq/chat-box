@@ -1,4 +1,4 @@
-package ink.whi.backend.common.converter;
+package ink.whi.backend.dao.converter;
 
 import ink.whi.backend.common.dto.user.BaseUserInfoDTO;
 import ink.whi.backend.common.dto.user.UserSaveReq;

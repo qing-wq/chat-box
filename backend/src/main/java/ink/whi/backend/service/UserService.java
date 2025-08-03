@@ -2,7 +2,7 @@ package ink.whi.backend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import ink.whi.backend.common.converter.UserConverter;
+import ink.whi.backend.dao.converter.UserConverter;
 import ink.whi.backend.common.dto.user.BaseUserInfoDTO;
 import ink.whi.backend.common.dto.user.UserSaveReq;
 import ink.whi.backend.common.exception.BusinessException;

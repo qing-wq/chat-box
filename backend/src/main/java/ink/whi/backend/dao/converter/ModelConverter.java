@@ -1,11 +1,10 @@
-package ink.whi.backend.common.converter;
+package ink.whi.backend.dao.converter;
 
 import ink.whi.backend.common.dto.model.ModelDTO;
 import ink.whi.backend.common.dto.model.SimpleModelDTO;
 import ink.whi.backend.dao.entity.Model;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author: qing

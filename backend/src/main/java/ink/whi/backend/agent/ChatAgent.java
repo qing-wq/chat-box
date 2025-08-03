@@ -9,11 +9,14 @@ import ink.whi.backend.common.dto.agent.ChatReq;
 import ink.whi.backend.common.dto.agent.ModelConfig;
 import ink.whi.backend.common.dto.message.MessageDTO;
 import ink.whi.backend.common.enums.MsgRoleEnum;
+import ink.whi.backend.common.exception.BusinessException;
+import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.dao.entity.Conversation;
 import ink.whi.backend.service.ConversationService;
 import ink.whi.backend.service.MessageService;
 import ink.whi.backend.service.ModelService;
 import ink.whi.backend.service.PMService;
+import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,9 +52,9 @@ public class ChatAgent {
         SseEmitter emitter = createEmitter();
         // check
         Conversation conv = conversationService.getAndCheck(request.getConversationUuId());
-
-        // save user message
-        messageService.saveUserMessage(request);
+        if (StringUtils.isBlank(request.getUserMessage())) {
+            throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS, "用户请求不能为空");
+        }
 
         // build model
         ModelConfig config = buildModelConfig(request);
@@ -81,9 +84,10 @@ public class ChatAgent {
         List<ChatMessage> chatMessages = buildChatMessages(messages, PROMPT);
 
         TokenStream tokenStream = chatAssistant.chatMessages(chatMessages);
-        registerStreamingHandler(tokenStream, emitter, (aiMessage, response) -> {
+        registerStreamingHandler(tokenStream, emitter, (aiMessage, tokenUsage) -> {
             // TODO 考虑事务
-            messageService.saveAiMessage(aiMessage.text(), request, response);
+            messageService.saveUserMessage(request, tokenUsage.inputTokenCount());
+            messageService.saveAiMessage(aiMessage.text(), request, tokenUsage.outputTokenCount());
             conversationService.updateTime(conv);
         });
 

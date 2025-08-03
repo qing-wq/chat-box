@@ -18,7 +18,7 @@ public class ModelDTO extends BaseDTO {
     private String name;
 
     /**
-     * 模型类型 {@link ModelTypeEnum}
+     * 模型类型 text,image,embedding,rerank
      */
     private String type;
 

@@ -2,9 +2,11 @@ package ink.whi.backend.service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ink.whi.backend.common.context.ReqInfoContext;
+import ink.whi.backend.common.dto.agent.ModelParams;
 import ink.whi.backend.common.dto.conversation.ConvUpdateReq;
 import ink.whi.backend.common.exception.BusinessException;
 import ink.whi.backend.common.status.StatusEnum;
+import ink.whi.backend.common.utils.JsonUtil;
 import ink.whi.backend.dao.entity.Conversation;
 import ink.whi.backend.dao.mapper.ChatMapper;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,12 @@ public class ConversationService extends ServiceImpl<ChatMapper, Conversation> {
 
     public void updateConvInfo(ConvUpdateReq req) {
         Conversation conv = getAndCheck(req.getUuid());
+
+        ModelParams params = ModelParams.builder().temperature(req.getTemperature())
+                .maxTokens(req.getMaxTokens())
+                .contextWindow(req.getContextWindow())
+                .build();
+        conv.setModelParams(params);
 
         if (req.getTitle() != null) {
             conv.setTitle(req.getTitle());

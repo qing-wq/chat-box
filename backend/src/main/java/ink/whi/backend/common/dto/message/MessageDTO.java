@@ -26,5 +26,5 @@ public class MessageDTO extends BaseDTO {
      */
     private String content;
 
-    private TokenUsage tokenUsage;
+    private Integer tokens;
 }

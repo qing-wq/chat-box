@@ -1,6 +1,6 @@
 package ink.whi.backend.controller;
 
-import ink.whi.backend.common.converter.PlatformConverter;
+import ink.whi.backend.dao.converter.PlatformConverter;
 import ink.whi.backend.common.dto.ResVo;
 import ink.whi.backend.common.dto.platform.PlatformCreateReq;
 import ink.whi.backend.common.dto.platform.PlatformDetailDTO;
@@ -8,7 +8,6 @@ import ink.whi.backend.common.dto.platform.PlatformUpdateReq;
 import ink.whi.backend.dao.entity.Model;
 import ink.whi.backend.dao.entity.Platform;
 import ink.whi.backend.service.ModelService;
-import ink.whi.backend.service.PMService;
 import ink.whi.backend.service.PlatformService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

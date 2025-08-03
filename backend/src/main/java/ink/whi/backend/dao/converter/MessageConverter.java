@@ -1,4 +1,4 @@
-package ink.whi.backend.common.converter;
+package ink.whi.backend.dao.converter;
 
 import ink.whi.backend.common.dto.message.MessageDTO;
 import ink.whi.backend.common.enums.MsgRoleEnum;
@@ -34,7 +34,7 @@ public class MessageConverter {
         dto.setContent(messageDO.getContent());
         dto.setCreateTime(messageDO.getCreateTime());
         dto.setUpdateTime(messageDO.getUpdateTime());
-        dto.setTokenUsage(messageDO.getTokenUsage());
+        dto.setTokens(messageDO.getTokens());
         return dto;
     }
 

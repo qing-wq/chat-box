@@ -87,7 +87,7 @@ public class AgentUtil {
         }
     }
 
-    public static void registerStreamingHandler(TokenStream tokenStream, SseEmitter emitter, BiConsumer<AiMessage, ChatResponse> consumer) {
+    public static void registerStreamingHandler(TokenStream tokenStream, SseEmitter emitter, BiConsumer<AiMessage, TokenUsage> consumer) {
         // TODO sse start
 
         tokenStream.onPartialResponse(token -> {
@@ -107,7 +107,7 @@ public class AgentUtil {
                         log.info("流式响应完成, response:{}", response.metadata());
 
                         // save aiMessage
-                        consumer.accept(aiMessage, response);
+                        consumer.accept(aiMessage, response.tokenUsage());
                         log.info("请求完成，响应：{}", response);
                     } catch (Exception e) {
                         log.error("关闭SSE连接失败", e);

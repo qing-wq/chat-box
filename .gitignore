@@ -35,3 +35,4 @@ build/
 .DS_Store
 todo.md
 web/.env
+backend/uploads/

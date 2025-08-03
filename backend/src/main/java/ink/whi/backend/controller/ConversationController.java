@@ -1,8 +1,7 @@
 package ink.whi.backend.controller;
 
-
 import ink.whi.backend.common.context.ReqInfoContext;
-import ink.whi.backend.common.converter.ConversationConverter;
+import ink.whi.backend.dao.converter.ConversationConverter;
 import ink.whi.backend.common.dto.ResVo;
 import ink.whi.backend.common.dto.conversation.ConversationDTO;
 import ink.whi.backend.common.dto.conversation.ConvUpdateReq;
@@ -15,14 +14,17 @@ import ink.whi.backend.dao.entity.Conversation;
 import ink.whi.backend.dao.entity.Message;
 import ink.whi.backend.dao.entity.Model;
 import ink.whi.backend.service.ConversationService;
+import ink.whi.backend.service.FileService;
 import ink.whi.backend.service.MessageService;
 import ink.whi.backend.service.ModelService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 对话接口
@@ -30,6 +32,7 @@ import java.util.UUID;
  * @author: qing
  * @Date: 2025/3/2
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/conversation")
 @RequiredArgsConstructor
@@ -38,6 +41,8 @@ public class ConversationController {
     private final ConversationService convService;
     private final MessageService messageService;
     private final ModelService modelService;
+    @Autowired
+    private FileService fileService;
 
     /**
      * 创建新的对话
@@ -125,5 +130,18 @@ public class ConversationController {
         // 删除对话
         convService.deleteConv(uuid);
         return ResVo.ok("ok");
+    }
+
+    /**
+     * 上传附件
+     * @param file
+     * @param uuid
+     * @return
+     */
+    @PostMapping("/upload")
+    public ResVo<Integer> upload(@RequestParam("file") MultipartFile file, @RequestParam("uuid") String uuid) {
+//            BaseFile baseFile = fileService.upload(file, uuid);
+//            return ResVo.ok(baseFile.getId());
+        return null;
     }
 }

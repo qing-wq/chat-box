@@ -1,21 +1,19 @@
 package ink.whi.backend.controller;
 
-import ink.whi.backend.common.context.ReqInfoContext;
-import ink.whi.backend.common.converter.ModelConverter;
+import ink.whi.backend.common.dto.model.ModelUpdateReq;
+import ink.whi.backend.dao.converter.ModelConverter;
 import ink.whi.backend.common.dto.ResVo;
 import ink.whi.backend.common.dto.model.ModelCreReq;
 import ink.whi.backend.common.dto.model.SimpleModelDTO;
-import ink.whi.backend.dao.entity.Message;
+import ink.whi.backend.common.enums.ModelTypeEnum;
+import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.dao.entity.Model;
 import ink.whi.backend.service.MessageService;
 import ink.whi.backend.service.ModelService;
-import ink.whi.backend.service.PMService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 模型管理接口
@@ -43,15 +41,15 @@ public class ModelController {
         return ResVo.ok(model);
     }
 
-    /**
-     * 模型选择接口
-     * @return 模型列表
-     */
-    @GetMapping("/list")
-    public ResVo<Map<String, List<SimpleModelDTO>>> getUserModelList() {
-        Map<String, List<SimpleModelDTO>> map = modelService.getUserModelList();
-        return ResVo.ok(map);
-    }
+//    /**
+//     * 模型选择接口
+//     * @return 模型列表
+//     */
+//    @GetMapping("/list")
+//    public ResVo<Map<String, List<SimpleModelDTO>>> getUserModelList() {
+//        Map<String, List<SimpleModelDTO>> map = modelService.getUserModelList();
+//        return ResVo.ok(map);
+//    }
 
     /**
      * 根据模型ID获取模型详情
@@ -70,8 +68,8 @@ public class ModelController {
      * @return 是否成功
      */
     @PostMapping("/update")
-    public ResVo<String> updateModel(@RequestBody Model model) {
-        modelService.updateModel(model);
+    public ResVo<String> updateModel(@RequestBody ModelUpdateReq req) {
+        modelService.updateModel(req);
         return ResVo.ok("ok");
     }
 
@@ -84,5 +82,20 @@ public class ModelController {
     public ResVo<String> deleteModel(@PathVariable Integer modelId) {
         modelService.deleteModel(modelId);
         return ResVo.ok("ok");
+    }
+
+    /**
+     * 模型选择接口
+     * @return 模型列表
+     */
+    @GetMapping("/list/{type}")
+    public ResVo<List<SimpleModelDTO>> getModelList(@PathVariable String type) {
+        ModelTypeEnum modelTypeEnum = ModelTypeEnum.of(type);
+        if (modelTypeEnum == null) {
+            return ResVo.fail(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "type不存在");
+        }
+        List<Model> list = modelService.getModelByType(modelTypeEnum);
+        List<SimpleModelDTO> dtos = ModelConverter.toSimpleDTOs(list);
+        return ResVo.ok(dtos);
     }
 }

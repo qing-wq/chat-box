@@ -25,7 +25,7 @@ public class Model extends BaseEntity {
     private ModelTypeEnum type;
 
     /**
-     * 模型创建
+     * 描述
      */
     private String description;
 

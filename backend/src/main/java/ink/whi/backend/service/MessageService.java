@@ -1,9 +1,8 @@
 package ink.whi.backend.service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import dev.langchain4j.model.chat.response.ChatResponse;
 import ink.whi.backend.common.context.ReqInfoContext;
-import ink.whi.backend.common.converter.MessageConverter;
+import ink.whi.backend.dao.converter.MessageConverter;
 import ink.whi.backend.common.dto.agent.ChatReq;
 import ink.whi.backend.common.dto.message.MessageDTO;
 import ink.whi.backend.common.enums.MsgRoleEnum;
@@ -28,25 +27,28 @@ public class MessageService extends ServiceImpl<MessageMapper, Message> {
                 .list();
         return MessageConverter.toDTOList(list);
     }
-
+    
     public void deleteAllMessages(String uuid) {
         lambdaUpdate().eq(Message::getConversationUuid, uuid).remove();
     }
 
-    public void saveUserMessage(ChatReq req) {
+    public void saveUserMessage(ChatReq req, Integer token) {
         Message message = new Message();
         message.setUserId(ReqInfoContext.getUserId());
         message.setContent(req.getUserMessage());
         message.setRole(MsgRoleEnum.User);
         message.setConversationUuid(req.getConversationUuId());
         message.setModelId(req.getModelId());
+        message.setTokens(token);
 
         message.setTools(req.getToolList());
-        message.setAttachments(String.join(",", req.getImageUrls()));
+        if (req.getImageUrls() != null && !req.getImageUrls().isEmpty()) {
+            message.setAttachments(String.join(",", req.getImageUrls()));
+        }
         save(message);
     }
 
-    public void saveAiMessage(String aiMessage, ChatReq request, ChatResponse response) {
+    public void saveAiMessage(String aiMessage, ChatReq request, Integer token) {
         Message message = new Message();
         message.setUserId(ReqInfoContext.getUserId());
         message.setContent(aiMessage);
@@ -54,7 +56,7 @@ public class MessageService extends ServiceImpl<MessageMapper, Message> {
         message.setConversationUuid(request.getConversationUuId());
         message.setModelId(request.getModelId());
 
-        message.setTokenUsage(response.tokenUsage());
+        message.setTokens(token);
         save(message);
     }
 

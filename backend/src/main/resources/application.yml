@@ -1,26 +1,36 @@
 server:
   port: 8080
-  servlet:
-    context-path: /
 
 spring:
   application:
     name: ai-backend
-  jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: GMT+8
   datasource:
     url: jdbc:mysql://localhost:3306/chat_box_db?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password:
+  web:
+    resources:
+      static-locations:
+        - classpath:/static/
+        - file:${file.upload-dir}
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 
 jwt:
   key: "chat-box"
 
-#logging:
-#  level:
-#    root: info
-#    ink.whi.backend: debug
-#  pattern:
-#    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-#    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+file:
+  upload-dir: /Users/qing/MyDocuments/code/project/chat-box/backend/uploads/
+
+
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+vector:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://127.0.0.1:5432/chat-box?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&tinyInt1isBit=false&allowMultiQueries=true
+    username: postgres
+    password:

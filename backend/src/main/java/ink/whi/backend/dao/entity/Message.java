@@ -3,12 +3,9 @@ package ink.whi.backend.dao.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import com.fasterxml.jackson.annotation.JsonValue;
-import dev.langchain4j.model.output.TokenUsage;
 import ink.whi.backend.common.enums.MsgRoleEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.apache.el.parser.Token;
 
 import java.util.List;
 
@@ -34,8 +31,7 @@ public class Message extends BaseEntity {
     /**
      * token数量
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private TokenUsage tokenUsage;
+    private Integer tokens;
 
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> tools;
