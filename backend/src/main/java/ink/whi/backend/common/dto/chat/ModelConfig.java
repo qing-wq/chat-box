@@ -1,4 +1,4 @@
-package ink.whi.backend.common.dto.agent;
+package ink.whi.backend.common.dto.chat;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
@@ -31,5 +31,5 @@ public class ModelConfig {
     /**
      * 模型参数（可选）
      */
-    private ModelParams modelParams;
+    private ModelSettings modelSettings;
 }

@@ -1,6 +1,7 @@
 package ink.whi.backend.common.dto.knowledgeBase;
 
 import ink.whi.backend.common.enums.ProcessTypeEnum;
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -9,12 +10,13 @@ import lombok.Data;
  * @Date: 2025/7/27
  */
 @Data
+@Builder
 public class ProcessSetting {
 
     /**
      * 处理方式
      */
-    private String processType;
+    private ProcessTypeEnum processType;
 
     /**
      * 分块大小(100-3000)
@@ -24,7 +26,7 @@ public class ProcessSetting {
     /**
      * 重叠大小（可选）
      */
-    private String maxOverlap;
+    private int maxOverlap;
 
     /**
      * 问答提示词（可选）

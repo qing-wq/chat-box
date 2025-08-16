@@ -2,18 +2,16 @@ package ink.whi.backend.common.utils;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.model.chat.response.ChatResponse;
-import dev.langchain4j.model.chat.response.ChatResponseMetadata;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.model.output.TokenUsage;
 import dev.langchain4j.service.TokenStream;
-import ink.whi.backend.common.context.ReqInfoContext;
 import ink.whi.backend.common.enums.MsgRoleEnum;
+import ink.whi.backend.common.enums.SseEventEnum;
 import ink.whi.backend.common.exception.BusinessException;
 import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.common.dto.message.MessageDTO;
-import ink.whi.backend.common.dto.agent.ModelConfig;
-import ink.whi.backend.common.dto.agent.ModelParams;
+import ink.whi.backend.common.dto.chat.ModelConfig;
+import ink.whi.backend.common.dto.chat.ModelSettings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -24,7 +22,6 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import static dev.langchain4j.data.message.SystemMessage.systemMessage;
 
@@ -40,7 +37,7 @@ public class AgentUtil {
             return;
         }
         for (String toolName : toolList) {
-//            if (toolName.equals(dateTool))
+            // if (toolName.equals(dateTool))
         }
     }
 
@@ -49,7 +46,7 @@ public class AgentUtil {
                 .apiKey(config.getApiKey())
                 .baseUrl(config.getBaseUrl())
                 .modelName(config.getModelName());
-        buildModelParams(config.getModelParams(), builder);
+        buildModelParams(config.getModelSettings(), builder);
         return builder.build();
     }
 
@@ -64,7 +61,8 @@ public class AgentUtil {
 
                 MsgRoleEnum role = MsgRoleEnum.formRole(msgDTO.getRole());
                 if (role == null) {
-                    throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "不支持的消息角色: " + msgDTO.getRole());
+                    throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED,
+                            "不支持的消息角色: " + msgDTO.getRole());
                 }
                 chatMessage = role.createMessage(msgDTO.getContent());
                 chatMessages.add(chatMessage);
@@ -73,7 +71,8 @@ public class AgentUtil {
         return chatMessages;
     }
 
-    private static void buildModelParams(ModelParams params, OpenAiStreamingChatModel.OpenAiStreamingChatModelBuilder builder) {
+    private static void buildModelParams(ModelSettings params,
+                                         OpenAiStreamingChatModel.OpenAiStreamingChatModelBuilder builder) {
         if (params == null) {
             return;
         }
@@ -87,9 +86,8 @@ public class AgentUtil {
         }
     }
 
-    public static void registerStreamingHandler(TokenStream tokenStream, SseEmitter emitter, BiConsumer<AiMessage, TokenUsage> consumer) {
-        // TODO sse start
-
+    public static void registerStreamingHandler(TokenStream tokenStream, SseEmitter emitter,
+                                                BiConsumer<AiMessage, TokenUsage> consumer) {
         tokenStream.onPartialResponse(token -> {
                     try {
                         // 将token封装为JSON格式 {v: token}
@@ -122,7 +120,7 @@ public class AgentUtil {
         try {
             // 发送错误消息和错误码
             emitter.send(SseEmitter.event()
-                    .name("error")
+                    .name(SseEventEnum.BEGIN.getEvent())
                     .data(errorMessage));
             emitter.complete();
         } catch (IOException e) {

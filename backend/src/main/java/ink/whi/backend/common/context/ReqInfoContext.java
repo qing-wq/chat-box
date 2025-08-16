@@ -39,7 +39,7 @@ public class ReqInfoContext {
         ReqInfo reqInfo = getReqInfo();
         Integer userId = reqInfo.getUserId();
         if (userId == null) {
-            throw BusinessException.newInstance(StatusEnum.UNEXPECT_ERROR);
+            throw BusinessException.newInstance(StatusEnum.FORBID_ERROR_MIXED, "请先登录");
         }
         return userId;
     }

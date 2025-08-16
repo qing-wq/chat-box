@@ -19,6 +19,8 @@ public class Model extends BaseEntity {
      */
     private String name;
 
+    private Integer userId;
+
     /**
      * 模型类型
      */

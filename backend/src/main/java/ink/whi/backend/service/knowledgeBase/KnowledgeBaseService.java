@@ -1,4 +1,4 @@
-package ink.whi.backend.service;
+package ink.whi.backend.service.knowledgeBase;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ink.whi.backend.common.context.ReqInfoContext;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import ink.whi.backend.dao.converter.KnowledgeBaseConverter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;

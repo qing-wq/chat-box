@@ -53,7 +53,7 @@ public class KnowledgeBase extends BaseEntity {
     /**
      * 文档切割时重叠数量(按token来计)
      */
-    private String maxOverlap;
+    private Integer maxOverlap;
 
     /**
      * 问答提示词（可选）

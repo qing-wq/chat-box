@@ -1,13 +1,13 @@
-package ink.whi.backend.filter;
+package ink.whi.backend.common.filter;
 
 import ink.whi.backend.common.context.ReqInfoContext;
 import ink.whi.backend.common.utils.CrossUtil;
+import jakarta.annotation.Resource;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -29,6 +29,9 @@ public class ReqInfoFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(ReqInfoFilter.class);
 
+    @Resource
+    private GlobalInitHelper globalInitHelper;
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -36,6 +39,7 @@ public class ReqInfoFilter implements Filter {
         HttpServletRequest req = null;
         try {
             req = initRequestInfo((HttpServletRequest) request);
+//            ReqInfoContext.getReqInfo().setUserId(1);
             CrossUtil.buildCors(req, (HttpServletResponse) response);
             chain.doFilter(req, response);
         } finally {
@@ -58,7 +62,7 @@ public class ReqInfoFilter implements Filter {
             reqInfo.setUserAgent(request.getHeader("User-Agent"));
             request = this.wrapperRequest(request, reqInfo);
             // 校验token
-            reqInfo.setUserId(1);  // TODO 先临时设置userId为1
+            globalInitHelper.initUserInfo(reqInfo);
             ReqInfoContext.addReqInfo(reqInfo);
         } catch (Exception e) {
             log.info("init reqInfo error: " + e.getMessage());

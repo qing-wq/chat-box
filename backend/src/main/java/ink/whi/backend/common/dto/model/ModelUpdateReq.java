@@ -11,14 +11,14 @@ import java.io.Serializable;
 @Data
 public class ModelUpdateReq implements Serializable {
 
-    private String modelId;
+    private Integer modelId;
 
     private String name;
 
     /**
      * 类型 text,image,embedding,rerank
      */
-    private String modelType;
+    private String type;
 
     /**
      * 描述

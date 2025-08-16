@@ -3,10 +3,9 @@ package ink.whi.backend.config;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;
-import ink.whi.backend.rag.EmbeddingRAG;
+import ink.whi.backend.rag.EmbeddingRagService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -66,11 +65,11 @@ public class PgVectorEmbeddingStoreConfig {
                 .build();
     }
 
-    @Bean
-    @Primary
-    public EmbeddingRAG initKnowledgeBaseRAGService(EmbeddingStore<TextSegment> kbEmbeddingStore) {
-        EmbeddingRAG ragService = new EmbeddingRAG(kbEmbeddingStore);
-        ragService.init();
-        return ragService;
-    }
+//    @Bean
+//    @Primary
+//    public EmbeddingRagService initKnowledgeBaseRAGService(EmbeddingStore<TextSegment> kbEmbeddingStore) {
+//        EmbeddingRagService ragService = new EmbeddingRagService(kbEmbeddingStore);
+//        ragService.init();
+//        return ragService;
+//    }
 }

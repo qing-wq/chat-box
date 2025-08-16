@@ -1,4 +1,4 @@
-package ink.whi.backend.common.dto.agent;
+package ink.whi.backend.common.dto.chat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -16,22 +16,19 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ModelParams implements Serializable {
+public class ModelSettings implements Serializable {
     /**
      * 温度参数，控制输出的随机性 (0-2.0)
      */
-    @JsonProperty("temperature")
     private Double temperature;
 
     /**
      * 最大token数
      */
-    @JsonProperty("maxTokens")
     private Integer maxTokens;
 
     /**
      * 上下文窗口
      */
-    @JsonProperty("contextWindow")
     private Integer contextWindow;
 }

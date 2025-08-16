@@ -1,6 +1,5 @@
 package ink.whi.backend.common.dto.conversation;
 
-import ink.whi.backend.common.dto.agent.ModelParams;
 import lombok.Data;
 
 /**

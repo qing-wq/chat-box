@@ -43,11 +43,10 @@ public enum PlatformTypeEnum {
 
     public static PlatformTypeEnum formName(String name) {
         for (PlatformTypeEnum typeEnum : PlatformTypeEnum.values()) {
-            if (Objects.equals(typeEnum.name, name)) {
+            if (Objects.equals(typeEnum.getName(), name)) {
                 return typeEnum;
             }
         }
-
         return null;
     }
 }

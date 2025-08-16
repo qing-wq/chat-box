@@ -1,12 +1,10 @@
-package ink.whi.backend.service;
+package ink.whi.backend.service.model;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.common.collect.Maps;
+import ink.whi.backend.common.context.ReqInfoContext;
 import ink.whi.backend.common.dto.model.ModelUpdateReq;
-import ink.whi.backend.dao.converter.ModelConverter;
-import ink.whi.backend.common.dto.agent.ModelConfig;
+import ink.whi.backend.common.dto.chat.ModelConfig;
 import ink.whi.backend.common.dto.model.ModelCreReq;
-import ink.whi.backend.common.dto.model.SimpleModelDTO;
 import ink.whi.backend.common.enums.ModelTypeEnum;
 import ink.whi.backend.common.exception.BusinessException;
 import ink.whi.backend.common.status.StatusEnum;
@@ -21,12 +19,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 /**
  * AI模型服务实现
+ *
  * @author: qing
  * @Date: 2025/7/8
  */
@@ -42,7 +40,7 @@ public class ModelService extends ServiceImpl<ModelMapper, Model> {
         // check
         platformService.getOrThrow(req.getPlatformId());
         // 检查模型名称是否已存在
-        if (getByName(req.getName()) != null) {
+        if (getByName(req.getName(), req.getPlatformId()) != null) {
             throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "该平台下模型名称已存在");
         }
 
@@ -55,31 +53,15 @@ public class ModelService extends ServiceImpl<ModelMapper, Model> {
         model.setName(req.getName());
         model.setPlatformId(req.getPlatformId());
         model.setType(modelType);
+        model.setUserId(ReqInfoContext.getUserId());
 
         save(model);
         return model;
     }
 
     /**
-     * 获取可用模型列表（对话模块）
-     * @return 模型列表
-     */
-    public Map<String, List<SimpleModelDTO>> getUserModelList() {
-        Map<String, List<SimpleModelDTO>> map = Maps.newHashMap();
-
-        List<Platform> platforms = platformService.getAllPlatforms();
-        platforms.forEach(platform -> {
-            List<Model> models = getModelsByPlatformId(platform.getId());
-            if (!models.isEmpty()) {
-                map.put(platform.getName(), ModelConverter.toSimpleDTOs(models));
-            }
-        });
-
-        return map;
-    }
-
-    /**
      * 根据平台ID获取模型列表
+     *
      * @param platformId 平台ID
      * @return 模型列表
      */
@@ -91,12 +73,16 @@ public class ModelService extends ServiceImpl<ModelMapper, Model> {
 
     public List<Model> getModelByType(ModelTypeEnum typeEnum) {
         return lambdaQuery().eq(Model::getType, typeEnum)
+                .eq(Model::getUserId, ReqInfoContext.getUserId())
                 .orderByDesc(BaseEntity::getCreateTime)
                 .list();
     }
 
     public ModelConfig buildModelConfig(Integer modelId) {
         Model model = getById(modelId);
+        if (model == null) {
+            throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "模型不存在");
+        }
         Platform platform = platformService.getById(model.getPlatformId());
         platformService.checkStatus(platform);
 
@@ -107,24 +93,26 @@ public class ModelService extends ServiceImpl<ModelMapper, Model> {
                 .build();
     }
 
-    public Model getByName(String name) {
-        return lambdaQuery().eq(Model::getName, name).one();
+    public Model getByName(String name, Integer platformId) {
+        return lambdaQuery().eq(Model::getPlatformId, platformId).eq(Model::getName, name).one();
     }
 
     public void updateModel(ModelUpdateReq req) {
-        Model model = new Model();
-
-        if (req.getModelId() == null) {
-            throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "模型id不能为空");
+        Model record = getById(req.getModelId());
+        if (record == null) {
+            throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "模型不存在");
         }
 
-        Model record = getByName(req.getName());
-        if (record != null) {
-            throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "模型名称已存在");
+        if (!Objects.equals(req.getName(), record.getName())) {
+            Model recordName = getByName(req.getName(), record.getPlatformId());
+            if (recordName != null) {
+                throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "模型名称已存在");
+            }
         }
 
-        BeanUtils.copyProperties(req, model);
-        updateById(model);
+        BeanUtils.copyProperties(req, record);
+        record.setType(ModelTypeEnum.of(req.getType()));
+        updateById(record);
     }
 
     public void deleteModel(Integer modelId) {

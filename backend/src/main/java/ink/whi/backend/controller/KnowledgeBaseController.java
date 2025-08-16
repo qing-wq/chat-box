@@ -9,7 +9,7 @@ import ink.whi.backend.common.dto.knowledgeBase.SimpleKbDto;
 import ink.whi.backend.common.enums.ProcessTypeEnum;
 import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.dao.entity.KnowledgeBase;
-import ink.whi.backend.service.KnowledgeBaseService;
+import ink.whi.backend.service.knowledgeBase.KnowledgeBaseService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -38,14 +38,23 @@ public class KnowledgeBaseController {
     @PostMapping(path = "/create")
     public ResVo<KnowledgeBase> create(@RequestBody KbCreateReq kbCreateReq) {
         KnowledgeBase knowledgeBase = new KnowledgeBase();
+
+        // 重名校验
+        KnowledgeBase record = knowledgeBaseService.getByTitle(kbCreateReq.getTitle());
+        if (record != null) {
+            return ResVo.fail(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "知识库名重复");
+        }
+
         BeanUtils.copyProperties(kbCreateReq, knowledgeBase);
         knowledgeBase.setOwnerId(ReqInfoContext.getUserId());
 
-        // 重名校验
-        KnowledgeBase title = knowledgeBaseService.getByTitle(kbCreateReq.getTitle());
-        if (title != null) {
-            return ResVo.fail(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "知识库名重复");
-        }
+        // 设置默认参数
+        knowledgeBase.setProcessType(ProcessTypeEnum.DIRECT);
+        knowledgeBase.setBlockSize(512);
+        knowledgeBase.setIsPublic(true);
+        knowledgeBase.setMaxOverlap(0);
+        knowledgeBase.setRetrieveMaxResults(3);
+        knowledgeBase.setRetrieveMinScore(0.6);
 
         // todo 校验模型类型
 

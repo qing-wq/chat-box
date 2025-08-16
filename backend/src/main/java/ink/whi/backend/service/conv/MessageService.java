@@ -1,9 +1,9 @@
-package ink.whi.backend.service;
+package ink.whi.backend.service.conv;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ink.whi.backend.common.context.ReqInfoContext;
 import ink.whi.backend.dao.converter.MessageConverter;
-import ink.whi.backend.common.dto.agent.ChatReq;
+import ink.whi.backend.common.dto.chat.ChatReq;
 import ink.whi.backend.common.dto.message.MessageDTO;
 import ink.whi.backend.common.enums.MsgRoleEnum;
 import ink.whi.backend.dao.entity.Message;

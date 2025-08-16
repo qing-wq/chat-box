@@ -1,7 +1,9 @@
 package ink.whi.backend.dao.converter;
 
 import ink.whi.backend.common.dto.model.ModelDTO;
+import ink.whi.backend.common.dto.model.ModelUpdateReq;
 import ink.whi.backend.common.dto.model.SimpleModelDTO;
+import ink.whi.backend.common.enums.ModelTypeEnum;
 import ink.whi.backend.dao.entity.Model;
 
 import java.util.List;

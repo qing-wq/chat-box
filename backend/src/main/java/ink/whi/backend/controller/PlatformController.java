@@ -7,8 +7,8 @@ import ink.whi.backend.common.dto.platform.PlatformDetailDTO;
 import ink.whi.backend.common.dto.platform.PlatformUpdateReq;
 import ink.whi.backend.dao.entity.Model;
 import ink.whi.backend.dao.entity.Platform;
-import ink.whi.backend.service.ModelService;
-import ink.whi.backend.service.PlatformService;
+import ink.whi.backend.service.model.ModelService;
+import ink.whi.backend.service.model.PlatformService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

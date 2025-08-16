@@ -1,4 +1,4 @@
-package ink.whi.backend.file;
+package ink.whi.backend.service.file;
 
 
 import dev.langchain4j.data.document.Document;
@@ -6,20 +6,8 @@ import dev.langchain4j.data.document.loader.FileSystemDocumentLoader;
 import dev.langchain4j.data.document.parser.TextDocumentParser;
 import dev.langchain4j.data.document.parser.apache.pdfbox.ApachePdfBoxDocumentParser;
 import dev.langchain4j.data.document.parser.apache.poi.ApachePoiDocumentParser;
-import ink.whi.backend.dao.entity.BaseFile;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 
 @Slf4j

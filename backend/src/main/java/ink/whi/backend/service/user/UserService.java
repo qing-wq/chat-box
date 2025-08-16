@@ -1,4 +1,4 @@
-package ink.whi.backend.service;
+package ink.whi.backend.service.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -60,6 +60,11 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     }
 
     public User createUser(String username, String password) {
+        User record = queryUserByName(username);
+        if (record != null) {
+            throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "用户名已存在");
+        }
+
         User user = new User();
         user.setUsername(username);
         user.setPassword(UserPwdEncoderUtil.encoder(password));
@@ -71,5 +76,9 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getUsername, username);
         return baseMapper.selectOne(wrapper);
+    }
+
+    public User queryUserByName(String username) {
+        return lambdaQuery().eq(User::getUsername, username).one();
     }
 }

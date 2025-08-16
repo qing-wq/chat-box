@@ -5,7 +5,7 @@ import ink.whi.backend.common.dto.ResVo;
 import ink.whi.backend.common.dto.knowledgeBase.KbItemDto;
 import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.dao.entity.KnowledgeBaseItem;
-import ink.whi.backend.service.KnowledgeBaseItemService;
+import ink.whi.backend.service.knowledgeBase.KnowledgeBaseItemService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -29,7 +29,7 @@ public class KnowledgeBaseItemController {
 
     /**
      * 获取指定知识库下的所有条目
-     * 
+     *
      * @param kbId 知识库ID
      * @return 知识库条目列表
      */
@@ -40,23 +40,23 @@ public class KnowledgeBaseItemController {
     }
 
     /**
-     * 上传文档到指定知识库
-     * 
+     * 多文件上传
+     *
      * @param kbId 知识库ID
      * @param docs 文档文件数组
      * @return 上传结果
      */
-//    @PostMapping(path = "/uploadDocs", headers = "content-type=multipart/form-data", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResVo<String> uploadDocs(@RequestParam Integer kbId,
-//                                    @RequestParam("files") MultipartFile[] docs) {
-//        try {
-//            boolean result = knowledgeBaseItemService.uploadDocs(kbId, docs);
-//            return result ? ResVo.ok("上传成功") : ResVo.fail(StatusEnum.UNEXPECT_ERROR, "上传失败");
-//        } catch (Exception e) {
-//            log.error("上传文档失败: {}", e.getMessage(), e);
-//            return ResVo.fail(StatusEnum.UNEXPECT_ERROR, "上传失败: " + e.getMessage());
-//        }
-//    }
+    @PostMapping(path = "/uploadDocs", headers = "content-type=multipart/form-data", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResVo<String> uploadDocs(@RequestParam Integer kbId,
+                                    @RequestParam("files") MultipartFile[] docs) {
+        try {
+            boolean result = knowledgeBaseItemService.uploadDocs(kbId, docs);
+            return result ? ResVo.ok("上传成功") : ResVo.fail(StatusEnum.UNEXPECT_ERROR, "上传失败");
+        } catch (Exception e) {
+            log.error("上传文档失败: {}", e.getMessage(), e);
+            return ResVo.fail(StatusEnum.UNEXPECT_ERROR, "上传失败: " + e.getMessage());
+        }
+    }
 
     /**
      * 上传、解析并索引文档
@@ -66,14 +66,14 @@ public class KnowledgeBaseItemController {
      */
     @PostMapping(path = "/upload/{kbId}", headers = "content-type=multipart/form-data", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResVo<KbItemDto> upload(@PathVariable Integer kbId,
-                          @RequestParam("file") MultipartFile doc) {
+                                   @RequestParam("file") MultipartFile doc) {
         KnowledgeBaseItem item = knowledgeBaseItemService.uploadDoc(kbId, doc);
         return ResVo.ok(KnowledgeBaseItemConverter.toDto(item));
     }
 
     /**
      * 删除知识库中的指定条目
-     * 
+     *
      * @param itemId 知识库条目ID
      * @return 删除结果
      */

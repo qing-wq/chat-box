@@ -8,8 +8,8 @@ import ink.whi.backend.common.dto.model.SimpleModelDTO;
 import ink.whi.backend.common.enums.ModelTypeEnum;
 import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.dao.entity.Model;
-import ink.whi.backend.service.MessageService;
-import ink.whi.backend.service.ModelService;
+import ink.whi.backend.service.conv.MessageService;
+import ink.whi.backend.service.model.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,16 +41,6 @@ public class ModelController {
         return ResVo.ok(model);
     }
 
-//    /**
-//     * 模型选择接口
-//     * @return 模型列表
-//     */
-//    @GetMapping("/list")
-//    public ResVo<Map<String, List<SimpleModelDTO>>> getUserModelList() {
-//        Map<String, List<SimpleModelDTO>> map = modelService.getUserModelList();
-//        return ResVo.ok(map);
-//    }
-
     /**
      * 根据模型ID获取模型详情
      * @param modelId 模型ID
@@ -64,7 +54,7 @@ public class ModelController {
 
     /**
      * 更新模型信息
-     * @param model 模型信息
+     * @param req 模型信息
      * @return 是否成功
      */
     @PostMapping("/update")

@@ -9,13 +9,13 @@ import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.common.utils.JwtUtil;
 import ink.whi.backend.common.utils.SessionUtil;
 import ink.whi.backend.dao.entity.User;
-import ink.whi.backend.service.UserService;
+import ink.whi.backend.service.user.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import static ink.whi.backend.global.GlobalInitHelper.SESSION_KEY;
+import static ink.whi.backend.common.filter.GlobalInitHelper.SESSION_KEY;
 
 
 /**

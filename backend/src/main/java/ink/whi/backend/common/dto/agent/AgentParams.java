@@ -1,16 +1,15 @@
 package ink.whi.backend.common.dto.agent;
 
-import ink.whi.backend.common.dto.message.MessageDTO;
+import ink.whi.backend.common.dto.chat.ModelSettings;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * 请求数据传输对象
  */
 @Data
-public class ChatReq implements Serializable {
+public class AgentParams {
 
     /**
      * 对话id
@@ -18,7 +17,7 @@ public class ChatReq implements Serializable {
     private String conversationUuId;
 
     /**
-     * 单条消息
+     * 用户消息
      */
     private String userMessage;
 
@@ -26,7 +25,22 @@ public class ChatReq implements Serializable {
      * 模型
      */
     private Integer modelId;
-    
+
+    /**
+     * 模型参数
+     */
+    private ModelSettings modelSettings;
+
+    /**
+     * 知识库（可选）
+     */
+    private List<Integer> kbId;
+
+    /**
+     * 检索参数
+     */
+    private RetrieveSetting retrieveSetting;
+
     /**
      * 工具列表（可选）
      */

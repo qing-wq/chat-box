@@ -5,59 +5,53 @@ import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiChatModelName;
 import dev.langchain4j.model.openai.OpenAiTokenizer;
-import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import dev.langchain4j.store.embedding.filter.Filter;
 import dev.langchain4j.store.embedding.filter.comparison.IsEqualTo;
+import ink.whi.backend.common.dto.agent.RetrieveSetting;
+import ink.whi.backend.common.dto.knowledgeBase.ProcessSetting;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.regex.Matcher;
+
+import static ink.whi.backend.common.SettingsDefaultConstant.*;
 
 
 @Slf4j
-public class EmbeddingRAG implements IRAGService{
+@Service
+public class EmbeddingRagService implements IRAGService {
 
-    /**
-     * 向量搜索时命中所需的最低分数
-     */
-    public static final double RAG_MIN_SCORE = 0.6;
-
-    /**
-     * 每块文档长度（按token算）
-     */
-    public static final int RAG_MAX_SEGMENT_SIZE_IN_TOKENS = 512;
-
-    private EmbeddingModel embeddingModel;
+    private final EmbeddingModel embeddingModel;
 
     private final EmbeddingStore<TextSegment> embeddingStore;
 
-    public EmbeddingRAG(EmbeddingStore<TextSegment> embeddingStore) {
+    public EmbeddingRagService(EmbeddingStore<TextSegment> embeddingStore) {
         this.embeddingStore = embeddingStore;
+        this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
     }
 
-    public void init() {
-        log.info("initEmbeddingModel");
-        embeddingModel = new AllMiniLmL6V2EmbeddingModel();
-    }
+//    public void init() {
+//        log.info("initEmbeddingModel");
+//        embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+//    }
 
     /**
      * 对文档切块、向量化并存储到数据库
      *
      * @param document 知识库文档
-     * @param overlap  重叠token数
+     * @param processSetting 处理设置
      */
-    public void ingest(Document document, int overlap) {
-        // TODO 配置切分大小
+    public void ingest(Document document, ProcessSetting processSetting) {
         log.info("EmbeddingRAG ingest");
-        DocumentSplitter documentSplitter = DocumentSplitters.recursive(RAG_MAX_SEGMENT_SIZE_IN_TOKENS, overlap, new OpenAiTokenizer(OpenAiChatModelName.GPT_3_5_TURBO));
+        DocumentSplitter documentSplitter = DocumentSplitters.recursive(processSetting.getBlockSize(), processSetting.getMaxOverlap(), new OpenAiTokenizer(OpenAiChatModelName.GPT_3_5_TURBO));
         EmbeddingStoreIngestor embeddingStoreIngestor = EmbeddingStoreIngestor.builder()
                 .documentSplitter(documentSplitter)
                 .embeddingModel(embeddingModel)
@@ -71,11 +65,10 @@ public class EmbeddingRAG implements IRAGService{
      * @param metadataCond
      * @param maxResults
      * @param minScore
-     * @param breakIfSearchMissed 如果向量数据库中搜索不到数据，是否强行中断该搜索，不继续往下执行（即不继续请求LLM进行回答）
      * @return
      */
     @Override
-    public EmbeddingStoreContentRetriever createRetriever(Map<String, String> metadataCond, int maxResults, double minScore) {
+    public EmbeddingStoreContentRetriever createRetriever(Map<String, String> metadataCond, RetrieveSetting retrieveSetting) {
         Filter filter = null;
         for (Map.Entry<String, String> entry : metadataCond.entrySet()) {
             String key = entry.getKey();
@@ -89,8 +82,8 @@ public class EmbeddingRAG implements IRAGService{
         return EmbeddingStoreContentRetriever.builder()
                 .embeddingStore(embeddingStore)
                 .embeddingModel(embeddingModel)
-                .maxResults(maxResults <= 0 ? 3 : maxResults)
-                .minScore(minScore <= 0 ? RAG_MIN_SCORE : minScore)
+//                .maxResults(maxResults <= 0 ? 3 : maxResults)
+//                .minScore(minScore <= 0 ? RAG_MIN_SCORE : minScore)
                 .filter(filter)
                 .build();
     }

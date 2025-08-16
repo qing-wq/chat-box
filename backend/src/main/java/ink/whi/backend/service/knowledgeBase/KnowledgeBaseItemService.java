@@ -1,7 +1,8 @@
-package ink.whi.backend.service.impl;
+package ink.whi.backend.service.knowledgeBase;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import dev.langchain4j.data.document.Document;
+import ink.whi.backend.common.dto.knowledgeBase.ProcessSetting;
 import ink.whi.backend.dao.converter.KnowledgeBaseItemConverter;
 import ink.whi.backend.common.dto.knowledgeBase.KbItemDto;
 import ink.whi.backend.common.enums.EmbeddingStatusEnum;
@@ -11,11 +12,9 @@ import ink.whi.backend.dao.entity.BaseFile;
 import ink.whi.backend.dao.entity.KnowledgeBase;
 import ink.whi.backend.dao.entity.KnowledgeBaseItem;
 import ink.whi.backend.dao.mapper.KnowledgeBaseItemMapper;
-import ink.whi.backend.file.LocalFileOperator;
-import ink.whi.backend.rag.EmbeddingRAG;
-import ink.whi.backend.service.FileService;
-import ink.whi.backend.service.KnowledgeBaseItemService;
-import ink.whi.backend.service.KnowledgeBaseService;
+import ink.whi.backend.service.file.LocalFileOperator;
+import ink.whi.backend.rag.EmbeddingRagService;
+import ink.whi.backend.service.file.FileService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,8 +36,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class KnowledgeBaseItemServiceImpl extends ServiceImpl<KnowledgeBaseItemMapper, KnowledgeBaseItem>
-        implements KnowledgeBaseItemService {
+public class KnowledgeBaseItemService extends ServiceImpl<KnowledgeBaseItemMapper, KnowledgeBaseItem> {
 
     @Resource
     private KnowledgeBaseService knowledgeBaseService;
@@ -47,9 +45,14 @@ public class KnowledgeBaseItemServiceImpl extends ServiceImpl<KnowledgeBaseItemM
     private FileService fileService;
 
     @Resource
-    private EmbeddingRAG embeddingRAG;
+    private EmbeddingRagService embeddingRAGService;
 
-    @Override
+    /**
+     * 根据知识库ID查询条目列表
+     *
+     * @param kbId 知识库ID
+     * @return 条目列表
+     */
     public List<KbItemDto> listItemByKbId(Integer kbId) {
         // 检查知识库权限
         knowledgeBaseService.getAndCheck(kbId);
@@ -65,37 +68,27 @@ public class KnowledgeBaseItemServiceImpl extends ServiceImpl<KnowledgeBaseItemM
                 .collect(Collectors.toList());
     }
 
-    @Override
-    @Transactional
+    /**
+     * 上传文档并保存为知识库条目
+     *
+     * @param kbId 知识库ID
+     * @param docs 文档文件数组
+     * @return 是否成功
+     */
     public boolean uploadDocs(Integer kbId, MultipartFile[] docs) {
-        // 检查知识库权限
-        KnowledgeBase kb = knowledgeBaseService.getAndCheck(kbId);
-
         if (docs == null || docs.length == 0) {
             throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "文档不能为空");
         }
 
         List<KnowledgeBaseItem> items = new ArrayList<>();
         for (MultipartFile doc : docs) {
-            try {
-                // 1. 上传文件到本地
-                BaseFile baseFile = fileService.upload(doc);
-
-                // 2. 将文件转为kbitem并保存
-                KnowledgeBaseItem item = saveItemFormFile(baseFile, kb);
-
-                // 3. 异步索引文档
-                asyncIndexDocument(baseFile, item);
-            } catch (Exception e) {
-                log.error("处理文档失败: {}", e.getMessage(), e);
-                throw BusinessException.newInstance(StatusEnum.UNEXPECT_ERROR, "处理文档失败: " + e.getMessage());
-            }
+            uploadDoc(kbId, doc);
         }
 
         return true;
     }
 
-    @Override
+    @Transactional
     public KnowledgeBaseItem uploadDoc(Integer kbId, MultipartFile doc) {
         // 检查知识库权限
         KnowledgeBase kb = knowledgeBaseService.getAndCheck(kbId);
@@ -134,7 +127,13 @@ public class KnowledgeBaseItemServiceImpl extends ServiceImpl<KnowledgeBaseItemM
                 document.metadata().put("kbId", item.getKbId().toString());
 
                 // 3. DocumentSplitter & 4. EmbeddingStoreIngestor
-                embeddingRAG.ingest(document, 100);
+                KnowledgeBase kb = knowledgeBaseService.getById(item.getKbId());
+                ProcessSetting settings = ProcessSetting.builder()
+                        .blockSize(kb.getBlockSize())
+                        .maxOverlap(kb.getMaxOverlap())
+                        .processType(kb.getProcessType())
+                        .build();
+                embeddingRAGService.ingest(document, settings);
 
                 // 更新状态为已索引
                 updateItemStatus(item.getId(), EmbeddingStatusEnum.INDEXED);
@@ -176,7 +175,12 @@ public class KnowledgeBaseItemServiceImpl extends ServiceImpl<KnowledgeBaseItemM
         updateById(item);
     }
 
-    @Override
+    /**
+     * 删除知识库条目
+     *
+     * @param itemId 条目ID
+     * @return 是否成功
+     */
     @Transactional
     public boolean deleteItem(String itemId) {
         if (itemId == null) {

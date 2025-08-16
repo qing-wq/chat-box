@@ -1,4 +1,4 @@
-package ink.whi.backend.global;
+package ink.whi.backend.common.filter;
 
 
 import ink.whi.backend.common.context.ReqInfoContext;
@@ -6,7 +6,7 @@ import ink.whi.backend.common.dto.user.BaseUserInfoDTO;
 import ink.whi.backend.common.exception.BusinessException;
 import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.common.utils.JwtUtil;
-import ink.whi.backend.service.UserService;
+import ink.whi.backend.service.user.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

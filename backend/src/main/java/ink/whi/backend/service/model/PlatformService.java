@@ -1,4 +1,4 @@
-package ink.whi.backend.service;
+package ink.whi.backend.service.model;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ink.whi.backend.common.context.ReqInfoContext;
@@ -11,7 +11,6 @@ import ink.whi.backend.dao.entity.Platform;
 import ink.whi.backend.dao.mapper.PlatformMapper;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
