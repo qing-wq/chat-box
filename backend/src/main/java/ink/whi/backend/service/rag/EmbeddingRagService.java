@@ -1,4 +1,4 @@
-package ink.whi.backend.rag;
+package ink.whi.backend.service.rag;
 
 
 import dev.langchain4j.data.document.Document;
@@ -16,13 +16,12 @@ import dev.langchain4j.store.embedding.filter.Filter;
 import dev.langchain4j.store.embedding.filter.comparison.IsEqualTo;
 import ink.whi.backend.common.dto.agent.RetrieveSetting;
 import ink.whi.backend.common.dto.knowledgeBase.ProcessSetting;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
-import static ink.whi.backend.common.SettingsDefaultConstant.*;
+import static ink.whi.backend.common.constant.SettingsDefaultConstant.*;
 
 
 @Slf4j
@@ -37,11 +36,6 @@ public class EmbeddingRagService implements IRAGService {
         this.embeddingStore = embeddingStore;
         this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
     }
-
-//    public void init() {
-//        log.info("initEmbeddingModel");
-//        embeddingModel = new AllMiniLmL6V2EmbeddingModel();
-//    }
 
     /**
      * 对文档切块、向量化并存储到数据库
@@ -62,9 +56,9 @@ public class EmbeddingRagService implements IRAGService {
 
 
     /**
+     * 创建检索器
      * @param metadataCond
-     * @param maxResults
-     * @param minScore
+     * @param retrieveSetting 检索参数
      * @return
      */
     @Override
@@ -79,11 +73,13 @@ public class EmbeddingRagService implements IRAGService {
                 filter = filter.and(new IsEqualTo(key, value));
             }
         }
+        int maxResults = retrieveSetting.getRetrieveMaxResults();
+        double minScore = retrieveSetting.getRetrieveMinScore();
         return EmbeddingStoreContentRetriever.builder()
                 .embeddingStore(embeddingStore)
                 .embeddingModel(embeddingModel)
-//                .maxResults(maxResults <= 0 ? 3 : maxResults)
-//                .minScore(minScore <= 0 ? RAG_MIN_SCORE : minScore)
+                .maxResults(maxResults <= 0 ? 3 : maxResults)
+                .minScore(minScore <= 0 ? RAG_MIN_SCORE : minScore)
                 .filter(filter)
                 .build();
     }

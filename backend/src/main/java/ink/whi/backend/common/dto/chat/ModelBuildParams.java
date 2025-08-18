@@ -9,7 +9,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class ModelConfig {
+public class ModelBuildParams {
     /**
      * API地址（必填）
      */
@@ -31,5 +31,5 @@ public class ModelConfig {
     /**
      * 模型参数（可选）
      */
-    private ModelSettings modelSettings;
+    private ModelParams modelParams;
 }

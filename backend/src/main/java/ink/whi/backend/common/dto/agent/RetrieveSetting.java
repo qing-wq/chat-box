@@ -29,5 +29,4 @@ public class RetrieveSetting {
      * 启动重排
      */
     private Boolean enableRerank;
-
 }

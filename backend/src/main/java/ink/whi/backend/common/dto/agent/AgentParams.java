@@ -1,6 +1,6 @@
 package ink.whi.backend.common.dto.agent;
 
-import ink.whi.backend.common.dto.chat.ModelSettings;
+import ink.whi.backend.common.dto.chat.ModelParams;
 import lombok.Data;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class AgentParams {
     /**
      * 模型参数
      */
-    private ModelSettings modelSettings;
+    private ModelParams modelParams;
 
     /**
      * 知识库（可选）
@@ -37,7 +37,7 @@ public class AgentParams {
     private List<Integer> kbId;
 
     /**
-     * 检索参数
+     * 知识库检索参数
      */
     private RetrieveSetting retrieveSetting;
 

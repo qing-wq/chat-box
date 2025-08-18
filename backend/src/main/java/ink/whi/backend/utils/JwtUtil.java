@@ -1,4 +1,4 @@
-package ink.whi.backend.common.utils;
+package ink.whi.backend.utils;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

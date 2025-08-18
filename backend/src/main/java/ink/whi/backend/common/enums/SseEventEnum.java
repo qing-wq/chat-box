@@ -10,7 +10,8 @@ import lombok.Getter;
 public enum SseEventEnum {
     
     BEGIN("begin"),
-    ERROR("error");
+    ERROR("error"),
+    STOP("stop");
     
     private final String event;
 

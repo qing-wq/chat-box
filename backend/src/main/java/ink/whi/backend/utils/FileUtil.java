@@ -1,4 +1,4 @@
-package ink.whi.backend.common.utils;
+package ink.whi.backend.utils;
 
 import ink.whi.backend.common.exception.BusinessException;
 import ink.whi.backend.common.status.StatusEnum;

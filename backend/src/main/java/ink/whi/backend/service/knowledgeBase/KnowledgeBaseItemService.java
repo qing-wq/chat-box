@@ -13,7 +13,7 @@ import ink.whi.backend.dao.entity.KnowledgeBase;
 import ink.whi.backend.dao.entity.KnowledgeBaseItem;
 import ink.whi.backend.dao.mapper.KnowledgeBaseItemMapper;
 import ink.whi.backend.service.file.LocalFileOperator;
-import ink.whi.backend.rag.EmbeddingRagService;
+import ink.whi.backend.service.rag.EmbeddingRagService;
 import ink.whi.backend.service.file.FileService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

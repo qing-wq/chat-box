@@ -37,7 +37,7 @@ public class ConversationConverter {
         dto.setUuid(conversationDO.getUuid());
         dto.setTitle(conversationDO.getTitle());
         dto.setSystemMessage(StringUtils.isEmpty(conversationDO.getSystemMessage()) ? "" : conversationDO.getSystemMessage());
-        dto.setModelSettings(conversationDO.getModelSettings());
+        dto.setModelParams(conversationDO.getModelParams());
         dto.setCreateTime(conversationDO.getCreateTime());
         dto.setUpdateTime(conversationDO.getUpdateTime());
         return dto;

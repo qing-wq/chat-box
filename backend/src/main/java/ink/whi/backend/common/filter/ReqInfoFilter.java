@@ -1,7 +1,8 @@
 package ink.whi.backend.common.filter;
 
 import ink.whi.backend.common.context.ReqInfoContext;
-import ink.whi.backend.common.utils.CrossUtil;
+import ink.whi.backend.utils.CrossUtil;
+import ink.whi.backend.helper.GlobalInitHelper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;

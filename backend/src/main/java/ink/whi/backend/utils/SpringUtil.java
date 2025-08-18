@@ -1,4 +1,4 @@
-package ink.whi.backend.common.utils;
+package ink.whi.backend.utils;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

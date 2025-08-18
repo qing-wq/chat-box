@@ -1,9 +1,9 @@
 package ink.whi.backend.controller;
 
+import ink.whi.backend.common.dto.ResVo;
 import ink.whi.backend.service.conv.ChatService;
 //import ink.whi.backend.agent.ChatMemoryAgent;
 import ink.whi.backend.common.dto.chat.ChatReq;
-import ink.whi.backend.service.conv.ConversationService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +21,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class ChatController {
 
     @Autowired
-    public ConversationService convService;
-
-    @Autowired
     public ChatService chatService;
 
     /**
@@ -34,5 +31,16 @@ public class ChatController {
     @PostMapping("/")
     public SseEmitter chat(@Valid @RequestBody ChatReq request) {
         return chatService.streamingChat(request);
+    }
+
+    /**
+     * 停止响应
+     * @param uuid 会话uuid
+     * @return SseEmitter 流式响应
+     */
+    @GetMapping("/stop")
+    public ResVo<String> stop(@RequestParam String uuid) {
+        chatService.stopChat(uuid);
+        return ResVo.ok();
     }
 }

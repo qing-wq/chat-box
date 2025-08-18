@@ -9,7 +9,7 @@ import ink.whi.backend.common.exception.BusinessException;
 import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.dao.entity.User;
 import ink.whi.backend.dao.mapper.UserMapper;
-import ink.whi.backend.common.utils.UserPwdEncoderUtil;
+import ink.whi.backend.utils.UserPwdEncoderUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

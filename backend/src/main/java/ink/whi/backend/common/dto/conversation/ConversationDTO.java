@@ -1,7 +1,7 @@
 package ink.whi.backend.common.dto.conversation;
 
 import ink.whi.backend.common.dto.BaseDTO;
-import ink.whi.backend.common.dto.chat.ModelSettings;
+import ink.whi.backend.common.dto.chat.ModelParams;
 import lombok.Data;
 
 import java.io.Serial;
@@ -22,5 +22,5 @@ public class ConversationDTO extends BaseDTO {
 
     private String systemMessage;
 
-    private ModelSettings modelSettings;
+    private ModelParams modelParams;
 }

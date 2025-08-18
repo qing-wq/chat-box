@@ -18,6 +18,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -91,6 +92,19 @@ public class GlobalExceptionHandler {
         resp.setHeader("Cache-Control", "no-cache, must-revalidate");
         setErrorCode(errStatus, resp);
         log.error("capture BusinessException: {}", ex.getStatus().getMsg(), ex);
+        return ResVo.fail(errStatus);
+    }
+
+    /**
+     * 处理异步请求超时异常
+     */
+    @ExceptionHandler(AsyncRequestTimeoutException.class)
+    public ResVo<String> handleAsyncRequestTimeoutException(HttpServletResponse resp, AsyncRequestTimeoutException e) {
+        Status errStatus = Status.newStatus(StatusEnum.SSE_TIMEOUT, "SSE连接超时，请重新发起对话");
+        resp.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+        resp.setHeader("Cache-Control", "no-cache, must-revalidate");
+        setErrorCode(errStatus, resp);
+        log.error("capture AsyncRequestTimeoutException: SSE连接超时", e);
         return ResVo.fail(errStatus);
     }
 

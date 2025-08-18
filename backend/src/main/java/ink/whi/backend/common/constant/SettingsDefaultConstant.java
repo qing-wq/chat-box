@@ -1,4 +1,4 @@
-package ink.whi.backend.common;
+package ink.whi.backend.common.constant;
 
 /**
  * 设置默认配置

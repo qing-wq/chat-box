@@ -1,4 +1,4 @@
-package ink.whi.backend.common.utils;
+package ink.whi.backend.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

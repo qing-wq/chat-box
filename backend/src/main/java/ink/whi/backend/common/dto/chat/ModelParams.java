@@ -1,6 +1,5 @@
 package ink.whi.backend.common.dto.chat;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +15,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ModelSettings implements Serializable {
+public class ModelParams implements Serializable {
     /**
      * 温度参数，控制输出的随机性 (0-2.0)
      */

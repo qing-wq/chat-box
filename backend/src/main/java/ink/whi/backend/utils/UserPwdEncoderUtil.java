@@ -1,4 +1,4 @@
-package ink.whi.backend.common.utils;
+package ink.whi.backend.utils;
 
 import org.springframework.util.DigestUtils;
 

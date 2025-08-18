@@ -1,7 +1,7 @@
 package ink.whi.backend.service.file;
 
 import ink.whi.backend.common.context.ReqInfoContext;
-import ink.whi.backend.common.utils.FileUtil;
+import ink.whi.backend.utils.FileUtil;
 import ink.whi.backend.dao.entity.BaseFile;
 import ink.whi.backend.dao.mapper.FileMapper;
 import org.springframework.beans.factory.annotation.Autowired;

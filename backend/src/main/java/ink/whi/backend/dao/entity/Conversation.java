@@ -3,7 +3,7 @@ package ink.whi.backend.dao.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
-import ink.whi.backend.common.dto.chat.ModelSettings;
+import ink.whi.backend.common.dto.chat.ModelParams;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -36,5 +36,5 @@ public class Conversation extends BaseEntity {
     private String systemMessage;
 
     @TableField(typeHandler = FastjsonTypeHandler.class)
-    private ModelSettings modelSettings;
+    private ModelParams modelParams;
 }

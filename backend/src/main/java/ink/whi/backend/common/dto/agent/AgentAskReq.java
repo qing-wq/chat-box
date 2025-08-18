@@ -1,6 +1,5 @@
 package ink.whi.backend.common.dto.agent;
 
-import ink.whi.backend.common.dto.chat.ModelSettings;
 import lombok.Data;
 
 import java.io.Serializable;

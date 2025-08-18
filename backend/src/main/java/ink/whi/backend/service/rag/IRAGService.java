@@ -1,4 +1,4 @@
-package ink.whi.backend.rag;
+package ink.whi.backend.service.rag;
 
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.model.chat.ChatLanguageModel;

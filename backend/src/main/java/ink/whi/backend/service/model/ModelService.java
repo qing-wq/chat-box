@@ -1,11 +1,14 @@
 package ink.whi.backend.service.model;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import ink.whi.backend.common.context.ReqInfoContext;
+import ink.whi.backend.common.dto.chat.ModelParams;
 import ink.whi.backend.common.dto.model.ModelUpdateReq;
-import ink.whi.backend.common.dto.chat.ModelConfig;
 import ink.whi.backend.common.dto.model.ModelCreReq;
 import ink.whi.backend.common.enums.ModelTypeEnum;
+import ink.whi.backend.common.enums.PlatformTypeEnum;
 import ink.whi.backend.common.exception.BusinessException;
 import ink.whi.backend.common.status.StatusEnum;
 import ink.whi.backend.dao.entity.Model;
@@ -78,7 +81,7 @@ public class ModelService extends ServiceImpl<ModelMapper, Model> {
                 .list();
     }
 
-    public ModelConfig buildModelConfig(Integer modelId) {
+    public StreamingChatLanguageModel buildStreamChatLanguagesModel(Integer modelId, ModelParams params) {
         Model model = getById(modelId);
         if (model == null) {
             throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "模型不存在");
@@ -86,11 +89,27 @@ public class ModelService extends ServiceImpl<ModelMapper, Model> {
         Platform platform = platformService.getById(model.getPlatformId());
         platformService.checkStatus(platform);
 
-        return ModelConfig.builder()
+        // TODO 支持其他平台
+        if(!platform.getPlatformType().getName().contains("openai")){
+            throw BusinessException.newInstance(StatusEnum.ILLEGAL_ARGUMENTS_MIXED, "目前只支持OpenAI格式");
+        }
+
+        var builder = OpenAiStreamingChatModel.builder()
                 .apiKey(platform.getApiKey())
                 .baseUrl(platform.getBaseUrl())
-                .modelName(model.getName())
-                .build();
+                .modelName(model.getName());
+
+        if (params != null) {
+            // 应用模型配置参数（如果有）
+            if (params.getTemperature() != null) {
+                builder.temperature(params.getTemperature());
+            }
+
+            if (params.getMaxTokens() != null) {
+                builder.maxTokens(params.getMaxTokens());
+            }
+        }
+        return builder.build();
     }
 
     public Model getByName(String name, Integer platformId) {

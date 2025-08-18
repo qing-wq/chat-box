@@ -40,6 +40,8 @@ public enum StatusEnum {
 
     // 系统异常
     UNEXPECT_ERROR(100_500_001, "服务器冒烟啦，要不稍后再试吧！ %s"),
+    SSE_ERROR(100_500_003, "SSE异常: %s"),
+    SSE_TIMEOUT(100_408_001, "SSE连接超时"),
 
     // 用户相关异常
     LOGIN_FAILED_MIXED(400_403_001, "登录失败:%s"),

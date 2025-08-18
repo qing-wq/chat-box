@@ -2,7 +2,7 @@ package ink.whi.backend.service.conv;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ink.whi.backend.common.context.ReqInfoContext;
-import ink.whi.backend.common.dto.chat.ModelSettings;
+import ink.whi.backend.common.dto.chat.ModelParams;
 import ink.whi.backend.common.dto.conversation.ConvUpdateReq;
 import ink.whi.backend.common.exception.BusinessException;
 import ink.whi.backend.common.status.StatusEnum;
@@ -37,11 +37,11 @@ public class ConversationService extends ServiceImpl<ChatMapper, Conversation> {
     public void updateConvInfo(ConvUpdateReq req) {
         Conversation conv = getAndCheck(req.getUuid());
 
-        ModelSettings params = ModelSettings.builder().temperature(req.getTemperature())
+        ModelParams params = ModelParams.builder().temperature(req.getTemperature())
                 .maxTokens(req.getMaxTokens())
                 .contextWindow(req.getContextWindow())
                 .build();
-        conv.setModelSettings(params);
+        conv.setModelParams(params);
 
         if (req.getTitle() != null) {
             conv.setTitle(req.getTitle());
